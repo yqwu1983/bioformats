@@ -6,6 +6,7 @@
 
 import os
 import pyfaidx
+import tempfile
 import unittest
 from bioformats.fasta import RandomSequence
 from bioformats.fasta import Writer
@@ -16,13 +17,13 @@ os.chdir(path)
 
 class TestWriter(unittest.TestCase):
     def setUp(self):
-        self.__test_dir = os.path.join('../data')
+        self.__output_file = tempfile.NamedTemporaryFile().name
 
     def test_write(self):
         """
         Check if sequences are written to a FASTA file properly.
         """
-        output_file = os.path.join(self.__test_dir, 'test.fa')
+        output_file = self.__output_file
 
         # prepare the sequences
         fasta_patterns = ['AC', 'ACG', 'CCGT']
