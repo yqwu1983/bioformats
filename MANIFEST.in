@@ -1,0 +1,5 @@
+include DESCRIPTION.rst
+
+# include the test suite
+recursive-include tests *
+
