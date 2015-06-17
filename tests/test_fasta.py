@@ -10,6 +10,7 @@ import tempfile
 import unittest
 from bioformats.fasta import RandomSequence
 from bioformats.fasta import Writer
+from six import iteritems
 
 path = os.path.dirname(__file__)
 os.chdir(path)
@@ -37,7 +38,7 @@ class TestWriter(unittest.TestCase):
 
         # check the written file
         reader = pyfaidx.Fasta(output_file)
-        for header, sequence in sequences.iteritems():
+        for (header, sequence) in iteritems(sequences):
             self.assertEqual(sequence, reader[header][:].seq)
 
         os.unlink(output_file)

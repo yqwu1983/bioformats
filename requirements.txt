@@ -1,1 +1,3 @@
 pyfaidx
+future
+six

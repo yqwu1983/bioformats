@@ -29,5 +29,7 @@ setup(name='bioformats',
 
       packages=find_packages(exclude=['doc', 'tests*']),
 
-      install_requires=['pyfaidx'],
+      install_requires=['pyfaidx',
+                        'future',
+                        'six'],
       )

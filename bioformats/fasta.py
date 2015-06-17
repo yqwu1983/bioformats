@@ -5,6 +5,7 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 import random
+from builtins import range
 
 
 class Writer(object):
@@ -38,7 +39,7 @@ class Writer(object):
         """
         self.__output.write('>{}\n'.format(header))
         seq_lines = []
-        for i in xrange(0, len(sequence), self.__width):
+        for i in range(0, len(sequence), self.__width):
             seq_lines.append(sequence[i:i + self.__width])
         self.__output.write('\n'.join(seq_lines))
         self.__output.write('\n')
