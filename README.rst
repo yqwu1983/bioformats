@@ -7,7 +7,7 @@ bioformats
 A collection of Python classes to handle bioinformatics data.
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/bioformats.svg?branch=master
-    :target: https://pypi.python.org/pypi?name=bioformats&version=0.1.0.dev1
+    :target: https://pypi.python.org/pypi/bioformats
 .. |Travis| image:: https://travis-ci.org/gtamazian/bioformats.svg?branch=master
     :target: https://travis-ci.org/gtamazian/bioformats
 .. |Coveralls| image:: https://coveralls.io/repos/gtamazian/bioformats/badge.svg?branch=master 
