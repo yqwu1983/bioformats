@@ -73,7 +73,7 @@ class RandomSequence(object):
         """
         result = []
         nucleotides = ('A', 'C', 'G', 'T')
-        for _ in xrange(self.__length):
+        for _ in range(self.__length):
             result.append(random.choice(nucleotides))
 
         return ''.join(result)

@@ -33,7 +33,7 @@ class TestWriter(unittest.TestCase):
             sequences['chr{}'.format(i)] = pattern * 100
 
         with Writer(output_file) as output_fasta:
-            for header, sequence in sequences.iteritems():
+            for header, sequence in iteritems(sequences):
                 output_fasta.write(header, sequence)
 
         # check the written file
