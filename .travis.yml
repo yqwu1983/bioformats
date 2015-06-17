@@ -9,5 +9,5 @@ install:
 # command to run tests
 script: nosetests --with-coverage --cover-package=bioformats
 after_success:
-	- coveralls
+  - coveralls
 
