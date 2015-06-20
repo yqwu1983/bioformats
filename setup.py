@@ -32,4 +32,9 @@ setup(name='bioformats',
       install_requires=['pyfaidx',
                         'future',
                         'six'],
+
+      entry_points={
+          'console_scripts': [
+              'randomfasta = bioformats.randomfasta:main']
+      },
       )
