@@ -26,3 +26,11 @@ class BlastTabError(BioformatsError):
     parser.
     """
     pass
+
+
+class LavError(BioformatsError):
+    """
+    The class describes an error related to the LAV alignment format
+    parser.
+    """
+    pass
