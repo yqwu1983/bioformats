@@ -51,7 +51,7 @@ class Reader(object):
             self.__lineno += 1
             if self.__line != '##gff-version 3':
                 logger.error('line %d: the incorrect GFF3 header '
-                             '%s'.format(self.__lineno, self.__line))
+                             '%s', self.__lineno, self.__line)
                 raise Gff3Error
             for self.__line in gff3_file:
                 self.__lineno += 1
