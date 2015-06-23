@@ -11,3 +11,10 @@ class BioformatsError(Exception):
     the bioformats package.
     """
     pass
+
+
+class BedError(BioformatsError):
+    """
+    The class describes an error related to the BED format parser.
+    """
+    pass
