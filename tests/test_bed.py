@@ -39,7 +39,7 @@ class TestBedReader(unittest.TestCase):
         parser = Reader(self.__correct_file)
         for record in parser.records():
             self.assertIsInstance(record, BedRecord)
-        # test agains the incorrect input file
+        # test against the incorrect input file
         parser = Reader(self.__incorrect_file)
         with self.assertRaises(BedError):
             for record in parser.records():
@@ -57,9 +57,6 @@ class TestBedWriter(unittest.TestCase):
         # silence the logging messages
         logging.disable(logging.ERROR)
 
-    def tearDown(self):
-        os.unlink(self.__output_file)
-
     def test_write(self):
         """
         Check if BED records are written in the correct way.
@@ -74,3 +71,5 @@ class TestBedWriter(unittest.TestCase):
                 open(self.__output_file) as written_file:
             for x, y in zip(original_file, written_file):
                 self.assertEqual(x, y)
+
+        os.unlink(self.__output_file)
