@@ -34,3 +34,10 @@ class LavError(BioformatsError):
     parser.
     """
     pass
+
+
+class Gff3Error(BioformatsError):
+    """
+    The class describes an error related to the GFF3 format parser.
+    """
+    pass
