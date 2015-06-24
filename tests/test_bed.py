@@ -6,6 +6,7 @@
 
 import os
 import logging
+import tempfile
 import unittest
 from bioformats.bed import BedRecord, Reader, Writer
 from bioformats.exception import BedError
@@ -51,9 +52,8 @@ class TestBedWriter(unittest.TestCase):
         self.__input_file = os.path.join(
             'data', 'bed', 'correct.bed'
         )
-        self.__output_file = os.path.join(
-            'data', 'bed', 'test.bed'
-        )
+        self.__output_file = tempfile.NamedTemporaryFile().name
+        
         # silence the logging messages
         logging.disable(logging.ERROR)
 
