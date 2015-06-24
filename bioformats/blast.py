@@ -4,7 +4,7 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
-from builtins import range
+from builtins import range  # pylint:disable=redefined-builtin
 from collections import namedtuple
 from .exception import BlastTabError
 import logging

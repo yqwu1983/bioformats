@@ -5,7 +5,7 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 import random
-from builtins import range
+from builtins import range  # pylint:disable=redefined-builtin
 
 
 class Writer(object):
