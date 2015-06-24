@@ -7,7 +7,7 @@
 from setuptools import setup, find_packages
 
 setup(name='bioformats',
-      version='0.1.0.dev1',
+      version='0.1.1.dev1',
       description='Classes to handle bioinformatics data',
 
       author='Gaik Tamazian',
