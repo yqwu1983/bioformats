@@ -11,6 +11,10 @@ import tempfile
 import unittest
 from bioformats.gff3 import Gff3Record, Reader, Writer
 from bioformats.exception import Gff3Error
+try:
+    import itertools.izip as zip
+except ImportError:
+    pass
 
 path = os.path.dirname(__file__)
 os.chdir(path)
@@ -49,24 +53,21 @@ class TestGff3Reader(unittest.TestCase):
 
 class TestGff3Writer(unittest.TestCase):
     def setUp(self):
+        self.__input_file = os.path.join('data', 'gff3', 'correct.gff')
         self.__output_file = tempfile.NamedTemporaryFile().name
 
     def test_write(self):
         """
         Check if GFF3 lines are written properly to the output file.
         """
-        record1 = Gff3Record('ctg123', '.', 'exon', 1300, 1500,
-                             100.0, '+', '.', dict(ID='exon00001'))
-        record2 = Gff3Record('ctg123', '.', 'exon', 7000, 9000,
-                             34.5, '+', '.', None)
-        with Writer(self.__output_file) as output_gff:
-            output_gff.write(record1)
-            output_gff.write(record2)
+        test_input = Reader(self.__input_file)
+        with Writer(self.__output_file) as test_output:
+            for record in test_input.records():
+                test_output.write(record)
 
-        # read records from the file and compare it to the original
-        # records
-        reader = Reader(self.__output_file)
-        written_records = [i for i in reader.records()]
-
-        self.assertEqual(record1, written_records[0])
-        self.assertEqual(record2, written_records[1])
+        # compare the test output file to the original one
+        with open(self.__input_file) as test_input:
+            with open(self.__output_file) as test_output:
+                for input_line, output_line in zip(test_input,
+                                                   test_output):
+                    self.assertEqual(input_line, output_line)

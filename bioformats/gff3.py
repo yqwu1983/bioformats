@@ -5,7 +5,7 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 import logging
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from future.utils import iteritems
 from .exception import Gff3Error
 
@@ -54,8 +54,10 @@ class Reader(object):
                              '%s', self.__lineno, self.__line)
                 raise Gff3Error
             for self.__line in gff3_file:
+                self.__line = self.__line.rstrip()
                 self.__lineno += 1
-                yield self.__parse_gff3_line()
+                if self.__line:
+                    yield self.__parse_gff3_line()
 
     def __parse_gff3_line(self):
         """
@@ -65,7 +67,7 @@ class Reader(object):
             from
         :rtype: Gff3Record
         """
-        line_parts = self.__line.rstrip().split('\t', 8)
+        line_parts = self.__line.split('\t', 8)
         if len(line_parts) < 8:
             logger.error('line %d: the incorrect number of columns - '
                          '%d', self.__lineno, len(line_parts))
@@ -95,7 +97,7 @@ class Reader(object):
 
         if len(line_parts) == 9:
             # parse the attributes
-            attributes = dict()
+            attributes = OrderedDict()
             for x in line_parts[8].split(';'):
                 tag, value = x.split('=', 2)
                 attributes[tag] = value
