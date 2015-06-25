@@ -99,7 +99,16 @@ class Reader(object):
             # parse the attributes
             attributes = OrderedDict()
             for x in line_parts[8].split(';'):
-                tag, value = x.split('=', 2)
+                try:
+                    tag, value = x.split('=', 2)
+                except ValueError:
+                    logger.error('line %d: the incorrect GFF3 '
+                                 'attribute %s', self.__lineno, x)
+                    raise Gff3Error
+                if not tag or not value:
+                    logger.error('line %d: the incorrect GFF3 '
+                                 'attribute %s', self.__lineno, x)
+                    raise Gff3Error
                 attributes[tag] = value
             line_parts[8] = attributes
         else:
