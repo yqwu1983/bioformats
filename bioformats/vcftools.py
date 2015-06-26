@@ -51,8 +51,8 @@ class FrqCount(object):
 
         # check if the line contains all required fields
         if len(line_parts) < 6:
-            logger.error('line {0}: the incorrect number of '
-                         'fields'.format(self.__lineno))
+            logger.error('line %d: the incorrect number of '
+                         'fields', self.__lineno)
             raise FrqCountError
 
         # convert numeric values
@@ -60,8 +60,8 @@ class FrqCount(object):
             try:
                 line_parts[i] = int(line_parts[i])
             except ValueError:
-                logger.error('line {0}: the incorrect numeric value {'
-                             '1}'.format(self.__lineno, line_parts[i]))
+                logger.error('line %d: the incorrect numeric value '
+                             '%s', self.__lineno, line_parts[i])
                 raise FrqCountError
 
         # parse the parts containing allele counts
@@ -87,24 +87,23 @@ class FrqCount(object):
             try:
                 allele, count = allele_record.rsplit(':', 1)
             except ValueError:
-                logger.error('line {0}: the incorrect allele record {'
-                             '1}'.format(self.__lineno, allele_record))
+                logger.error('line %d: the incorrect allele record '
+                             '%s', self.__lineno, allele_record)
                 raise FrqCountError
             # check if the count value is a valid integer
             try:
                 count = int(count)
             except ValueError:
-                logger.error('line {0}: the incorrect allele count '
-                             'value {1}'.format(self.__lineno, count))
+                logger.error('line %d: the incorrect allele count '
+                             'value %s', self.__lineno, count)
                 raise FrqCountError
             # check if the count allele value is unique, otherwise
             # raise the exception
             if allele not in result:
                 result[allele] = count
             else:
-                logger.error('line {0}: multiple allele counts for '
-                             'the allele {1}'.format(self.__lineno,
-                                                     allele))
+                logger.error('line %d: multiple allele counts for '
+                             'the allele %s', self.__lineno, allele)
                 raise FrqCountError
 
         return result
