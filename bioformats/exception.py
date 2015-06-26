@@ -41,3 +41,19 @@ class Gff3Error(BioformatsError):
     The class describes an error related to the GFF3 format parser.
     """
     pass
+
+
+class VcftoolsError(BioformatsError):
+    """
+    This class describes an error related to any parser of VCFtools
+    output files.
+    """
+    pass
+
+
+class FrqCountError(VcftoolsError):
+    """
+    This class describes an error related to the frequency count
+    format of VCFtools.
+    """
+    pass
