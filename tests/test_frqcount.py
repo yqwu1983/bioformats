@@ -7,9 +7,14 @@
 import glob
 import logging
 import os
+import tempfile
 import unittest
-from bioformats.vcftools.frqcount import Reader
+from bioformats.vcftools.frqcount import Reader, Writer, FrqCountRecord
 from bioformats.exception import FrqCountReaderError
+try:
+    import itertools.izip as zip
+except ImportError:
+    pass
 
 path = os.path.dirname(__file__)
 os.chdir(path)
@@ -37,7 +42,7 @@ class TestReader(unittest.TestCase):
         # test against the correct input file
         parser = Reader(self.__correct_file)
         for record in parser.variants():
-            self.assertIsInstance(record, Reader.Record)
+            self.assertIsInstance(record, FrqCountRecord)
         # test against incorrect input files
         for frqcount_file in self.__incorrect_files:
             parser = Reader(os.path.join(self.__incorrect_file_dir,
@@ -45,3 +50,27 @@ class TestReader(unittest.TestCase):
             with self.assertRaises(FrqCountReaderError):
                 for _ in parser.variants():
                     pass
+
+
+class TestWriter(unittest.TestCase):
+    def setUp(self):
+        self.__input_file = os.path.join('data', 'frqcount',
+                                         'correct.txt')
+        self.__output_file = tempfile.NamedTemporaryFile().name
+
+    def test_write(self):
+        """
+        Check if VCFtools allele frequencies are correctly written to
+        the output file.
+        """
+        test_input = Reader(self.__input_file)
+        with Writer(self.__output_file) as test_output:
+            for record in test_input.variants():
+                test_output.write(record)
+
+        # compare the test output file to the original one
+        with open(self.__input_file) as test_input:
+            with open(self.__output_file) as test_output:
+                for input_line, output_line in zip(test_input,
+                                                   test_output):
+                    self.assertEqual(input_line, output_line)

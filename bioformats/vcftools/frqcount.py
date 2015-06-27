@@ -4,7 +4,8 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
-from collections import namedtuple
+from future.utils import iteritems
+from collections import namedtuple, OrderedDict
 from bioformats.exception import FrqCountReaderError
 import gzip
 import logging
@@ -12,19 +13,18 @@ import logging
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
+numeric_fields = (1, 2, 3)
+
+frqcount_names = ('chrom', 'pos', 'n_alleles', 'n_chr', 'ref', 'alt')
+
+FrqCountRecord = namedtuple('FrqCountRecord', frqcount_names)
+
 
 class Reader(object):
     """
     This class provides routines to process allele frequency files
     (*.frq.count) produced by VCFtools using its --counts option.
     """
-
-    numeric_fields = (1, 2, 3)
-
-    frq_count_names = ('chrom', 'pos', 'n_alleles', 'n_chr', 'ref',
-                       'alt')
-
-    Record = namedtuple('FrqCountLine', frq_count_names)
 
     def __init__(self, filename, gzipped=False):
         """
@@ -56,7 +56,7 @@ class Reader(object):
             raise FrqCountReaderError
 
         # convert numeric values
-        for i in Reader.numeric_fields:
+        for i in numeric_fields:
             try:
                 line_parts[i] = int(line_parts[i])
             except ValueError:
@@ -69,7 +69,7 @@ class Reader(object):
             line_parts[i] = self.__parse_allele_counts(
                 line_parts[i])
 
-        return Reader.Record(*line_parts)
+        return FrqCountRecord(*line_parts)
 
     def __parse_allele_counts(self, counts):
         """
@@ -81,7 +81,7 @@ class Reader(object):
             their counts
         :rtype: dict
         """
-        result = dict()
+        result = OrderedDict()
 
         for allele_record in counts.split():
             try:
@@ -124,3 +124,53 @@ class Reader(object):
                     # skip the comment line
                     continue
                 yield self.__parse_frq_count_line()
+
+
+class Writer(object):
+    """
+    The class implements writing to a file in the VCFtools allele
+    frequency format.
+    """
+    def __init__(self, filename):
+        """
+        Given a name of a file, create a VCFtools frequencty count
+        writer object to write data to it.
+
+        :param filename: a name of a file to write allele frequency
+            counts to
+        :type filename: str
+        """
+        self.__filename = filename
+
+    def __enter__(self):
+        self.__output = open(self.__filename, 'w')
+        self.__output.write(
+            'CHROM\tPOS\tN_ALLELES\tN_CHR\t{ALLELE:COUNT}\n')
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.__output.close()
+
+    def write(self, frqcount_record):
+        """
+        Given an allele frequency count record, write it to the file
+        specified when the object was created.
+
+        :param frqcount_record: an allele frequency count record to
+            be written to the file
+        :type frqcount_record: FrqCountRecord
+        """
+        # prepare alelle frequencies
+        ref_freq = ['{}:{}'.format(x, y)
+                    for x, y in iteritems(frqcount_record.ref)]
+        alt_freq = ['{}:{}'.format(x, y)
+                    for x, y in iteritems(frqcount_record.alt)]
+        ref_freq = ref_freq[0]
+        alt_freq = '\t'.join(alt_freq)
+        # prepare the line to be written
+        frqcount_record = list(frqcount_record)
+        frqcount_record[4] = ref_freq
+        frqcount_record[5] = alt_freq
+
+        template = '\t'.join(['{}'] * len(frqcount_record)) + '\n'
+        self.__output.write(template.format(*frqcount_record))
