@@ -51,7 +51,7 @@ class VcftoolsError(BioformatsError):
     pass
 
 
-class FrqCountError(VcftoolsError):
+class FrqCountReaderError(VcftoolsError):
     """
     This class describes an error related to the frequency count
     format of VCFtools.

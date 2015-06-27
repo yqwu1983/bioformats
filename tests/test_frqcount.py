@@ -8,14 +8,14 @@ import glob
 import logging
 import os
 import unittest
-from bioformats.vcftools import FrqCount
-from bioformats.vcftools import FrqCountError
+from bioformats.vcftools.frqcount import Reader
+from bioformats.exception import FrqCountReaderError
 
 path = os.path.dirname(__file__)
 os.chdir(path)
 
 
-class TestFrqCount(unittest.TestCase):
+class TestReader(unittest.TestCase):
     def setUp(self):
         self.__correct_file = os.path.join(
             'data', 'frqcount', 'correct.txt'
@@ -35,13 +35,13 @@ class TestFrqCount(unittest.TestCase):
         counts format in the correct way.
         """
         # test against the correct input file
-        parser = FrqCount(self.__correct_file)
+        parser = Reader(self.__correct_file)
         for record in parser.variants():
-            self.assertIsInstance(record, FrqCount.Record)
+            self.assertIsInstance(record, Reader.Record)
         # test against incorrect input files
         for frqcount_file in self.__incorrect_files:
-            parser = FrqCount(os.path.join(self.__incorrect_file_dir,
-                                           frqcount_file))
-            with self.assertRaises(FrqCountError):
+            parser = Reader(os.path.join(self.__incorrect_file_dir,
+                                         frqcount_file))
+            with self.assertRaises(FrqCountReaderError):
                 for _ in parser.variants():
                     pass

@@ -5,7 +5,7 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 from collections import namedtuple
-from .exception import FrqCountError
+from bioformats.exception import FrqCountReaderError
 import gzip
 import logging
 
@@ -13,7 +13,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 
-class FrqCount(object):
+class Reader(object):
     """
     This class provides routines to process allele frequency files
     (*.frq.count) produced by VCFtools using its --counts option.
@@ -28,7 +28,7 @@ class FrqCount(object):
 
     def __init__(self, filename, gzipped=False):
         """
-        Create an FrqCount object from the specified file.
+        Create an Reader object from the specified file.
 
         :param filename: a name of a VCFtools frequency count file
         :param gzipped: is the specified file gzipped or not
@@ -45,7 +45,7 @@ class FrqCount(object):
         Parse a current line from a frequency count file.
 
         :return: a named tuple representing a frequecy count record
-        :rtype: FrqCount.Record
+        :rtype: Reader.Record
         """
         line_parts = self.__line.split(None, 5)
 
@@ -53,23 +53,23 @@ class FrqCount(object):
         if len(line_parts) < 6:
             logger.error('line %d: the incorrect number of '
                          'fields', self.__lineno)
-            raise FrqCountError
+            raise FrqCountReaderError
 
         # convert numeric values
-        for i in FrqCount.numeric_fields:
+        for i in Reader.numeric_fields:
             try:
                 line_parts[i] = int(line_parts[i])
             except ValueError:
                 logger.error('line %d: the incorrect numeric value '
                              '%s', self.__lineno, line_parts[i])
-                raise FrqCountError
+                raise FrqCountReaderError
 
         # parse the parts containing allele counts
         for i in (4, 5):
             line_parts[i] = self.__parse_allele_counts(
                 line_parts[i])
 
-        return FrqCount.Record(*line_parts)
+        return Reader.Record(*line_parts)
 
     def __parse_allele_counts(self, counts):
         """
@@ -89,14 +89,14 @@ class FrqCount(object):
             except ValueError:
                 logger.error('line %d: the incorrect allele record '
                              '%s', self.__lineno, allele_record)
-                raise FrqCountError
+                raise FrqCountReaderError
             # check if the count value is a valid integer
             try:
                 count = int(count)
             except ValueError:
                 logger.error('line %d: the incorrect allele count '
                              'value %s', self.__lineno, count)
-                raise FrqCountError
+                raise FrqCountReaderError
             # check if the count allele value is unique, otherwise
             # raise the exception
             if allele not in result:
@@ -104,7 +104,7 @@ class FrqCount(object):
             else:
                 logger.error('line %d: multiple allele counts for '
                              'the allele %s', self.__lineno, allele)
-                raise FrqCountError
+                raise FrqCountReaderError
 
         return result
 
