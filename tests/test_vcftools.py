@@ -36,8 +36,8 @@ class TestFrqCount(unittest.TestCase):
         """
         # test against the correct input file
         parser = FrqCount(self.__correct_file)
-        #for record in parser.variants():
-        #    self.assertIsInstance(record, FrqCount.Record)
+        for record in parser.variants():
+            self.assertIsInstance(record, FrqCount.Record)
         # test against incorrect input files
         for frqcount_file in self.__incorrect_files:
             parser = FrqCount(os.path.join(self.__incorrect_file_dir,
