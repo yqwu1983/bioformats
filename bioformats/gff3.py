@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 gff3_columns = ('seqid', 'source', 'type', 'start', 'end', 'score',
                 'strand', 'phase', 'attributes', )
 
-Gff3Record = namedtuple('GffRecord', gff3_columns)
+Gff3Record = namedtuple('Gff3Record', gff3_columns)
 
 
 class Reader(object):
@@ -145,7 +145,7 @@ class Writer(object):
         object was created.
 
         :param gff3_record: a GFF3 record to be written to the file
-        :return: Gff3Record
+        :type gff3_record: Gff3Record
         """
         gff3_record = list(gff3_record)
         # prepare the attributes line
