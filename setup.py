@@ -30,8 +30,7 @@ setup(name='bioformats',
       packages=find_packages(exclude=['doc', 'tests*']),
 
       install_requires=['pyfaidx',
-                        'future',
-                        'six'],
+                        'future'],
 
       entry_points={
           'console_scripts': [

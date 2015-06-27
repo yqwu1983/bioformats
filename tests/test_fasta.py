@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from bioformats.fasta import RandomSequence
 from bioformats.fasta import Writer
-from six import iteritems
+from future.utils import iteritems
 
 path = os.path.dirname(__file__)
 os.chdir(path)
