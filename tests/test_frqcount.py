@@ -25,6 +25,9 @@ class TestReader(unittest.TestCase):
         self.__correct_file = os.path.join(
             'data', 'frqcount', 'correct.txt'
         )
+        self.__compressed_correct_file = os.path.join(
+            'data', 'frqcount', 'correct.gz'
+        )
         self.__incorrect_file_dir = os.path.join(
             'data', 'frqcount', 'incorrect_input'
         )
@@ -41,6 +44,10 @@ class TestReader(unittest.TestCase):
         """
         # test against the correct input file
         parser = Reader(self.__correct_file)
+        for record in parser.variants():
+            self.assertIsInstance(record, FrqCountRecord)
+        # test against the compressed correct input file
+        parser = Reader(self.__compressed_correct_file, gzipped=True)
         for record in parser.variants():
             self.assertIsInstance(record, FrqCountRecord)
         # test against incorrect input files
