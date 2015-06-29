@@ -5,6 +5,7 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 import glob
+import gzip
 import logging
 import os
 import tempfile
@@ -70,14 +71,14 @@ class TestWriter(unittest.TestCase):
         Check if VCFtools allele frequencies are correctly written to
         the output file.
         """
-        test_input = Reader(self.__input_file)
-        with Writer(self.__output_file) as test_output:
-            for record in test_input.variants():
-                test_output.write(record)
+        for gzipped in (True, False):
+            test_input = Reader(self.__input_file)
+            with Writer(self.__output_file, gzipped) as test_output:
+                for record in test_input.variants():
+                    test_output.write(record)
 
-        # compare the test output file to the original one
-        with open(self.__input_file) as test_input:
-            with open(self.__output_file) as test_output:
-                for input_line, output_line in zip(test_input,
-                                                   test_output):
-                    self.assertEqual(input_line, output_line)
+            # compare the test output file to the original one
+            test_output = Reader(self.__output_file, gzipped)
+            for x, y in zip(
+                    test_input.variants(), test_output.variants()):
+                self.assertEqual(x, y)

@@ -115,7 +115,7 @@ class Reader(object):
         :return: the allele count record iterator
         """
         file_handler = open if not self.__gzipped else gzip.open
-        with file_handler(self.__filename) as count_file:
+        with file_handler(self.__filename, 'rt') as count_file:
             self.__lineno = 0
             for self.__line in count_file:
                 self.__line = self.__line.rstrip()
@@ -131,19 +131,25 @@ class Writer(object):
     The class implements writing to a file in the VCFtools allele
     frequency format.
     """
-    def __init__(self, filename):
+    def __init__(self, filename, gzipped=False):
         """
         Given a name of a file, create a VCFtools frequencty count
         writer object to write data to it.
 
         :param filename: a name of a file to write allele frequency
             counts to
+        :param gzipped: produce the gzipped output file or not
         :type filename: str
+        :type gzipped: bool
         """
         self.__filename = filename
+        self.__gzipped = gzipped
 
     def __enter__(self):
-        self.__output = open(self.__filename, 'w')
+        if self.__gzipped:
+            self.__output = gzip.open(self.__filename, 'wt')
+        else:
+            self.__output = open(self.__filename, 'w')
         self.__output.write(
             'CHROM\tPOS\tN_ALLELES\tN_CHR\t{ALLELE:COUNT}\n')
         return self
