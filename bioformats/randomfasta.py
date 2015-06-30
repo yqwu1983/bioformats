@@ -28,6 +28,3 @@ def main():
         for i in range(args.seq_num):
             output_fasta.write('random_seq{}'.format(i+1),
                                seq_generator.get())
-
-if __name__ == '__main__':
-    main()
