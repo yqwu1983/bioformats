@@ -281,7 +281,7 @@ class Lav(object):
             # check if there is the reverse complement flag in the line
             if len(line_parts) > 2:
                 reverse_flag = line_parts[-2] == '(reverse' and \
-                    line_parts[-1] == 'complement)"'
+                               line_parts[-1] == 'complement)"'
             else:
                 reverse_flag = False
             # cut line parts with the '>' sign and the reverse
@@ -477,17 +477,17 @@ class Lav(object):
             # starting with the n symbol
             line_parts = self.__line.split(None, 3)
             if line_parts[0] == 'x' and len(line_parts) == 3:
-                    for i in range(1, 3):
-                        try:
-                            line_parts[i] = int(line_parts[i])
-                        except ValueError:
-                            logger.error(
-                                'line %d: the incorrect numeric '
-                                'value %s', self.__lineno,
-                                line_parts[i])
-                            raise LavError
-                    result_regions.append(Lav.MStanzaItem(
-                        start=line_parts[1], end=line_parts[2]))
+                for i in range(1, 3):
+                    try:
+                        line_parts[i] = int(line_parts[i])
+                    except ValueError:
+                        logger.error(
+                            'line %d: the incorrect numeric '
+                            'value %s', self.__lineno,
+                            line_parts[i])
+                        raise LavError
+                result_regions.append(Lav.MStanzaItem(
+                    start=line_parts[1], end=line_parts[2]))
             elif line_parts[0] == 'n' and len(line_parts) == 2:
                 try:
                     result_base_count = int(line_parts[1])
