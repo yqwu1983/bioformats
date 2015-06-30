@@ -5,13 +5,16 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 import glob
-import gzip
 import logging
 import os
 import tempfile
 import unittest
-from bioformats.vcftools.frqcount import Reader, Writer, FrqCountRecord
+from bioformats.vcftools.frqcount import FrqCountRecord
+from bioformats.vcftools.frqcount import Reader
+from bioformats.vcftools.frqcount import SortedReader
+from bioformats.vcftools.frqcount import Writer
 from bioformats.exception import FrqCountReaderError
+from future.utils import itervalues
 try:
     import itertools.izip as zip
 except ImportError:
@@ -82,3 +85,35 @@ class TestWriter(unittest.TestCase):
             for x, y in zip(
                     test_input.variants(), test_output.variants()):
                 self.assertEqual(x, y)
+
+            os.unlink(self.__output_file)
+
+
+class TestSortedReader(unittest.TestCase):
+    def setUp(self):
+        self.__sorted = os.path.join(
+            'data', 'frqcount', 'sorted.txt'
+        )
+        self.__unsorted = os.path.join(
+            'data', 'frqcount', 'unsorted.txt'
+        )
+        self.__output = tempfile.NamedTemporaryFile().name
+
+    def test_variants(self):
+        """
+        Check if SortedReader reads and sorts variants.
+        """
+        reader = SortedReader(self.__unsorted)
+        with Writer(self.__output) as sorted_output:
+            for chromosome in reader.variants:
+                for variant in reader.variants[chromosome]:
+                    sorted_output.write(variant)
+
+        # compare the original sorted file and the produced one
+        test_original = Reader(self.__sorted)
+        test_output = Reader(self.__output)
+        for x, y in zip(
+                test_original.variants(), test_output.variants()):
+            self.assertEqual(x, y)
+
+        os.unlink(self.__output)

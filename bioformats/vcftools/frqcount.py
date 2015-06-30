@@ -5,7 +5,11 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 from future.utils import iteritems
-from collections import namedtuple, OrderedDict
+from future.utils import itervalues
+from collections import defaultdict
+from collections import namedtuple
+from collections import OrderedDict
+from operator import attrgetter
 from bioformats.exception import FrqCountReaderError
 import gzip
 import logging
@@ -22,8 +26,8 @@ FrqCountRecord = namedtuple('FrqCountRecord', frqcount_names)
 
 class Reader(object):
     """
-    This class provides routines to process allele frequency files
-    (*.frq.count) produced by VCFtools using its --counts option.
+    This class provides routines to read allele frequencies from files
+    produced by VCFtools using its --counts option (*.frq.count).
     """
 
     def __init__(self, filename, gzipped=False):
@@ -124,6 +128,47 @@ class Reader(object):
                     # skip the comment line
                     continue
                 yield self.__parse_frq_count_line()
+
+
+class SortedReader(object):
+    """
+    This class provides routines to read sorted allele frequencies
+    from files produced by VCFtools using its --count option (
+    *.frq.count).
+    """
+
+    def __init__(self, filename, gzipped=False):
+        """
+        Create an SortedReader object from the specified file.
+
+        :param filename: a name of a VCFtools frequency count file
+        :param gzipped: is the specified file gzipped or not
+        :type filename: str
+        :type gzipped: bool
+        """
+        # load variants from the specified file
+        temp_variants = defaultdict(list)
+        parser = Reader(filename, gzipped)
+        logger.info('started reading variants')
+        for variant in parser.variants():
+            temp_variants[variant.chrom].append(variant)
+        logger.info('reading variants completed: %d variants on %d '
+                    'sequences',
+                    sum(map(len, itervalues(temp_variants))),
+                    len(temp_variants))
+        # sort variants by their position on a chromosome
+        chromosomes = list(temp_variants)
+        for i in chromosomes:
+            temp_variants[i] = sorted(temp_variants[i], key=attrgetter(
+                'pos'))
+        # create the dictionary ordered by chromosome names
+        self.__variants = OrderedDict()
+        for i in sorted(chromosomes):
+            self.__variants[i] = temp_variants[i]
+
+    @property
+    def variants(self):
+        return self.__variants
 
 
 class Writer(object):
