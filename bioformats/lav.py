@@ -442,6 +442,7 @@ class Lav(object):
         else:
             logger.error('line %d: an incorrect score record in an'
                          'x-stanza', self.__lineno)
+            raise LavError
 
         # make sure that the stanza has the proper end
         self.__line = self.__handler.readline().rstrip()
@@ -475,8 +476,7 @@ class Lav(object):
             # we read masked region lines unless we read a line
             # starting with the n symbol
             line_parts = self.__line.split(None, 3)
-            if line_parts[0] == 'x':
-                if len(line_parts) == 3:
+            if line_parts[0] == 'x' and len(line_parts) == 3:
                     for i in range(1, 3):
                         try:
                             line_parts[i] = int(line_parts[i])
@@ -485,27 +485,18 @@ class Lav(object):
                                 'line %d: the incorrect numeric '
                                 'value %s', self.__lineno,
                                 line_parts[i])
+                            raise LavError
                     result_regions.append(Lav.MStanzaItem(
                         start=line_parts[1], end=line_parts[2]))
-                else:
-                    logger.error('line %d: an incorrest masked '
-                                 'region line', self.__lineno)
-                    raise LavError
-            elif line_parts[0] == 'n':
-                if len(line_parts) == 2:
-                    try:
-                        result_base_count = int(line_parts[1])
-                    except ValueError:
-                        logger.error(
-                            'line %d: the incorrect numeric value '
-                            '%s', self.__lineno, line_parts[1])
-                        raise ValueError
-                    n_flag = True
-                else:
+            elif line_parts[0] == 'n' and len(line_parts) == 2:
+                try:
+                    result_base_count = int(line_parts[1])
+                except ValueError:
                     logger.error(
-                        'line %d: an incorrect total masked bases '
-                        'line', self.__lineno)
+                        'line %d: the incorrect numeric value '
+                        '%s', self.__lineno, line_parts[1])
                     raise LavError
+                n_flag = True
             else:
                 # the line inside an m stanza must start from either
                 # 'x' or 'n', otherwise show the error message and

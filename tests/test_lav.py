@@ -42,4 +42,6 @@ class TestLavAlignment(unittest.TestCase):
             parser = Lav(os.path.join(self.__incorrect_file_dir,
                                       lav_file))
             with self.assertRaises(LavError):
-                next(parser.alignments())
+                for alignment in parser.alignments():
+                    self.assertIsInstance(alignment,
+                                          Lav.GapFreeAlignment)
