@@ -14,7 +14,6 @@ from bioformats.vcftools.frqcount import Reader
 from bioformats.vcftools.frqcount import SortedReader
 from bioformats.vcftools.frqcount import Writer
 from bioformats.exception import FrqCountReaderError
-from future.utils import itervalues
 try:
     import itertools.izip as zip
 except ImportError:
