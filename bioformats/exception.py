@@ -57,3 +57,11 @@ class FrqCountReaderError(VcftoolsError):
     format of VCFtools.
     """
     pass
+
+
+class IntervalError(BioformatsError):
+    """
+    This class describes an error related to the interval format used
+    by WindowMasker and DustMasker.
+    """
+    pass
