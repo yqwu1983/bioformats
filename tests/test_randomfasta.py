@@ -8,7 +8,7 @@ import os
 import sys
 import tempfile
 import unittest
-import bioformats.randomfasta
+import bioformats.cli
 
 
 class TestRandomFasta(unittest.TestCase):
@@ -20,5 +20,5 @@ class TestRandomFasta(unittest.TestCase):
         Check if a random FASTA file is created.
         """
         sys.argv = ['', '10', '10', self.__output_file]
-        bioformats.randomfasta.main()
+        bioformats.cli.randomfasta()
         os.unlink(self.__output_file)

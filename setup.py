@@ -34,7 +34,7 @@ setup(name='bioformats',
 
       entry_points={
           'console_scripts': [
-              'randomfasta = bioformats.randomfasta:main',
-              'fastagaps = bioformats.fastagaps:main']
+              'randomfasta = bioformats.cli:randomfasta',
+              'fastagaps = bioformats.cli:fastagaps']
       },
       )
