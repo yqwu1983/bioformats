@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.1.2
+-----
+- Parser for VCFtools frequency count format
+- Tool to detect gaps in FASTA files
+
 0.1.1
 -----
 - Parsers for BED, GFF3, LAV and BLAST tabular alignment formats
