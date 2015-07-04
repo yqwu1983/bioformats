@@ -53,4 +53,4 @@ def fastagaps():
                 gap_pattern, str(seq))]
             for start, end in gap_regions:
                 output.write('{}\t{}\t{}\n'.format(
-                    seq.name, start, end + 1))
+                    seq.name, start, end))
