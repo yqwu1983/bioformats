@@ -65,3 +65,28 @@ class IntervalError(BioformatsError):
     by WindowMasker and DustMasker.
     """
     pass
+
+
+class SeqRenameError(BioformatsError):
+    """
+    This class describes an error related to sequence renaming
+    routines.
+    """
+    pass
+
+
+class IncorrectDictError(SeqRenameError):
+    """
+    This class corresponds to a situation when a specified renaming
+    dictionary file contains errors, for example, a column of new names
+    is missing.
+    """
+    pass
+
+
+class MissingSeqNameError(SeqRenameError):
+    """
+    This class describes an exception to be raised when a sequence name
+    is missing from the dictionary of a sequence renamer object.
+    """
+    pass

@@ -1,0 +1,6 @@
+# comment
+seq1	1	300
+seq1	300	600
+seq2	45	24
+seq3	5	37
+

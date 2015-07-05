@@ -1,0 +1,4 @@
+seq1
+seq2	chrA2
+seq3	chrA3
+
