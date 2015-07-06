@@ -4,8 +4,7 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
-from collections import OrderedDict
-from future.utils import iteritems 
+from future.utils import iteritems
 from .exception import IncorrectDictError
 from .exception import MissingSeqNameError
 
@@ -20,8 +19,8 @@ class BaseSeqRenamer(object):
         """
         Create a BaseSeqRenamer object.
         """
-        self.renaming_dict = OrderedDict()
-        self.reverse_renaming_dict = OrderedDict()
+        self.renaming_dict = dict()
+        self.reverse_renaming_dict = dict()
 
     def read_renaming_dict(self, filename):
         """

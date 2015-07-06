@@ -53,10 +53,8 @@ class TestBaseSeqRenamer(unittest.TestCase):
         # compare the original and written dictionaries
         produced_renamer = bioformats.seqname.BaseSeqRenamer()
         produced_renamer.read_renaming_dict(self.__output)
-        for x, y in zip(
-                itervalues(renamer.renaming_dict),
-                itervalues(produced_renamer.renaming_dict)):
-            self.assertEqual(x, y)
+        self.assertEqual(renamer.renaming_dict,
+                         produced_renamer.renaming_dict)
 
         os.unlink(self.__output)
 
