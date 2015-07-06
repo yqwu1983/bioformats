@@ -4,9 +4,13 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import logging
 from future.utils import iteritems
 from .exception import IncorrectDictError
 from .exception import MissingSeqNameError
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
 
 
 class BaseSeqRenamer(object):
@@ -32,11 +36,15 @@ class BaseSeqRenamer(object):
         :type filename: str
         """
         with open(filename) as dict_file:
+            lineno = 0
             for line in dict_file:
                 line = line.rstrip()
+                lineno += 1
                 if line:
                     words = line.rstrip().split(None, 2)
                     if len(words) < 2:
+                        logger.error('line %d: incorrect renaming '
+                                     'dictionary entry', lineno, line)
                         raise IncorrectDictError(line)
                     orig_name, new_name = words[0], words[1]
                     self.renaming_dict[orig_name] = new_name
@@ -80,13 +88,17 @@ class FastaSeqRenamer(BaseSeqRenamer):
         renaming_dict = self.reverse_renaming_dict if reverse else \
             self.renaming_dict
         with open(filename) as fasta_file:
+            lineno = 0
             for line in fasta_file:
                 line = line.rstrip()
+                lineno += 1
                 if line.startswith('>'):
                     # the line is a sequence header, rename it
                     line_parts = line.split()
                     seq_name = line_parts[0][1:]
                     if seq_name not in renaming_dict:
+                        logger.error('line %d: missing sequence %s',
+                                     lineno, seq_name)
                         raise MissingSeqNameError(seq_name)
                     else:
                         line_parts[0] = '>' + renaming_dict[seq_name]
@@ -130,13 +142,17 @@ class TableSeqRenamer(BaseSeqRenamer):
         renaming_dict = self.reverse_renaming_dict if reverse else \
             self.renaming_dict
         with open(filename) as table_file:
+            lineno = 0
             for line in table_file:
                 line = line.rstrip()
+                lineno += 1
                 if line.startswith(comment_char):
                     yield line
                 elif line:
                     line_parts = line.split(sep)
                     if line_parts[column] not in renaming_dict:
+                        logger.error('line %d: missing sequence %s',
+                                     lineno, line_parts[column])
                         raise MissingSeqNameError(
                             line_parts[column])
                     else:
