@@ -44,7 +44,8 @@ class BaseSeqRenamer(object):
                     words = line.rstrip().split(None, 2)
                     if len(words) < 2:
                         logger.error('line %d: incorrect renaming '
-                                     'dictionary entry', lineno, line)
+                                     'dictionary entry %s', lineno,
+                                     line)
                         raise IncorrectDictError(line)
                     orig_name, new_name = words[0], words[1]
                     self.renaming_dict[orig_name] = new_name
