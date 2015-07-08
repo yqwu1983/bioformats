@@ -232,8 +232,9 @@ class NcbiBaseSeqRenamer(BaseSeqRenamer):
 
         return result
 
-    def read_ncbi_acc_num(self, filename, orig_fmt, new_fmt, prefix,
-                          suffix, remove_seq_version=False, ucsc=False):
+    def read_ncbi_acc_num(self, filename, orig_fmt, new_fmt, prefix='',
+                          suffix='', remove_seq_version=False,
+                          ucsc=False):
         """
         Given a name of a file with accession numbers obtained from
         NCBI, form a renaming dictionary of specified original and
