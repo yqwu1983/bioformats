@@ -92,7 +92,6 @@ class FastaSeqRenamer(BaseSeqRenamer):
         with open(filename) as fasta_file:
             lineno = 0
             for line in fasta_file:
-                line = line.rstrip()
                 lineno += 1
                 if line.startswith('>'):
                     # the line is a sequence header, rename it
@@ -104,7 +103,7 @@ class FastaSeqRenamer(BaseSeqRenamer):
                         raise MissingSeqNameError(seq_name)
                     else:
                         line_parts[0] = '>' + renaming_dict[seq_name]
-                    yield ' '.join(line_parts)
+                    yield ' '.join(line_parts) + '\n'
                 else:
                     # the line contains a sequence, just return it
                     yield line
