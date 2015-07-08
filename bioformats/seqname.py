@@ -165,8 +165,8 @@ class TableSeqRenamer(BaseSeqRenamer):
 
 class NcbiBaseSeqRenamer(BaseSeqRenamer):
     """
-    This abstract class adds routines to process NCBI accession number files
-    to the BaseSeqRenamer class.
+    This abstract class adds routines to process NCBI accession number
+    files to the BaseSeqRenamer class.
     """
 
     acceptable_formats = ('chr',
@@ -182,15 +182,15 @@ class NcbiBaseSeqRenamer(BaseSeqRenamer):
         return a sequence name in the specified format.
 
         :param fmt: a format of the required sequence names, possible
-        values: chr, refseq_full, genbank_full, refseq_gi, genbank_gi,
-        refseq_acc_num, genbank_acc_num
+            values: chr, refseq_full, genbank_full, refseq_gi,
+            genbank_gi, refseq_acc_num, genbank_acc_num
         :param chrom: a chromosome or fragment name
         :param refseq: a RefSeq accession number
         :param refseq_gi: a gene identifier in RefSeq
         :param genbank: a GenBank accession number
         :param genbank_gi: a gene identifier in GenBank
-        :param remove_seq_version: remove sequence version from an accession
-        number
+        :param remove_seq_version: remove sequence version from an
+            accession number
         :type fmt: str
         :type chrom: str
         :type refseq: str
@@ -232,24 +232,25 @@ class NcbiBaseSeqRenamer(BaseSeqRenamer):
 
         return result
 
-    def read_ncbi_acc_num(self, filename, orig_fmt, new_fmt, prefix, suffix,
-                          remove_seq_version=False, ucsc=False):
+    def read_ncbi_acc_num(self, filename, orig_fmt, new_fmt, prefix,
+                          suffix, remove_seq_version=False, ucsc=False):
         """
-        Given a name of a file with accession numbers obtained from NCBI,
-        form a renaming dictionary of specified original and new sequence
-        names.
+        Given a name of a file with accession numbers obtained from
+        NCBI, form a renaming dictionary of specified original and
+        new sequence names.
 
         :param filename: a name of an NCBI file with accession numbers
         :param orig_fmt: a specification of the format of original
-        sequence names
-        :param new_fmt: a specification of the format of new sequence names
+            sequence names
+        :param new_fmt: a specification of the format of new sequence
+            names
         :param prefix: a prefix to be added to new sequence names
         :param suffix: a suffix to be added to new sequence names
         :param remove_seq_version: remove a sequence version from an
-        accession number
-        :param ucsc: use a name in the style of UCSC for a sequence (that is,
-        a chromosome name and a GenBank accession number separated by an
-        underscore)
+            accession number
+        :param ucsc: use a name in the style of UCSC for a sequence
+            (that is, a chromosome name and a GenBank accession number
+            separated by an underscore)
         :type filename: str
         :type orig_fmt: str
         :type new_fmt: str
