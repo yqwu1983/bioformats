@@ -6,6 +6,7 @@
 
 import logging
 from future.utils import iteritems
+from .exception import SeqRenameError
 from .exception import IncorrectDictError
 from .exception import MissingSeqNameError
 
@@ -160,3 +161,159 @@ class TableSeqRenamer(BaseSeqRenamer):
                         line_parts[column] = renaming_dict[
                             line_parts[column]]
                     yield sep.join(line_parts)
+
+
+class NcbiBaseSeqRenamer(BaseSeqRenamer):
+    """
+    This abstract class adds routines to process NCBI accession number files
+    to the BaseSeqRenamer class.
+    """
+
+    acceptable_formats = ('chr',
+                          'refseq_full', 'genbank_full',
+                          'refseq_gi', 'genbank_gi',
+                          'refseq_acc_num', 'genbank_acc_num')
+
+    @staticmethod
+    def form_identifier(fmt, chrom, refseq, refseq_gi, genbank,
+                        genbank_gi, remove_seq_version=False):
+        """
+        Given a format and data from an NCBI accession number file,
+        return a sequence name in the specified format.
+
+        :param fmt: a format of the required sequence names, possible
+        values: chr, refseq_full, genbank_full, refseq_gi, genbank_gi,
+        refseq_acc_num, genbank_acc_num
+        :param chrom: a chromosome or fragment name
+        :param refseq: a RefSeq accession number
+        :param refseq_gi: a gene identifier in RefSeq
+        :param genbank: a GenBank accession number
+        :param genbank_gi: a gene identifier in GenBank
+        :param remove_seq_version: remove sequence version from an accession
+        number
+        :type fmt: str
+        :type chrom: str
+        :type refseq: str
+        :type refseq_gi: str
+        :type genbank: str
+        :type genbank_gi: str
+        :type remove_seq_version: bool
+        :return: a sequence name in the specified format
+        :rtype: str
+        """
+        # check if the correct format is specified
+        if fmt not in NcbiBaseSeqRenamer.acceptable_formats:
+            logger.error('incorrect format %s', fmt)
+            raise SeqRenameError(fmt)
+
+        # if required, remove sequence version from accession numbers
+        if remove_seq_version:
+            refseq = refseq.split('.')[0]
+            genbank = genbank.split('.')[0]
+
+        if fmt == 'chr':
+            result = chrom
+        elif fmt == 'refseq_full':
+            result = 'gi|' + refseq_gi + '|ref|' + refseq + '|'
+        elif fmt == 'genbank_full':
+            result = 'gi|' + genbank_gi + '|gb|' + genbank + '|'
+        elif fmt == 'refseq_gi':
+            result = refseq_gi
+        elif fmt == 'genbank_gi':
+            result = genbank_gi
+        elif fmt == 'refseq_acc_num':
+            result = refseq
+        elif fmt == 'genbank_acc_num':
+            result = genbank
+        else:
+            # an incorrect format is specified, raise the exception
+            logger.error('incorrect format %s', fmt)
+            raise SeqRenameError(fmt)
+
+        return result
+
+    def read_ncbi_acc_num(self, filename, orig_fmt, new_fmt, prefix, suffix,
+                          remove_seq_version=False, ucsc=False):
+        """
+        Given a name of a file with accession numbers obtained from NCBI,
+        form a renaming dictionary of specified original and new sequence
+        names.
+
+        :param filename: a name of an NCBI file with accession numbers
+        :param orig_fmt: a specification of the format of original
+        sequence names
+        :param new_fmt: a specification of the format of new sequence names
+        :param prefix: a prefix to be added to new sequence names
+        :param suffix: a suffix to be added to new sequence names
+        :param remove_seq_version: remove a sequence version from an
+        accession number
+        :param ucsc: use a name in the style of UCSC for a sequence (that is,
+        a chromosome name and a GenBank accession number separated by an
+        underscore)
+        :type filename: str
+        :type orig_fmt: str
+        :type new_fmt: str
+        :type prefix: str
+        :type suffix: str
+        :type remove_seq_version: bool
+        :type ucsc: bool
+        """
+        # check if correct format values are specified
+        if orig_fmt not in NcbiBaseSeqRenamer.acceptable_formats:
+            logger.error('incorrect format %s', orig_fmt)
+            raise SeqRenameError(orig_fmt)
+        if new_fmt not in NcbiBaseSeqRenamer.acceptable_formats:
+            logger.error('incorrect format %s', new_fmt)
+            raise SeqRenameError(new_fmt)
+
+        with open(filename) as ncbi_acc_num_file:
+            for line in ncbi_acc_num_file:
+                line = line.rstrip()
+                # skip comments
+                if line.startswith('#'):
+                    continue
+                line_parts = line.split(None, 5)
+                if len(line_parts) < 5:
+                    logger.error('incorrect dictionary entry %s', line)
+                    raise IncorrectDictError(line)
+                chrom, refseq, refseq_gi, genbank, genbank_gi = \
+                    line_parts
+                # form a key and a value of the renaming dictionary
+                # according to the specified format arguments
+                key = NcbiBaseSeqRenamer.form_identifier(orig_fmt,
+                                                         chrom,
+                                                         refseq,
+                                                         refseq_gi,
+                                                         genbank,
+                                                         genbank_gi)
+
+                if ucsc:
+                    if remove_seq_version:
+                        genbank = genbank.split('.')[0]
+                    value = chrom + '_' + genbank
+                else:
+                    value = NcbiBaseSeqRenamer.form_identifier(
+                        new_fmt, chrom, refseq, refseq_gi, genbank,
+                        genbank_gi, remove_seq_version)
+
+                value = prefix + value + suffix
+
+                self.renaming_dict[key] = value
+                self.reverse_renaming_dict[value] = key
+
+
+class NcbiFastaSeqRenamer(FastaSeqRenamer, NcbiBaseSeqRenamer):
+    """
+    The class implements functionality of a sequence renamer for a
+    FASTA file that can handle NCBI accession numbers.
+    """
+    pass
+
+
+class NcbiTableSeqRenamer(TableSeqRenamer, NcbiBaseSeqRenamer):
+    """
+    The class implements functionality of a sequence renamer for a
+    plain-text file of separated values that can handle NCBI accession
+    numbers.
+    """
+    pass
