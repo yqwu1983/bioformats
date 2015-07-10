@@ -171,7 +171,8 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
 
     def test_renamed(self):
         formats = ('refseq_full', 'genbank_full', 'refseq_gi',
-                   'genbank_gi', 'refseq_acc_num', 'genbank_acc_num')
+                   'genbank_gi', 'refseq', 'genbank',
+                   'chr_refseq', 'chr_genbank')
         for i, j in itertools.product(formats, repeat=2):
             renamer = bioformats.seqname.NcbiFastaSeqRenamer()
             for k in self.__acc_num_files:

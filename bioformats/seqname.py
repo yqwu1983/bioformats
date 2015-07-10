@@ -171,7 +171,8 @@ class NcbiBaseSeqRenamer(BaseSeqRenamer):
     acceptable_formats = ('chr',
                           'refseq_full', 'genbank_full',
                           'refseq_gi', 'genbank_gi',
-                          'refseq_acc_num', 'genbank_acc_num')
+                          'refseq', 'genbank',
+                          'chr_refseq', 'chr_genbank')
 
     @staticmethod
     def form_identifier(fmt, chrom, refseq, refseq_gi, genbank,
@@ -220,10 +221,14 @@ class NcbiBaseSeqRenamer(BaseSeqRenamer):
             result = refseq_gi
         elif fmt == 'genbank_gi':
             result = genbank_gi
-        elif fmt == 'refseq_acc_num':
+        elif fmt == 'refseq':
             result = refseq
-        elif fmt == 'genbank_acc_num':
+        elif fmt == 'genbank':
             result = genbank
+        elif fmt == 'chr_genbank':
+            result = chrom + '_' + genbank
+        elif fmt == 'chr_refseq':
+            result = chrom + '_' + refseq
         else:
             # an incorrect format is specified, raise the exception
             logger.error('incorrect format %s', fmt)
@@ -288,14 +293,9 @@ class NcbiBaseSeqRenamer(BaseSeqRenamer):
                                                          genbank,
                                                          genbank_gi)
 
-                if ucsc:
-                    if remove_seq_version:
-                        genbank = genbank.split('.')[0]
-                    value = chrom + '_' + genbank
-                else:
-                    value = NcbiBaseSeqRenamer.form_identifier(
-                        new_fmt, chrom, refseq, refseq_gi, genbank,
-                        genbank_gi, remove_seq_version)
+                value = NcbiBaseSeqRenamer.form_identifier(
+                    new_fmt, chrom, refseq, refseq_gi, genbank,
+                    genbank_gi, remove_seq_version)
 
                 value = prefix + value + suffix
 
