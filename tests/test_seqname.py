@@ -12,6 +12,7 @@ import unittest
 import bioformats.seqname
 from bioformats.exception import IncorrectDictError
 from bioformats.exception import MissingSeqNameError
+from bioformats.exception import SeqRenameError
 from pyfaidx import Fasta
 try:
     import itertools.izip as zip
@@ -160,6 +161,9 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
         self.__chr = os.path.join(
             self.__test_dir, 'chr_accessions_GRCh38.p2'
         )
+        self.__chr_incorrect = os.path.join(
+            self.__test_dir, 'incorrect_chr_accessions_GRCh38.p2'
+        )
         self.__unlocalized = os.path.join(
             self.__test_dir, 'unlocalized_accessions_GRCh38.p2'
         )
@@ -172,17 +176,17 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
     def test_renamed(self):
         formats = ('refseq_full', 'genbank_full', 'refseq_gi',
                    'genbank_gi', 'refseq', 'genbank',
-                   'chr_refseq', 'chr_genbank')
-        for i, j in itertools.product(formats, repeat=2):
+                   'chr_refseq', 'chr_genbank', 'chr')
+        for i, j in itertools.product(formats[:-1], formats):
             renamer = bioformats.seqname.NcbiFastaSeqRenamer()
             for k in self.__acc_num_files:
                 renamer.read_ncbi_acc_num(k, i, j)
             # convert sequence IDs
             input_file = os.path.join(self.__test_dir,
                                       'ncbi_' + i + '.fa')
-            with open(self.__output, 'w') as output_file:
+            with open(self.__output, 'w') as output_fasta:
                 for line in renamer.renamed(input_file):
-                    output_file.write(line)
+                    output_fasta.write(line)
 
             example_file = os.path.join(self.__test_dir,
                                         'ncbi_' + j + '.fa')
@@ -190,6 +194,39 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
             example_fasta = Fasta(example_file)
             # compare the obtained file to the example
             self.assertEqual(output_fasta.keys, example_fasta.keys)
+
+        # test for an incorrect format
+        with self.assertRaises(SeqRenameError):
+            renamer = bioformats.seqname.NcbiFastaSeqRenamer()
+            renamer.read_ncbi_acc_num(
+                'unknown', 'chr_refseq', os.path.join(
+                    self.__test_dir, 'ncbi_chr_refseq.fa'))
+        with self.assertRaises(SeqRenameError):
+            renamer.read_ncbi_acc_num(
+                'chr_refseq', 'unknown', os.path.join(
+                    self.__test_dir, 'ncbi_chr_refseq.fa'))
+
+        # test for an incorrect NCBI accession number dictionary
+        with self.assertRaises(IncorrectDictError):
+            renamer.read_ncbi_acc_num(self.__chr_incorrect,
+                                      'refseq_full',
+                                      'chr_refseq')
+
+        # check if sequence versions are removed
+        renamer = bioformats.seqname.NcbiFastaSeqRenamer()
+        for k in self.__acc_num_files:
+            renamer.read_ncbi_acc_num(k, 'chr', 'genbank',
+                                      remove_seq_version=True)
+        input_file = os.path.join(self.__test_dir, 'ncbi_chr.fa')
+        example_file = os.path.join(self.__test_dir,
+                                    'ncbi_genbank_nover.fa')
+        with open(self.__output, 'w') as output_fasta:
+            for line in renamer.renamed(input_file):
+                output_fasta.write(line)
+        output_fasta = Fasta(self.__output)
+        example_fasta = Fasta(example_file)
+        self.assertEqual(output_fasta.keys, example_fasta.keys)
+        os.unlink(example_file + '.fai')
 
         # remove temporary files and FASTA indices
         os.unlink(self.__output)

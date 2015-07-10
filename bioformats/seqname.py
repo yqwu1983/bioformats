@@ -201,19 +201,12 @@ class NcbiBaseSeqRenamer(BaseSeqRenamer):
         :return: a sequence name in the specified format
         :rtype: str
         """
-        # check if the correct format is specified
-        if fmt not in NcbiBaseSeqRenamer.acceptable_formats:
-            logger.error('incorrect format %s', fmt)
-            raise SeqRenameError(fmt)
-
         # if required, remove sequence version from accession numbers
         if remove_seq_version:
             refseq = refseq.split('.')[0]
             genbank = genbank.split('.')[0]
 
-        if fmt == 'chr':
-            result = chrom
-        elif fmt == 'refseq_full':
+        if fmt == 'refseq_full':
             result = 'gi|' + refseq_gi + '|ref|' + refseq + '|'
         elif fmt == 'genbank_full':
             result = 'gi|' + genbank_gi + '|gb|' + genbank + '|'
@@ -230,15 +223,12 @@ class NcbiBaseSeqRenamer(BaseSeqRenamer):
         elif fmt == 'chr_refseq':
             result = chrom + '_' + refseq
         else:
-            # an incorrect format is specified, raise the exception
-            logger.error('incorrect format %s', fmt)
-            raise SeqRenameError(fmt)
+            result = chrom
 
         return result
 
     def read_ncbi_acc_num(self, filename, orig_fmt, new_fmt, prefix='',
-                          suffix='', remove_seq_version=False,
-                          ucsc=False):
+                          suffix='', remove_seq_version=False):
         """
         Given a name of a file with accession numbers obtained from
         NCBI, form a renaming dictionary of specified original and
