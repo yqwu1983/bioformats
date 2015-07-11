@@ -131,5 +131,3 @@ def renameseq():
             if args.fasta and args.no_description:
                 line = line.split()[0]
             output.write(line)
-            if not args.fasta:
-                output.write('\n')

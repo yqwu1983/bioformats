@@ -148,7 +148,7 @@ class TableSeqRenamer(BaseSeqRenamer):
                 line = line.rstrip()
                 lineno += 1
                 if line.startswith(comment_char):
-                    yield line
+                    yield line + '\n'
                 elif line:
                     line_parts = line.split(sep)
                     if line_parts[column] not in renaming_dict:
@@ -159,7 +159,7 @@ class TableSeqRenamer(BaseSeqRenamer):
                     else:
                         line_parts[column] = renaming_dict[
                             line_parts[column]]
-                    yield sep.join(line_parts)
+                    yield sep.join(line_parts) + '\n'
 
 
 class NcbiBaseSeqRenamer(BaseSeqRenamer):

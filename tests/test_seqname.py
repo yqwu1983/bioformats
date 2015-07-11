@@ -127,14 +127,14 @@ class TestTableSeqRenamer(unittest.TestCase):
         renamer.read_renaming_dict(self.__renaming_dict)
         with open(self.__output, 'w') as output_table:
             for line in renamer.renamed(self.__table, 0):
-                output_table.write(line + '\n')
+                output_table.write(line)
 
         # perform the reverse renaming
         rev_renamer = bioformats.seqname.TableSeqRenamer()
         rev_renamer.read_renaming_dict(self.__renaming_dict)
         with open(self.__rev_output, 'w') as rev_output_table:
             for line in renamer.renamed(self.__output, 0, reverse=True):
-                rev_output_table.write(line + '\n')
+                rev_output_table.write(line)
 
         # compare the original and reverse-renamed tables
         with open(self.__table) as original_table:
