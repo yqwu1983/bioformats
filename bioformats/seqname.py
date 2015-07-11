@@ -243,16 +243,12 @@ class NcbiBaseSeqRenamer(BaseSeqRenamer):
         :param suffix: a suffix to be added to new sequence names
         :param remove_seq_version: remove a sequence version from an
             accession number
-        :param ucsc: use a name in the style of UCSC for a sequence
-            (that is, a chromosome name and a GenBank accession number
-            separated by an underscore)
         :type filename: str
         :type orig_fmt: str
         :type new_fmt: str
         :type prefix: str
         :type suffix: str
         :type remove_seq_version: bool
-        :type ucsc: bool
         """
         # check if correct format values are specified
         if orig_fmt not in NcbiBaseSeqRenamer.acceptable_formats:
