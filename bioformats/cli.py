@@ -110,11 +110,15 @@ def renameseq():
 
     renamer.read_renaming_dict(args.renaming_table)
 
+    # for a user, the ecolumn numbers start from 1, for the program
+    # from 0
+    args.column -= 1
+
     if args.fasta:
         renamed_lines = renamer.renamed(args.input_file,
                                         reverse=args.revert)
     else:
-        renamed_lines = renamer.renamed(args.file, args.column,
+        renamed_lines = renamer.renamed(args.input_file, args.column,
                                         sep=args.separator,
                                         comment_char=args.comment_char,
                                         reverse=args.revert)
@@ -127,3 +131,5 @@ def renameseq():
             if args.fasta and args.no_description:
                 line = line.split()[0]
             output.write(line)
+            if not args.fasta:
+                output.write('\n')
