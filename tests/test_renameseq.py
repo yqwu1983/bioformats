@@ -24,6 +24,9 @@ class TestRenameSeq(unittest.TestCase):
         self.__fasta = os.path.join(
             'data', 'seqrename', 'fasta.fa'
         )
+        self.__fasta_desc = os.path.join(
+            'data', 'seqrename', 'fasta_desc.fa'
+        )
         self.__table = os.path.join(
             'data', 'seqrename', 'table.txt'
         )
@@ -51,6 +54,17 @@ class TestRenameSeq(unittest.TestCase):
                 original_fasta.keys(),
                 rev_renamed_fasta.keys()):
             self.assertEqual(x, y)
+
+        # check if sequence descriptions are removed
+        sys.argv = ['', self.__renaming_dict, self.__fasta,
+                    self.__rev_output, '-f', '--no_description']
+
+        bioformats.cli.renameseq()
+
+        with open(self.__output) as renamed_fasta:
+            with open(self.__rev_output) as nodesc_renamed_fasta:
+                for x, y in zip(renamed_fasta, nodesc_renamed_fasta):
+                    self.assertEqual(x, y)
 
         os.unlink(self.__output)
         os.unlink(self.__rev_output)

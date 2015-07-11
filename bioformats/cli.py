@@ -129,5 +129,5 @@ def renameseq():
             # descriptions from FASTA sequence headers is specified,
             # then remove the description
             if args.fasta and args.no_description:
-                line = line.split()[0]
+                line = line.split()[0] + '\n'
             output.write(line)
