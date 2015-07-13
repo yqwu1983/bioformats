@@ -64,7 +64,7 @@ def renameseq():
     """
     parser = argparse.ArgumentParser(
         description='Change sequence names in a FASTA or plain text '
-                    'file.'
+                    'tabular file.'
     )
 
     # required parameters
@@ -131,3 +131,143 @@ def renameseq():
             if args.fasta and args.no_description:
                 line = line.split()[0] + '\n'
             output.write(line)
+
+
+def ncbirenameseq():
+    """
+    This function corresponds to a command-line tool that changes
+    NCBI-style identificators of sequences in a tabular or FASTA file.
+    """
+    parser = argparse.ArgumentParser(
+        description='Change NCBI-style sequence names in a FASTA file'
+                    'or plain text tabular file',
+        epilog='Format values: refseq_full, genbank_full, refseq_gi, '
+               'genbank_gi, refseq, genbank, chr_refseq, chr_genbank'
+    )
+
+    # required parameters
+    parser.add_argument('input_file',
+                        help='a file to change sequence names in')
+    parser.add_argument('input_fmt',
+                        help='a format of sequence names in input')
+    parser.add_argument('output_file',
+                        help='an output file for renamed sequences')
+    parser.add_argument('output_fmt',
+                        help='a format of sequence names in output')
+
+    # the input file format
+    parser.add_argument('-f', '--fasta', action='store_true',
+                        help='the input file is of the FASTA format')
+    parser.add_argument('-c', '--column', type=int, default=1,
+                        help='the number of the column that contains '
+                             'sequence names to be changed (1 by '
+                             'default)')
+
+    # the format of an input plain text file
+    parser.add_argument('--comment_char', default='#',
+                        help='a character designating comment lines '
+                             'in the specified plain text file')
+    parser.add_argument('-s', '--separator', default='\t',
+                        help='a symbol separating columns in the '
+                             'specified plain text file')
+    
+    # NCBI accession number files
+    parser.add_argument('--chr', 
+                        help='a name of a file containing NCBI '
+                             'chromosome accession numbers')
+    parser.add_argument('--unloc', 
+                        help='a name of a file containing NCBI '
+                             'accession numbers of unlocalized '
+                             'fragments')
+    parser.add_argument('--unpl',
+                        help='a name of a file containing NCBI '
+                             'accession numbers of unplaced fragments')
+    
+    # prefixes for sequence names
+    parser.add_argument('--prefix', default='',
+                        help='a prefix to be added to sequence names')
+    parser.add_argument('--prefix_chr', default='',
+                        help='a prefix to be added to chromosome '
+                             'names')
+    parser.add_argument('--prefix_unloc', default='',
+                        help='a prefix to be added to unlocalized '
+                             'fragment names')
+    parser.add_argument('--prefix_unpl', default='',
+                        help='a prefix to be added to unplaced '
+                             'fragment names')
+    
+    # suffixes for sequence names
+    parser.add_argument('--suffix', default='',
+                        help='a suffix to be added to sequence names')
+    parser.add_argument('--suffix_chr', default='',
+                        help='a suffix to be added to chromosome '
+                             'names')
+    parser.add_argument('--suffix_unloc', default='',
+                        help='a suffix to be added to unlocalized '
+                             'fragment names')
+    parser.add_argument('--suffix_unpl', default='',
+                        help='a suffix to be added to unplaced '
+                             'fragment names')
+    
+    # auxiliary options for sequence names
+    parser.add_argument('--no_version', action='store_true',
+                        help='remove a sequence version from an '
+                             'accession number')
+    parser.add_argument('--no_description', action='store_true',
+                        help='remove descriptions from FASTA sequence '
+                             'headers')
+    parser.add_argument('--ucsc', action='store_true',
+                        help='use the UCSC-like notation for sequence'
+                             'names, that is, chromosome names for '
+                             'chromosomes and GenBank accession '
+                             'numbers for unlocalized and unplaced '
+                             'fragments')
+    
+    args = parser.parse_args()
+    
+    # choose the renaming object according to the specified 
+    # command-line option
+    if args.fasta:
+        renamer = seqname.NcbiFastaSeqRenamer()
+    else:
+        renamer = seqname.NcbiTableSeqRenamer()
+        
+    # read accession numbers for chromosomes, unlocalized and 
+    # unplaced fragments
+    if args.chr:
+        renamer.read_ncbi_acc_num(
+            args.chr, args.input_fmt, args.output_fmt,
+            prefix=args.prefix + args.prefix_chr,
+            suffix=args.suffix + args.suffix_chr,
+            remove_seq_version=args.no_version
+        )
+    if args.unloc:
+        renamer.read_ncbi_acc_num(
+            args.unloc, args.input_fmt, args.output_fmt,
+            prefix=args.prefix + args.prefix_unloc,
+            suffix=args.suffix + args.suffix_unloc,
+            remove_seq_version=args.no_version
+        )
+    if args.unpl:
+        renamer.read_ncbi_acc_num(
+            args.unpl, args.input_fmt, args.output_fmt,
+            prefix=args.prefix + args.prefix_unpl,
+            suffix=args.suffix + args.suffix_unpl,
+            remove_seq_version=args.no_version
+        )
+
+    if args.fasta:
+        renamed_lines = renamer.renamed(args.file)
+    else:
+        renamed_lines = renamer.renamed(args.file, args.column,
+                                        sep=args.separator,
+                                        comment_char=args.comment_char)
+
+    with open(args.output) as output_file:
+        for line in renamed_lines:
+            # if we are processing a FASTA file and the option to
+            # remove description from FASTA sequence headers is
+            # specified, do it
+            if args.fasta and args.no_description:
+                line = line.split()[0] + '\n'
+            output_file.write(line)
