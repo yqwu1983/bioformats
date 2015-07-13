@@ -66,8 +66,10 @@ class TestRenameSeq(unittest.TestCase):
                 for x, y in zip(renamed_fasta, nodesc_renamed_fasta):
                     self.assertEqual(x, y)
 
+        os.unlink(self.__fasta + '.fai')
         os.unlink(self.__output)
         os.unlink(self.__rev_output)
+        os.unlink(self.__rev_output + '.fai')
 
     def test_renameseq_table(self):
         """
