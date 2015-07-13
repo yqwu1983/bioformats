@@ -231,7 +231,15 @@ def ncbirenameseq():
         renamer = seqname.NcbiFastaSeqRenamer()
     else:
         renamer = seqname.NcbiTableSeqRenamer()
-        
+
+    # set the UCSC-like sequence name format if required
+    if args.ucsc:
+        args.output_fmt = 'chr_genbank'
+        args.prefix = 'chr'
+        args.prefix_chr = args.prefix_unloc = args.prefix_unpl = ''
+        args.suffix = args.suffix_chr = args.suffix_unpl = ''
+        args.suffix_unloc = '_random'
+
     # read accession numbers for chromosomes, unlocalized and 
     # unplaced fragments
     if args.chr:
