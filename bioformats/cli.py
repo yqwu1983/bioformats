@@ -142,7 +142,8 @@ def ncbirenameseq():
         description='Change NCBI-style sequence names in a FASTA file'
                     'or plain text tabular file',
         epilog='Format values: refseq_full, genbank_full, refseq_gi, '
-               'genbank_gi, refseq, genbank, chr_refseq, chr_genbank'
+               'genbank_gi, refseq, genbank, chr_refseq, chr_genbank '
+               'and ucsc (only as the output format).'
     )
 
     # required parameters
@@ -216,12 +217,6 @@ def ncbirenameseq():
     parser.add_argument('--no_description', action='store_true',
                         help='remove descriptions from FASTA sequence '
                              'headers')
-    parser.add_argument('--ucsc', action='store_true',
-                        help='use the UCSC-like notation for sequence'
-                             'names, that is, chromosome names for '
-                             'chromosomes and GenBank accession '
-                             'numbers for unlocalized and unplaced '
-                             'fragments')
     
     args = parser.parse_args()
     
@@ -232,46 +227,54 @@ def ncbirenameseq():
     else:
         renamer = seqname.NcbiTableSeqRenamer()
 
-    # set the UCSC-like sequence name format if required
-    if args.ucsc:
-        args.output_fmt = 'chr_genbank'
+    if args.output_fmt == 'ucsc':
+        chr_output_fmt = 'chr'
+        unloc_output_fmt = unpl_output_fmt = 'chr_genbank'
         args.prefix = 'chr'
         args.prefix_chr = args.prefix_unloc = args.prefix_unpl = ''
         args.suffix = args.suffix_chr = args.suffix_unpl = ''
         args.suffix_unloc = '_random'
+        args.no_version = True
+    else:
+        chr_output_fmt = unloc_output_fmt = unpl_output_fmt = \
+            args.output_fmt
 
     # read accession numbers for chromosomes, unlocalized and 
     # unplaced fragments
     if args.chr:
         renamer.read_ncbi_acc_num(
-            args.chr, args.input_fmt, args.output_fmt,
+            args.chr, args.input_fmt, chr_output_fmt,
             prefix=args.prefix + args.prefix_chr,
             suffix=args.suffix + args.suffix_chr,
             remove_seq_version=args.no_version
         )
     if args.unloc:
         renamer.read_ncbi_acc_num(
-            args.unloc, args.input_fmt, args.output_fmt,
+            args.unloc, args.input_fmt, unloc_output_fmt,
             prefix=args.prefix + args.prefix_unloc,
             suffix=args.suffix + args.suffix_unloc,
             remove_seq_version=args.no_version
         )
     if args.unpl:
         renamer.read_ncbi_acc_num(
-            args.unpl, args.input_fmt, args.output_fmt,
+            args.unpl, args.input_fmt, unpl_output_fmt,
             prefix=args.prefix + args.prefix_unpl,
             suffix=args.suffix + args.suffix_unpl,
             remove_seq_version=args.no_version
         )
 
+    # for a user, the column numbers start from 1, but for the
+    # program they start from 0
+    args.column -= 1
+
     if args.fasta:
-        renamed_lines = renamer.renamed(args.file)
+        renamed_lines = renamer.renamed(args.input_file)
     else:
-        renamed_lines = renamer.renamed(args.file, args.column,
+        renamed_lines = renamer.renamed(args.input_file, args.column,
                                         sep=args.separator,
                                         comment_char=args.comment_char)
 
-    with open(args.output) as output_file:
+    with open(args.output_file, 'w') as output_file:
         for line in renamed_lines:
             # if we are processing a FASTA file and the option to
             # remove description from FASTA sequence headers is
