@@ -217,6 +217,9 @@ def ncbirenameseq():
     parser.add_argument('--no_description', action='store_true',
                         help='remove descriptions from FASTA sequence '
                              'headers')
+    parser.add_argument('--output_table',
+                        help='write the renaming table to the '
+                             'specified file')
     
     args = parser.parse_args()
     
@@ -280,3 +283,7 @@ def ncbirenameseq():
     with open(args.output_file, 'w') as output_file:
         for line in renamed_lines:
             output_file.write(line)
+
+    # write the renaming table to the specified file, if required
+    if args.output_table:
+        renamer.write_renaming_dict(args.output_table)

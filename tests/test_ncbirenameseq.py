@@ -9,6 +9,7 @@ import sys
 import tempfile
 import unittest
 import bioformats.cli
+from bioformats.seqname import BaseSeqRenamer
 from pyfaidx import Fasta
 try:
     import itertools.izip as zip
@@ -36,6 +37,7 @@ class TestNcbiRenameSeq(unittest.TestCase):
         self.__unpl = os.path.join(
             'data', 'seqrename', 'unplaced_accessions_GRCh38.p2'
         )
+        self.__output_table = tempfile.NamedTemporaryFile().name
         self.__output = tempfile.NamedTemporaryFile().name
         self.__rev_output = tempfile.NamedTemporaryFile().name
 
@@ -67,9 +69,14 @@ class TestNcbiRenameSeq(unittest.TestCase):
         sys.argv = ['', self.__table, 'genbank', self.__output,
                     'refseq',
                     '--chr', self.__chr, '--unloc', self.__unloc,
-                    '--unpl', self.__unpl]
+                    '--unpl', self.__unpl,
+                    '--output_table', self.__output_table]
 
         bioformats.cli.ncbirenameseq()
+
+        # check if the produced renaming table is correct
+        test_renamer = BaseSeqRenamer()
+        test_renamer.read_renaming_dict(self.__output_table)
 
         sys.argv = ['', self.__output, 'refseq', self.__rev_output,
                     'genbank',
@@ -85,5 +92,6 @@ class TestNcbiRenameSeq(unittest.TestCase):
                 for x, y in zip(original_table, rev_renamed_table):
                     self.assertEqual(x, y)
 
+        os.unlink(self.__output_table)
         os.unlink(self.__output)
         os.unlink(self.__rev_output)
