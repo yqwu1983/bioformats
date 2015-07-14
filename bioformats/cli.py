@@ -116,7 +116,8 @@ def renameseq():
 
     if args.fasta:
         renamed_lines = renamer.renamed(args.input_file,
-                                        reverse=args.revert)
+                                        reverse=args.revert,
+                                        no_desc=args.no_description)
     else:
         renamed_lines = renamer.renamed(args.input_file, args.column,
                                         sep=args.separator,
@@ -125,11 +126,6 @@ def renameseq():
 
     with open(args.output_file, 'w') as output:
         for line in renamed_lines:
-            # if we are processing a FASTA file and the option to remove
-            # descriptions from FASTA sequence headers is specified,
-            # then remove the description
-            if args.fasta and args.no_description:
-                line = line.split()[0] + '\n'
             output.write(line)
 
 
@@ -268,7 +264,8 @@ def ncbirenameseq():
     args.column -= 1
 
     if args.fasta:
-        renamed_lines = renamer.renamed(args.input_file)
+        renamed_lines = renamer.renamed(args.input_file,
+                                        no_desc=args.no_description)
     else:
         renamed_lines = renamer.renamed(args.input_file, args.column,
                                         sep=args.separator,
@@ -276,9 +273,4 @@ def ncbirenameseq():
 
     with open(args.output_file, 'w') as output_file:
         for line in renamed_lines:
-            # if we are processing a FASTA file and the option to
-            # remove description from FASTA sequence headers is
-            # specified, do it
-            if args.fasta and args.no_description:
-                line = line.split()[0] + '\n'
             output_file.write(line)

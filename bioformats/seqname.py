@@ -72,7 +72,7 @@ class FastaSeqRenamer(BaseSeqRenamer):
     the corresponding values from the renaming dictionary.
     """
 
-    def renamed(self, filename, reverse=False):
+    def renamed(self, filename, reverse=False, no_desc=False):
         """
         The method implements a generator of lines from the specified
         FASTA file with changed sequence names.
@@ -81,8 +81,10 @@ class FastaSeqRenamer(BaseSeqRenamer):
         to be renamed
         :param reverse: if specified, new sequence names will be 
         replaced with the original ones
+        :param no_desc: remove a FASTA sequence description
         :type filename: str
         :type reverse: bool
+        :type no_desc: bool
         :return: a line from a FASTA file with renamed sequences
         :rtype: str
         """
@@ -103,7 +105,10 @@ class FastaSeqRenamer(BaseSeqRenamer):
                         raise MissingSeqNameError(seq_name)
                     else:
                         line_parts[0] = '>' + renaming_dict[seq_name]
-                    yield ' '.join(line_parts) + '\n'
+                    if no_desc:
+                        yield line_parts[0] + '\n'
+                    else:
+                        yield ' '.join(line_parts) + '\n'
                 else:
                     # the line contains a sequence, just return it
                     yield line
