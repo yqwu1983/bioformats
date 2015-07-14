@@ -207,6 +207,10 @@ def ncbirenameseq():
                              'fragment names')
     
     # auxiliary options for sequence names
+    parser.add_argument('-r', '--revert', action='store_true',
+                        help='perform reverse renaming, that is, '
+                             'change original and new names in the '
+                             'renaming table')
     parser.add_argument('--no_version', action='store_true',
                         help='remove a sequence version from an '
                              'accession number')
@@ -265,11 +269,13 @@ def ncbirenameseq():
 
     if args.fasta:
         renamed_lines = renamer.renamed(args.input_file,
-                                        no_desc=args.no_description)
+                                        no_desc=args.no_description,
+                                        reverse=args.revert)
     else:
         renamed_lines = renamer.renamed(args.input_file, args.column,
                                         sep=args.separator,
-                                        comment_char=args.comment_char)
+                                        comment_char=args.comment_char,
+                                        reverse=args.revert)
 
     with open(args.output_file, 'w') as output_file:
         for line in renamed_lines:
