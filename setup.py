@@ -7,7 +7,7 @@
 from setuptools import setup, find_packages
 
 setup(name='bioformats',
-      version='0.1.2.post1',
+      version='0.1.3',
       description='Classes to handle bioinformatics data',
 
       author='Gaik Tamazian',
@@ -36,6 +36,7 @@ setup(name='bioformats',
           'console_scripts': [
               'randomfasta = bioformats.cli:randomfasta',
               'fastagaps = bioformats.cli:fastagaps',
-              'renameseq = bioformats.cli:renameseq']
+              'renameseq = bioformats.cli:renameseq',
+              'ncbirenameseq = bioformats.cli:ncbirenameseq']
       },
       )
