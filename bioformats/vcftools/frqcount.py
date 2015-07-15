@@ -32,7 +32,7 @@ class Reader(object):
 
     def __init__(self, filename, gzipped=False):
         """
-        Create an Reader object from the specified file.
+        Create a Reader object from the specified file.
 
         :param filename: a name of a VCFtools frequency count file
         :param gzipped: is the specified file gzipped or not
@@ -49,7 +49,7 @@ class Reader(object):
         Parse a current line from a frequency count file.
 
         :return: a named tuple representing a frequecy count record
-        :rtype: Reader.Record
+        :rtype: FrqCountRecord
         """
         line_parts = self.__line.split(None, 5)
 
