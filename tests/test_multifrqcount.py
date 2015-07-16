@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2015 by Gaik Tamazian
+# gaik (dot) tamazian (at) gmail (dot) com
+
+import logging
+import os
+import unittest
+from bioformats.vcftools.multifrqcount import Reader
+from bioformats.vcftools.multifrqcount import Record
+
+
+path = os.path.dirname(__file__)
+os.chdir(path)
+
+
+class TestReader(unittest.TestCase):
+    def setUp(self):
+        self.__correct = os.path.join(
+            'data', 'multifrqcount', 'correct.txt'
+        )
+
+        # silence the logging messages
+        logging.disable(logging.ERROR)
+
+    def test_alleles(self):
+        """
+        Check if allele counts are read correctly.
+        """
+        reader = Reader(self.__correct)
+        for i in reader.alleles():
+            self.assertIsInstance(i, Record)
