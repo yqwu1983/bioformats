@@ -46,20 +46,16 @@ class TestReader(unittest.TestCase):
         counts format in the correct way.
         """
         # test against the correct input file
-        parser = Reader(self.__correct_file)
-        for record in parser.variants():
-            self.assertIsInstance(record, FrqCountRecord)
-        # test against the compressed correct input file
-        parser = Reader(self.__compressed_correct_file, gzipped=True)
-        for record in parser.variants():
-            self.assertIsInstance(record, FrqCountRecord)
+        with open(self.__correct_file) as input_file:
+            for record in Reader(input_file).variants():
+                self.assertIsInstance(record, FrqCountRecord)
         # test against incorrect input files
         for frqcount_file in self.__incorrect_files:
-            parser = Reader(os.path.join(self.__incorrect_file_dir,
-                                         frqcount_file))
-            with self.assertRaises(FrqCountReaderError):
-                for _ in parser.variants():
-                    pass
+            with open(os.path.join(self.__incorrect_file_dir,
+                                   frqcount_file)) as input_file:
+                with self.assertRaises(FrqCountReaderError):
+                    for _ in Reader(input_file).variants():
+                        pass
 
 
 class TestWriter(unittest.TestCase):
@@ -73,19 +69,21 @@ class TestWriter(unittest.TestCase):
         Check if VCFtools allele frequencies are correctly written to
         the output file.
         """
-        for gzipped in (True, False):
-            test_input = Reader(self.__input_file)
-            with Writer(self.__output_file, gzipped) as test_output:
-                for record in test_input.variants():
-                    test_output.write(record)
+        with open(self.__input_file) as input_file, \
+                open(self.__output_file, 'w') as output_file:
+            writer = Writer(output_file)
+            for record in Reader(input_file).variants():
+                writer.write(record)
 
-            # compare the test output file to the original one
-            test_output = Reader(self.__output_file, gzipped)
+        # compare the test output file to the original one
+        with open(self.__input_file) as input_file, \
+                open(self.__output_file) as output_file:
             for x, y in zip(
-                    test_input.variants(), test_output.variants()):
+                    Reader(input_file).variants(),
+                    Reader(output_file).variants()):
                 self.assertEqual(x, y)
 
-            os.unlink(self.__output_file)
+        os.unlink(self.__output_file)
 
 
 class TestSortedReader(unittest.TestCase):
@@ -102,17 +100,20 @@ class TestSortedReader(unittest.TestCase):
         """
         Check if SortedReader reads and sorts variants.
         """
-        reader = SortedReader(self.__unsorted)
-        with Writer(self.__output) as sorted_output:
+        with open(self.__unsorted) as unsorted_input, \
+                open(self.__output, 'w') as sorted_output:
+            reader = SortedReader(unsorted_input)
+            writer = Writer(sorted_output)
             for chromosome in reader.variants:
                 for variant in reader.variants[chromosome]:
-                    sorted_output.write(variant)
+                    writer.write(variant)
 
         # compare the original sorted file and the produced one
-        test_original = Reader(self.__sorted)
-        test_output = Reader(self.__output)
-        for x, y in zip(
-                test_original.variants(), test_output.variants()):
-            self.assertEqual(x, y)
+        with open(self.__sorted) as original_sorted, \
+                open(self.__output) as produced_sorted:
+            for x, y in zip(
+                    Reader(original_sorted).variants(),
+                    Reader(produced_sorted).variants()):
+                self.assertEqual(x, y)
 
         os.unlink(self.__output)
