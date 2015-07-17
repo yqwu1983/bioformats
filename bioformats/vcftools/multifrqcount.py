@@ -28,7 +28,6 @@ class Reader(object):
         Create a Reader object from the specified file.
 
         :param handle: a handle of a multiple allele count file
-        :type handle: str
         """
         self.__handle = handle
         self.__lineno = 0
