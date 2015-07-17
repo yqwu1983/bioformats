@@ -28,6 +28,7 @@ class TestReader(unittest.TestCase):
         """
         Check if allele counts are read correctly.
         """
-        reader = Reader(self.__correct)
-        for i in reader.alleles():
-            self.assertIsInstance(i, Record)
+        with open(self.__correct) as correct_file:
+            reader = Reader(correct_file)
+            for i in reader.alleles():
+                self.assertIsInstance(i, Record)

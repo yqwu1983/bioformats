@@ -23,17 +23,14 @@ class Reader(object):
     produced from VCFtools frequency count files (*.frq.count).
     """
 
-    def __init__(self, filename, gzipped=False):
+    def __init__(self, handle):
         """
         Create a Reader object from the specified file.
 
-        :param filename: a name of a multiple allele count file
-        :param gzipped: is the specified file gzipped or not
-        :type filename: str
-        :type gzipped: bool
+        :param handle: a handle of a multiple allele count file
+        :type handle: str
         """
-        self.__filename = filename
-        self.__gzipped = gzipped
+        self.__handle = handle
         self.__lineno = 0
         self.__line = ''
 
@@ -43,9 +40,7 @@ class Reader(object):
 
         :return: the allele count record iterator
         """
-        file_handler = open if not self.__gzipped else gzip.open
-        with file_handler(self.__filename) as count_file:
-            reader = csv.reader(count_file, delimiter='\t')
-            for line in reader:
-                line[4] = tuple(map(int, line[4:]))
-                yield Record(*line[:5])
+        reader = csv.reader(self.__handle, delimiter='\t')
+        for line in reader:
+            line[4] = tuple(map(int, line[4:]))
+            yield Record(*line[:5])
