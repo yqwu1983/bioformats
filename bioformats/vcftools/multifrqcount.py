@@ -16,8 +16,6 @@ record_names = ('chrom', 'pos', 'ref', 'alt', 'counts')
 
 Record = namedtuple('Record', record_names)
 
-csv.register_dialect('tab_delimited', delimiter='\t')
-
 
 class Reader(object):
     """
@@ -47,7 +45,7 @@ class Reader(object):
         """
         file_handler = open if not self.__gzipped else gzip.open
         with file_handler(self.__filename) as count_file:
-            reader = csv.reader(count_file, 'tab_delimited')
+            reader = csv.reader(count_file, delimiter='\t')
             for line in reader:
                 line[4] = tuple(map(int, line[4:]))
                 yield Record(*line[:5])
