@@ -30,17 +30,13 @@ class Reader(object):
     produced by VCFtools using its --counts option (*.frq.count).
     """
 
-    def __init__(self, filename, gzipped=False):
+    def __init__(self, handle):
         """
         Create a Reader object from the specified file.
 
-        :param filename: a name of a VCFtools frequency count file
-        :param gzipped: is the specified file gzipped or not
-        :type filename: str
-        :type gzipped: bool
+        :param handle: a handle of a VCFtools frequency count file
         """
-        self.__filename = filename
-        self.__gzipped = gzipped
+        self.__handle = handle
         self.__lineno = 0
         self.__line = ''
 
@@ -118,16 +114,14 @@ class Reader(object):
 
         :return: the allele count record iterator
         """
-        file_handler = open if not self.__gzipped else gzip.open
-        with file_handler(self.__filename, 'rt') as count_file:
-            self.__lineno = 0
-            for self.__line in count_file:
-                self.__line = self.__line.rstrip()
-                self.__lineno += 1
-                if self.__line.startswith('CHROM'):
-                    # skip the comment line
-                    continue
-                yield self.__parse_frq_count_line()
+        self.__lineno = 0
+        for self.__line in self.__handle:
+            self.__line = self.__line.rstrip()
+            self.__lineno += 1
+            if self.__line.startswith('CHROM'):
+                # skip the comment line
+                continue
+            yield self.__parse_frq_count_line()
 
 
 class SortedReader(object):
@@ -137,18 +131,15 @@ class SortedReader(object):
     *.frq.count).
     """
 
-    def __init__(self, filename, gzipped=False):
+    def __init__(self, handle):
         """
         Create an SortedReader object from the specified file.
 
-        :param filename: a name of a VCFtools frequency count file
-        :param gzipped: is the specified file gzipped or not
-        :type filename: str
-        :type gzipped: bool
+        :param handle: a handle of a VCFtools frequency count file
         """
         # load variants from the specified file
         temp_variants = defaultdict(list)
-        parser = Reader(filename, gzipped)
+        parser = Reader(handle)
         logger.info('started reading variants')
         for variant in parser.variants():
             temp_variants[variant.chrom].append(variant)
@@ -176,31 +167,17 @@ class Writer(object):
     The class implements writing to a file in the VCFtools allele
     frequency format.
     """
-    def __init__(self, filename, gzipped=False):
+    def __init__(self, handle):
         """
         Given a name of a file, create a VCFtools frequencty count
         writer object to write data to it.
 
-        :param filename: a name of a file to write allele frequency
+        :param handle: a handle of a file to write allele frequency
             counts to
-        :param gzipped: produce the gzipped output file or not
-        :type filename: str
-        :type gzipped: bool
         """
-        self.__filename = filename
-        self.__gzipped = gzipped
-
-    def __enter__(self):
-        if self.__gzipped:
-            self.__output = gzip.open(self.__filename, 'wt')
-        else:
-            self.__output = open(self.__filename, 'w')
-        self.__output.write(
+        self.__handle = handle
+        self.__handle.write(
             'CHROM\tPOS\tN_ALLELES\tN_CHR\t{ALLELE:COUNT}\n')
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.__output.close()
 
     def write(self, frqcount_record):
         """
@@ -224,4 +201,4 @@ class Writer(object):
         frqcount_record[5] = alt_freq
 
         template = '\t'.join(['{}'] * len(frqcount_record)) + '\n'
-        self.__output.write(template.format(*frqcount_record))
+        self.__handle.write(template.format(*frqcount_record))
