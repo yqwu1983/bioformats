@@ -72,7 +72,7 @@ class TestReorder(unittest.TestCase):
         """
         Check if input sequences are properly reordered.
         """
-        test = Reorder(open(self.__order))
+        test = Reorder(self.__order)
         test.write(self.__input, self.__output, ignore_missing=True)
         # check if sequences are in the specified order
         input_fasta = pyfaidx.Fasta(self.__input)

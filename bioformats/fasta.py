@@ -85,17 +85,18 @@ class Reorder(object):
     The class implements reordering of sequences in a FASTA file.
     """
 
-    def __init__(self, order_handle):
+    def __init__(self, order_filename):
         """
-        Given a handle of a file containing sequence names in the
+        Given a name of a file containing sequence names in the
         specific order, read this order.
 
-        :param order_handle: a handle of a file with ordered sequence
+        :param order_filename: a name of a file with ordered sequence
             names
         """
         self.__order = []
-        for line in order_handle:
-            self.__order.append(line.rstrip())
+        with open(order_filename) as order_file:
+            for line in order_file:
+                self.__order.append(line.rstrip())
 
     @property
     def order(self):
