@@ -1,6 +1,14 @@
 Changes
 =======
 
+0.1.4
+-----
+- Tool `fastareorder` to reorder sequences in a FASTA file added.
+
+0.1.3
+-----
+- Sequence renaming tools `renameseq` and `ncbirenameseq` added.
+
 0.1.2
 -----
 - Parser for VCFtools frequency count format
