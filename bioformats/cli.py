@@ -287,3 +287,31 @@ def ncbirenameseq():
     # write the renaming table to the specified file, if required
     if args.output_table:
         renamer.write_renaming_dict(args.output_table)
+
+
+def fastareorder():
+    """
+    This function corresponds to a command-line tool that reorders
+    sequences in a FASTA file.
+    """
+    parser = argparse.ArgumentParser(
+        description='Reorder sequences in a FASTA file.'
+    )
+
+    parser.add_argument('fasta', help='a FASTA file of sequences to '
+                                      'reorder')
+    parser.add_argument('order_file', help='a file with the sequence '
+                                           'order')
+    parser.add_argument('output', help='an output FASTA file of '
+                                       'reordered sequences')
+
+    parser.add_argument('-i', '--ignore_missing', action='store_true',
+                        help='ignore sequences in the specified order '
+                             'file that are missing in the input '
+                             'FASTA file')
+
+    args = parser.parse_args()
+
+    reorderer = fasta.Reorder(args.order_file)
+    reorderer.write(args.fasta, args.output,
+                    ignore_missing=args.ignore_missing)

@@ -37,6 +37,7 @@ setup(name='bioformats',
               'randomfasta = bioformats.cli:randomfasta',
               'fastagaps = bioformats.cli:fastagaps',
               'renameseq = bioformats.cli:renameseq',
-              'ncbirenameseq = bioformats.cli:ncbirenameseq']
+              'ncbirenameseq = bioformats.cli:ncbirenameseq',
+              'fastareorder = bioformats.cli:fastareorder']
       },
       )
