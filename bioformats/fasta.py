@@ -4,9 +4,10 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import pyfaidx
 import random
 from builtins import range  # pylint:disable=redefined-builtin
-
+from .exception import BioformatsError
 
 class Writer(object):
     """
@@ -77,3 +78,46 @@ class RandomSequence(object):
             result.append(random.choice(nucleotides))
 
         return ''.join(result)
+
+
+class Reorder(object):
+    """
+    The class implements reordering of sequences in a FASTA file.
+    """
+
+    def __init__(self, order_handle):
+        """
+        Given a handle of a file containing sequence names in the
+        specific order, read this order.
+
+        :param order_handle: a handle of a file with ordered sequence
+            names
+        """
+        self.__order = []
+        for line in order_handle:
+            self.__order.append(line.rstrip())
+
+    @property
+    def order(self):
+        return self.__order
+
+    def write(self, input_file, output_file, ignore_missing=True):
+        """
+        Given a handle of an input FASTA file, reorder its sequences
+        and write to the specified output file.
+
+        :param input_file: a name of an input FASTA file
+        :param output_file: a name of an output FASTA file
+        :param ignore_missing: ignore sequences given in the sequence
+            order but present in the input FASTA file
+        :type ignore_missing: bool
+        """
+        seq_reader = pyfaidx.Fasta(input_file)
+        with Writer(output_file) as seq_writer:
+            for i in self.__order:
+                if i not in seq_reader.keys():
+                    if not ignore_missing:
+                        raise BioformatsError('missing sequence {'
+                                              '}'.format(i))
+                else:
+                    seq_writer.write(i, str(seq_reader[i]))
