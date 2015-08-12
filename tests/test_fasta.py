@@ -78,7 +78,7 @@ class TestReorder(unittest.TestCase):
         input_fasta = pyfaidx.Fasta(self.__input)
         output_fasta = pyfaidx.Fasta(self.__output)
         present_seq = [x for x in test.order if x in input_fasta.keys()]
-        self.assertEqual(present_seq, output_fasta.keys())
+        self.assertEqual(present_seq, list(output_fasta.keys()))
 
         with self.assertRaises(BioformatsError):
             test.write(self.__input, self.__output,
