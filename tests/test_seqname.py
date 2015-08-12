@@ -190,6 +190,11 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
 
             example_file = os.path.join(self.__test_dir,
                                         'ncbi_' + j + '.fa')
+
+            for k in (self.__output + '.fai', example_file + '.fai'):
+                if os.path.isfile(k):
+                    os.unlink(k)
+
             output_fasta = Fasta(self.__output)
             example_fasta = Fasta(example_file)
             # compare the obtained file to the example
@@ -223,6 +228,11 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
         with open(self.__output, 'w') as output_fasta:
             for line in renamer.renamed(input_file):
                 output_fasta.write(line)
+
+        for k in (self.__output + '.fai', example_file + '.fai'):
+            if os.path.isfile(k):
+                os.unlink(k)
+
         output_fasta = Fasta(self.__output)
         example_fasta = Fasta(example_file)
         self.assertEqual(output_fasta.keys, example_fasta.keys)
