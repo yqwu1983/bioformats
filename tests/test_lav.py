@@ -36,7 +36,9 @@ class TestLavAlignment(unittest.TestCase):
         # test against the correct input file
         parser = Lav(self.__correct_file)
         for alignment in parser.alignments():
-            self.assertEqual(len(alignment), 6)
+            self.assertEqual(len(alignment), 7)
+        for alignment in parser.alignments(gapped=False):
+            self.assertEqual(len(alignment), 8)
         # test againts incorrect input files
         for lav_file in self.__incorrect_files:
             parser = Lav(os.path.join(self.__incorrect_file_dir,

@@ -46,7 +46,13 @@ class Lav(object):
 
     GapFreeAlignment = namedtuple('GapFreeAlignment', (
         'first_seq', 'second_seq', 'first_start', 'first_end',
-        'second_start', 'second_end'))
+        'second_start', 'second_end', 'identity'
+    ))
+
+    GappedAlignment = namedtuple('GappedAlignment', (
+        'first_seq', 'second_seq', 'first_start', 'first_end',
+        'second_start', 'second_end', 'score', 'identity'
+    ))
 
     def __init__(self, filename):
         """
@@ -61,13 +67,16 @@ class Lav(object):
         self.__lineno = 0
         self.__line = None
 
-    def alignments(self):
+    def alignments(self, gapped=True):
         """
         Iterate through alignments in the file the object was created
         from.
 
-        :return: an alignment from the file the object was created from
-        :rtype: Lav.Alignment
+        :param gapped: return gapped alignments
+        :type gapped: bool
+
+        :return: an iterator to iterate through gapped or ungapped
+            alignments
         """
         with open(self.__filename) as self.__handler:
             self.__line = self.__handler.readline().rstrip()
@@ -90,18 +99,43 @@ class Lav(object):
                 while not self.__line.startswith('#'):
                     if self.__line.startswith('a'):
                         a_stanza = self.__parse_a_stanza()
+                        identical_bases = total_bases = 0
                         for segment in a_stanza.segments:
                             assert isinstance(segment,
                                               Lav.GapFreeSegment)
-                            gap_free_alignment = Lav.GapFreeAlignment(
+                            if gapped:
+                                gap_free_alignment = \
+                                    Lav.GapFreeAlignment(
+                                        first_seq=first_seq,
+                                        second_seq=second_seq,
+                                        first_start=segment.first_start,
+                                        first_end=segment.first_end,
+                                        second_start=
+                                        segment.second_start,
+                                        second_end=segment.second_end,
+                                        identity=segment.identity
+                                    )
+                                yield gap_free_alignment
+                            else:
+                                segment_len = segment.first_end - \
+                                    segment.first_start
+                                identical_bases += segment.identity * \
+                                    float(segment_len) / 100
+                                total_bases += segment_len
+                        if not gapped:
+                            gapped_alignment = Lav.GappedAlignment(
                                 first_seq=first_seq,
                                 second_seq=second_seq,
-                                first_start=segment.first_start,
-                                first_end=segment.first_end,
-                                second_start=segment.second_start,
-                                second_end=segment.second_end
+                                first_start=a_stanza.first_start,
+                                first_end=a_stanza.first_end,
+                                second_start=a_stanza.second_start,
+                                second_end=a_stanza.second_end,
+                                score=a_stanza.score,
+                                identity=int(round(
+                                    identical_bases * 100 /
+                                    total_bases))
                             )
-                            yield gap_free_alignment
+                            yield gapped_alignment
                     elif self.__line.startswith('x'):
                         self.__parse_x_stanza()
                     elif self.__line.startswith('m'):
