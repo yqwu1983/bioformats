@@ -9,7 +9,7 @@ import pyfaidx
 import re
 from . import fasta
 from . import seqname
-
+from argparse import RawTextHelpFormatter
 
 def randomfasta():
     """
@@ -137,19 +137,32 @@ def ncbirenameseq():
     parser = argparse.ArgumentParser(
         description='Change NCBI-style sequence names in a FASTA file'
                     'or plain text tabular file',
-        epilog='Format values: refseq_full, genbank_full, refseq_gi, '
-               'genbank_gi, refseq, genbank, chr_refseq, chr_genbank '
-               'and ucsc (only as the output format).'
+        epilog='Format values: \n'
+               '\trefseq_full:\tgi|568815597|ref|NC_000001.11|\n'
+               '\tgenbank_full:\tgi|568336023|gb|CM000663.2|\n'
+               '\trefseq_gi:\t568815597\n'
+               '\tgenbank_gi:\t568336023\n'
+               '\trefseq: \tNC_000001.11\n'
+               '\tgenbank:\tCM000663.2\n'
+               '\tchr_refseq:\t1_NC_000001.11\n'
+               '\tchr_genbank:\t1_CM000663.2',
+        formatter_class=RawTextHelpFormatter
     )
+
+    format_values = ['refseq_full', 'genbank_full', 'refseq_gi',
+                     'genbank_gi', 'refseq', 'genbank', 'chr_refseq',
+                     'chr_genbank']
 
     # required parameters
     parser.add_argument('input_file',
                         help='a file to change sequence names in')
     parser.add_argument('input_fmt',
+                        choices=format_values,
                         help='a format of sequence names in input')
     parser.add_argument('output_file',
                         help='an output file for renamed sequences')
     parser.add_argument('output_fmt',
+                        choices=format_values + ['ucsc'],
                         help='a format of sequence names in output')
 
     # the input file format
