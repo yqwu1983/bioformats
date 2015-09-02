@@ -9,6 +9,7 @@ import random
 from builtins import range  # pylint:disable=redefined-builtin
 from .exception import BioformatsError
 
+
 class Writer(object):
     """
     The class implements routines to write sequences in the FASTA

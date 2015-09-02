@@ -11,6 +11,7 @@ from . import fasta
 from . import seqname
 from argparse import RawTextHelpFormatter
 
+
 def randomfasta():
     """
     This function corresponds to a command-line tool which creates a
