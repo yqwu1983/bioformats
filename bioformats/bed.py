@@ -17,7 +17,7 @@ bed_columns = ('seq', 'start', 'end', 'name', 'score', 'strand',
 
 bed_numeric_fields = (1, 2, 4, 6, 7, 9)
 
-BedRecord = namedtuple('BedRecord', bed_columns)
+Record = namedtuple('Record', bed_columns)
 
 
 class Reader(object):
@@ -43,7 +43,7 @@ class Reader(object):
         created from.
 
         :return: a record from the BED file the object was created from
-        :rtype: BedRecord
+        :rtype: Record
         """
         with open(self.__filename) as bed_file:
             for self.__line in bed_file:
@@ -55,7 +55,7 @@ class Reader(object):
         Parse the current line from the BED file.
 
         :return: a record from the BED file the object was created from
-        :rtype: BedRecord
+        :rtype: Record
         """
         line_parts = self.__line.split()
 
@@ -75,7 +75,7 @@ class Reader(object):
 
         # form the tuple to be returned as a result
         line_parts += ([None] * (len(bed_columns) - len(line_parts)))
-        result = BedRecord(*line_parts)
+        result = Record(*line_parts)
 
         return result
 
@@ -104,7 +104,7 @@ class Writer(object):
         object was creted.
 
         :param bed_record: a BED record to be written to the file
-        :type: BedRecord
+        :type: Record
         """
         num_fields = len(bed_record)
         # check if the last column contains any values

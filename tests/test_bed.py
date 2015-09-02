@@ -8,7 +8,7 @@ import os
 import logging
 import tempfile
 import unittest
-from bioformats.bed import BedRecord, Reader, Writer
+from bioformats.bed import Record, Reader, Writer
 from bioformats.exception import BedError
 
 try:
@@ -39,12 +39,12 @@ class TestBedReader(unittest.TestCase):
         # test against the correct input file
         parser = Reader(self.__correct_file)
         for record in parser.records():
-            self.assertIsInstance(record, BedRecord)
+            self.assertIsInstance(record, Record)
         # test against the incorrect input file
         parser = Reader(self.__incorrect_file)
         with self.assertRaises(BedError):
             for record in parser.records():
-                self.assertIsInstance(record, BedRecord)
+                self.assertIsInstance(record, Record)
 
 
 class TestBedWriter(unittest.TestCase):
