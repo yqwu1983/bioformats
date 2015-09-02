@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 gff3_columns = ('seqid', 'source', 'type', 'start', 'end', 'score',
                 'strand', 'phase', 'attributes', )
 
-Gff3Record = namedtuple('Gff3Record', gff3_columns)
+Record = namedtuple('Record', gff3_columns)
 
 
 class Reader(object):
@@ -42,7 +42,7 @@ class Reader(object):
 
         :return: a record from the GFF3 file the object was created
         from
-        :rtype: Gff3Record
+        :rtype: Record
         """
         with open(self.__filename) as gff3_file:
             # check the first line of the file
@@ -65,7 +65,7 @@ class Reader(object):
 
         :return: a record from the GFF3 file the object was created
             from
-        :rtype: Gff3Record
+        :rtype: Record
         """
         line_parts = self.__line.split('\t', 8)
         if len(line_parts) < 8:
@@ -114,7 +114,7 @@ class Reader(object):
         else:
             line_parts += [None]
 
-        return Gff3Record(*line_parts)
+        return Record(*line_parts)
 
 
 class Writer(object):
@@ -145,7 +145,7 @@ class Writer(object):
         object was created.
 
         :param gff3_record: a GFF3 record to be written to the file
-        :type gff3_record: Gff3Record
+        :type gff3_record: Record
         """
         gff3_record = list(gff3_record)
         # prepare the attributes line

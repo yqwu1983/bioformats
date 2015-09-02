@@ -9,7 +9,7 @@ import os
 import logging
 import tempfile
 import unittest
-from bioformats.gff3 import Gff3Record, Reader, Writer
+from bioformats.gff3 import Record, Reader, Writer
 from bioformats.exception import Gff3Error
 try:
     import itertools.izip as zip
@@ -41,7 +41,7 @@ class TestGff3Reader(unittest.TestCase):
         # test against the correct input file
         parser = Reader(self.__correct_file)
         for record in parser.records():
-            self.assertIsInstance(record, Gff3Record)
+            self.assertIsInstance(record, Record)
         # test against incorrect input files
         for gff_file in self.__incorrect_files:
             parser = Reader(os.path.join(self.__incorrect_file_dir,
