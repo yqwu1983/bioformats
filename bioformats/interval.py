@@ -12,7 +12,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 interval_fields = ('seq', 'start', 'end')
-IntervalRecord = namedtuple('IntervalRecord', interval_fields)
+Record = namedtuple('Record', interval_fields)
 
 
 class Reader(object):
@@ -40,7 +40,7 @@ class Reader(object):
 
         :return: a record from the interval format file the object
             was created from
-        :rtype: IntervalRecord
+        :rtype: Record
         """
         with open(self.__filename) as interval_file:
             for self.__line in interval_file:
@@ -58,7 +58,7 @@ class Reader(object):
                                      'line %s', self.__lineno,
                                      self.__line)
                         raise IntervalError
-                    yield IntervalRecord(self.__seq, start, end)
+                    yield Record(self.__seq, start, end)
 
 
 class Writer(object):
@@ -90,7 +90,7 @@ class Writer(object):
 
         :param interval_record: an interval format record to be
             written to the file
-        :type interval_record: IntervalRecord
+        :type interval_record: Record
         """
         if self.__seq != interval_record.seq:
             self.__seq = interval_record.seq

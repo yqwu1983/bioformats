@@ -8,7 +8,7 @@ import logging
 import os
 import tempfile
 import unittest
-from bioformats.interval import IntervalRecord
+from bioformats.interval import Record
 from bioformats.interval import Reader
 from bioformats.interval import Writer
 from bioformats.exception import IntervalError
@@ -41,7 +41,7 @@ class TestReader(unittest.TestCase):
         # test against the correct input file
         parser = Reader(self.__correct_file)
         for record in parser.intervals():
-            self.assertIsInstance(record, IntervalRecord)
+            self.assertIsInstance(record, Record)
         # test against the incorrect input file
         parser = Reader(self.__incorrect_file)
         with self.assertRaises(IntervalError):
