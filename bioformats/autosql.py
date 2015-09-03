@@ -30,6 +30,9 @@ class Reader(object):
         line = self.__handle.readline().rstrip()
         self.__desc = line.strip('"')
 
+        logging.debug('started reading table %s (%s)...', self.__name,
+                      self.__desc)
+
     @property
     def table_name(self):
         return self.__name
@@ -56,6 +59,9 @@ class Reader(object):
                 entry_num = None
             yield TableEntry(entry_type, entry_num, entry_name,
                              entry_desc)
+
+        logging.debug('finished reading table %s (%s)', self.__name,
+                      self.__desc)
 
     def get_table(self):
         """
@@ -89,6 +95,9 @@ class Writer(object):
         self.__tbl_desc = table_desc
 
     def __enter__(self):
+        logger.debug('started writing table %s(%s) to %s...',
+                     self.__tbl_name, self.__tbl_desc, self.__filename)
+
         self.__output = open(self.__filename, 'w')
         self.__output.write('table {}\n"{}"\n'.format(self.__tbl_name,
                                                       self.__tbl_desc))
@@ -111,3 +120,6 @@ class Writer(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.__output.write(')\n')
         self.__output.close()
+
+        logger.debug('finished writing table %s (%s) to %s',
+                     self.__tbl_name, self.__tbl_desc, self.__filename)
