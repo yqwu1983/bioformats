@@ -59,8 +59,11 @@ class Reader(object):
                 array_matches = re.search('[\d+]', entry_type, 1)
                 if array_matches is not None:
                     entry_num = int(array_matches.group(0))
+                    entry_type = entry_type[:array_matches.start(0)-1]
                 else:
                     entry_num = None
+                entry_name = entry_name.rstrip(';')
+                entry_desc = entry_desc.strip('"')
                 yield TableEntry(entry_type, entry_num, entry_name,
                                  entry_desc)
 
