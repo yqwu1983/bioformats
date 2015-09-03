@@ -30,6 +30,9 @@ class Reader(object):
         line = self.__handle.readline().rstrip()
         self.__desc = line.strip('"')
 
+        # read a line denoting the start of entry records
+        line = self.__handle.readline().rstrip()
+
         logging.debug('started reading table %s (%s)...', self.__name,
                       self.__desc)
 
@@ -49,16 +52,17 @@ class Reader(object):
         :return: an itereator to iterate through autoSql file entries
         """
         for line in self.__handle:
-            entry_type, entry_name, entry_desc = line.rstrip().split(
-                None, 3)
-            # check if the field type is an array
-            array_matches = re.search('[\d+]', entry_type, 1)
-            if array_matches is not None:
-                entry_num = int(array_matches.group(0))
-            else:
-                entry_num = None
-            yield TableEntry(entry_type, entry_num, entry_name,
-                             entry_desc)
+            line = line.rstrip()
+            if line != ')':
+                entry_type, entry_name, entry_desc = line.split(None, 2)
+                # check if the field type is an array
+                array_matches = re.search('[\d+]', entry_type, 1)
+                if array_matches is not None:
+                    entry_num = int(array_matches.group(0))
+                else:
+                    entry_num = None
+                yield TableEntry(entry_type, entry_num, entry_name,
+                                 entry_desc)
 
         logging.debug('finished reading table %s (%s)', self.__name,
                       self.__desc)
