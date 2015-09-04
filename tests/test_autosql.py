@@ -89,6 +89,7 @@ class TestAutoSqlTypeRoutines(unittest.TestCase):
         correct_types = [
             (255, 'ubyte'),
             (-128, 'byte'),
+            (127, 'byte'),
             (-129, 'short'),
             (256, 'short'),
             (65535, 'ushort'),
@@ -119,6 +120,8 @@ class TestAutoSqlTypeRoutines(unittest.TestCase):
 
     def test_compare_autosql_types(self):
         triplets = [
+            ('ubyte', None, 'ubyte'),
+            ('short', 'uint', 'int'),
             ('ubyte', 'byte', 'short'),
             ('uint', 'byte', 'int'),
             ('int', 'float', 'float'),
