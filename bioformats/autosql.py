@@ -130,3 +130,87 @@ class Writer(object):
 
         logger.debug('finished writing table %s (%s) to %s',
                      self.__tbl_name, self.__tbl_desc, self.__filename)
+
+
+def is_int(x):
+    """
+    Given a string value, determine if it is an integer.
+
+    :param x: a string value to check if it is an integer
+    :type x: str
+    :return: whether the specified value is an integer or not
+    :rtype: bool
+    """
+    try:
+        int(x)
+    except ValueError:
+        return False
+    return True
+
+
+def get_int_type(x):
+    """
+    Given an integer value, determine which the least autoSql type
+    that suits it.
+
+    :param x: an integer value
+    :type x: int
+    :return: an autoSql type for the specified value
+    :rtype: str
+    """
+    if x < 0:
+        # consider signed types
+        if -pow(2, 7) - 1 < x < pow(2, 7):
+            return 'byte'
+        elif -pow(2, 15) - 1 < x < pow(2, 15):
+            return 'short'
+        elif -pow(2, 31) - 1 < x < pow(2, 31):
+            return 'int'
+    else:
+        # consider unsigned types
+        if x < pow(2, 8):
+            return 'ubyte'
+        elif x < pow(2, 16):
+            return 'ushort'
+        elif x < pow(2, 32):
+            return 'unit'
+    return None
+
+
+def is_float(x):
+    """
+    Given a string value, determine if it is a floating-point number.
+
+    :param x: a string value to check if it is a floating-point number
+    :type x: str
+    :return: whether the specified value is a floating-point number
+        or not
+    :rtype: bool
+    """
+    try:
+        float(x)
+    except ValueError:
+        return False
+    return True
+
+
+def get_autosql_type(value):
+    """
+    Given a string value, determine the most appropriate autoSql type
+    for it.
+
+    :param value: a string value to determine its autoSql type
+    :type value: str
+    :return: an autoSql type
+    :rtype: str
+    """
+    if is_int(value) and get_int_type(value) is not None:
+        value_type = get_int_type(value)
+    elif is_float(value):
+        value_type = 'float'
+    elif len(value) < 256:
+        value_type = 'string'
+    else:
+        value_type = 'lstring'
+
+    return value_type
