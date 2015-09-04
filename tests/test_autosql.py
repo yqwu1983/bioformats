@@ -9,6 +9,7 @@ import os
 import tempfile
 import unittest
 from bioformats.autosql import Table, TableEntry, Reader, Writer
+from bioformats.autosql import Classifier
 
 try:
     import itertools.izip as zip
@@ -129,3 +130,29 @@ class TestAutoSqlTypeRoutines(unittest.TestCase):
             self.assertEqual(
                 bioformats.autosql.compare_autosql_types(x[0], x[1]),
                 x[2])
+
+
+class TestClassifier(unittest.TestCase):
+    def test_is_array(self):
+        classifier = Classifier()
+        classifier.add_value('af')
+        classifier.add_value('gt')
+        classifier.add_value('ty')
+        self.assertEqual(classifier.is_array(), True)
+        classifier.add_value('gth')
+        self.assertEqual(classifier.is_array(), False)
+
+    def test_data_type(self):
+        classifier = Classifier()
+        classifier.add_value('128')
+        self.assertEqual(classifier.data_type, 'ubyte')
+        classifier.add_value('256')
+        self.assertEqual(classifier.data_type, 'short')
+        classifier.add_value('65536')
+        self.assertEqual(classifier.data_type, 'int')
+        classifier.add_value('5.9')
+        self.assertEqual(classifier.data_type, 'float')
+        classifier.add_value('a' * 10)
+        self.assertEqual(classifier.data_type, 'string')
+        classifier.add_value('a' * 1000)
+        self.assertEqual(classifier.data_type, 'lstring')

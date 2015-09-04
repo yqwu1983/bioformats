@@ -256,6 +256,12 @@ def compare_autosql_types(x, y):
     :return: the most common of the specified autoSql types
     :rtype: str
     """
+    if x is None or y is None:
+        if x is None:
+            return y
+        else:
+            return x
+
     is_x_int = x in (signed_types + unsigned_types)
     is_y_int = y in (signed_types + unsigned_types)
     is_x_signed = x in signed_types
@@ -278,3 +284,50 @@ def compare_autosql_types(x, y):
         result = max(type_order[x], type_order[y])
 
     return type_names[result]
+
+
+class Classifier(object):
+    """
+    This class implements routines to assign autoSql types to arrays
+    of values.
+    """
+
+    def __init__(self):
+        """
+        Initialize the classifier object.
+        """
+        self.__data_type = None
+        self.__lengths = []
+
+    def add_value(self, value):
+        """
+        Add a value from the data set which type is being specified.
+
+        :param value: a data set value
+        :type value: str
+        """
+        self.__lengths.append(len(value))
+        curr_type = get_autosql_type(value)
+        self.__data_type = compare_autosql_types(self.__data_type,
+                                                 curr_type)
+
+    def is_array(self):
+        """
+        Based on lengths of value strings, consider if they can be
+        represented as an array.
+
+        :return: if the classified value can be an array of fixed
+            length
+        :rtype: bool
+        """
+        return len(set(self.__lengths)) <= 1
+
+    @property
+    def data_type(self):
+        """
+        Return the autoSql data type that suits all specified values.
+
+        :return: autoSql data type specifying all values
+        :rtype: str
+        """
+        return self.__data_type
