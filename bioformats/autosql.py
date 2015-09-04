@@ -173,7 +173,7 @@ def get_int_type(x):
         elif x < pow(2, 16):
             return 'ushort'
         elif x < pow(2, 32):
-            return 'unit'
+            return 'uint'
     return None
 
 
@@ -204,8 +204,8 @@ def get_autosql_type(value):
     :return: an autoSql type
     :rtype: str
     """
-    if is_int(value) and get_int_type(value) is not None:
-        value_type = get_int_type(value)
+    if is_int(value) and get_int_type(int(value)) is not None:
+        value_type = get_int_type(int(value))
     elif is_float(value):
         value_type = 'float'
     elif len(value) < 256:

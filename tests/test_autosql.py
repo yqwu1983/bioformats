@@ -4,6 +4,7 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import bioformats.autosql
 import os
 import tempfile
 import unittest
@@ -70,3 +71,47 @@ class TestAutoSqlWriter(unittest.TestCase):
     def tearDown(self):
         if os.path.isfile(self.__output):
             os.unlink(self.__output)
+
+
+class TestAutoSqlTypeRoutines(unittest.TestCase):
+    def test_is_int(self):
+        self.assertEqual(bioformats.autosql.is_int('5'), True)
+        self.assertEqual(bioformats.autosql.is_int('5.4'), False)
+        self.assertEqual(bioformats.autosql.is_int('5fa'), False)
+
+    def test_is_float(self):
+        self.assertEqual(bioformats.autosql.is_float('5'), True)
+        self.assertEqual(bioformats.autosql.is_float('5.4'), True)
+        self.assertEqual(bioformats.autosql.is_float('6.45sf'), False)
+
+    def test_get_int_type(self):
+        correct_types = [
+            (255, 'ubyte'),
+            (-128, 'byte'),
+            (-129, 'short'),
+            (256, 'ushort'),
+            (65535, 'ushort'),
+            (-32768, 'short'),
+            (65537, 'uint'),
+            (-32769, 'int'),
+            (4294967295, 'uint'),
+            (-2147483648, 'int')
+        ]
+
+        for x, y in correct_types:
+            self.assertEqual(bioformats.autosql.get_int_type(x), y)
+
+        self.assertIsNone(bioformats.autosql.get_int_type(pow(2, 32)))
+        self.assertIsNone(bioformats.autosql.get_int_type(
+            -pow(2, 31) - 1))
+
+    def test_get_autosql_type(self):
+        correct_types = [
+            ('255', 'ubyte'),
+            ('1.5', 'float'),
+            ('a' * 255, 'string'),
+            ('a' * 256, 'lstring')
+        ]
+
+        for x, y in correct_types:
+            self.assertEqual(bioformats.autosql.get_autosql_type(x), y)
