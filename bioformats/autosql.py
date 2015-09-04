@@ -188,11 +188,20 @@ def get_int_type(x):
     else:
         # consider unsigned types
         if x < pow(2, 8):
-            return 'ubyte'
+            if x < pow(2, 7):
+                return 'byte'
+            else:
+                return 'ubyte'
         elif x < pow(2, 16):
-            return 'ushort'
+            if x < pow(2, 15):
+                return 'short'
+            else:
+                return 'ushort'
         elif x < pow(2, 32):
-            return 'uint'
+            if x < pow(2, 31):
+                return 'int'
+            else:
+                return 'uint'
     return None
 
 

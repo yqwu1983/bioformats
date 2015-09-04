@@ -89,10 +89,10 @@ class TestAutoSqlTypeRoutines(unittest.TestCase):
             (255, 'ubyte'),
             (-128, 'byte'),
             (-129, 'short'),
-            (256, 'ushort'),
+            (256, 'short'),
             (65535, 'ushort'),
             (-32768, 'short'),
-            (65537, 'uint'),
+            (65537, 'int'),
             (-32769, 'int'),
             (4294967295, 'uint'),
             (-2147483648, 'int')
