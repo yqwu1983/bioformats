@@ -115,3 +115,17 @@ class TestAutoSqlTypeRoutines(unittest.TestCase):
 
         for x, y in correct_types:
             self.assertEqual(bioformats.autosql.get_autosql_type(x), y)
+
+    def test_compare_autosql_types(self):
+        triplets = [
+            ('ubyte', 'byte', 'short'),
+            ('uint', 'byte', 'int'),
+            ('int', 'float', 'float'),
+            ('string', 'byte', 'string'),
+            ('lstring', 'string', 'lstring')
+        ]
+
+        for x in triplets:
+            self.assertEqual(
+                bioformats.autosql.compare_autosql_types(x[0], x[1]),
+                x[2])

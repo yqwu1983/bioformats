@@ -7,12 +7,31 @@
 import logging
 import re
 from collections import namedtuple
+from future.utils import iteritems
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 Table = namedtuple('Table', ('name', 'desc', 'entries'))
 TableEntry = namedtuple('TableEntry', ('type', 'num', 'name', 'desc'))
+
+# below we introduce the hierarchy of autoSql types
+type_order = dict([
+    ('byte', 1),
+    ('ubyte', 2),
+    ('short', 3),
+    ('ushort', 4),
+    ('int', 5),
+    ('uint', 6),
+    ('float', 7),
+    ('string', 8),
+    ('lstring', 9)
+])
+
+type_names = {value: key for key, value in iteritems(type_order)}
+
+signed_types = ('byte', 'short', 'int')
+unsigned_types = ('ubyte', 'ushort', 'uint')
 
 
 class Reader(object):
@@ -214,3 +233,39 @@ def get_autosql_type(value):
         value_type = 'lstring'
 
     return value_type
+
+
+def compare_autosql_types(x, y):
+    """
+    Given two values of autoSql types, compare them to each other and
+    return the type that is more common.
+
+    :param x: the first autoSql type value
+    :param y: the second autoSql type value
+    :type x: str
+    :type y: str
+    :return: the most common of the specified autoSql types
+    :rtype: str
+    """
+    is_x_int = x in (signed_types + unsigned_types)
+    is_y_int = y in (signed_types + unsigned_types)
+    is_x_signed = x in signed_types
+    is_y_signed = y in signed_types
+    if is_x_int and is_y_int and is_x_signed != is_y_signed:
+        # one of the integer types is signed and another one is not
+        if is_x_signed:
+            signed_arg = type_order[x]
+            unsigned_arg = type_order[y]
+        else:
+            signed_arg = type_order[y]
+            unsigned_arg = type_order[x]
+        if unsigned_arg < signed_arg:
+            result = signed_arg
+        else:
+            # the largest signed integer type is int which
+            # corresponding number is 5
+            result = min(max(signed_arg, unsigned_arg - 1) + 2, 5)
+    else:
+        result = max(type_order[x], type_order[y])
+
+    return type_names[result]
