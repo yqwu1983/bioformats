@@ -4,9 +4,9 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
-import autosql
 import logging
 from collections import namedtuple
+from . import autosql
 from .exception import BedError
 
 logging.basicConfig()
