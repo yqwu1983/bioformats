@@ -4,6 +4,7 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import autosql
 import logging
 from collections import namedtuple
 from .exception import BedError
@@ -115,3 +116,117 @@ class Writer(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.__output.close()
+
+
+def is_score(x):
+    """
+    Given a value, check if it can represent a BED score.
+
+    :param x: a value to check
+    :type x: str
+    :return: if the specified value can represent a BED score
+    :rtype: bool
+    """
+    return autosql.is_int(x) and (0 <= int(x) <= 1000)
+
+
+def is_strand(x):
+    """
+    Given a value, determine if it can represent a BED strand.
+
+    :param x: a value to check
+    :type x: str
+    :return: if the specified value can represent a BED strand.
+    :rtype: bool
+    """
+    return x in ('+', '-')
+
+
+def is_coordinate(x):
+    """
+    Given a value, determine if it can represent a BED coordinate.
+
+    :param x: a value to check
+    :type x: str
+    :return: if the specified value can represent a BED coordinate
+    :rtype: bool
+    """
+    return autosql.is_int(x) and (int(x) >= 0)
+
+
+def is_itemrgb(x):
+    """
+    Given a value, determine if it can represent a BED RGB color
+    value.
+
+    :param x: a value to check
+    :type x: str
+    :return: if the specified value can represent a BED RGB color value
+    :rtype: bool
+    """
+    color_values = x.split(',', 2)
+    if len(color_values) < 3:
+        return False
+    if not all([autosql.is_int(x) for x in color_values]):
+        return False
+    color_codes = [int(x) for x in color_values]
+    for i in color_codes:
+        if not (0 <= i <= 255):
+            return False
+    return True
+
+
+def is_block_count(x):
+    """
+    Given a value, determine if it can represent a BED block count.
+
+    :param x: a value to check
+    :type x: str
+    :return: if the specified value can represent a BED block count
+    :rtype: bool
+    """
+    return autosql.is_int(x) and (int(x) > 0)
+
+
+def is_block_sizes(x):
+    """
+    Given a value, determine if it can represent BED block sizes.
+
+    :param x: a value to check
+    :type x: str
+    :return: if the specified value can represent BED block sizes
+    :rtype: bool
+    """
+    size_values = x.split(',')
+    if not all([autosql.is_int(x) for x in size_values]):
+        return False
+    size_numbers = [int(x) for x in size_values]
+    for x in size_numbers:
+        # block sizes must be positive numbers
+        if not x > 0:
+            return False
+    return True
+
+
+def is_block_starts(x):
+    """
+    Given a value, determine if it can represent BED block sizes.
+
+    :param x: a value to check
+    :type x: str
+    :return: if the specified value can represent BED block sizes
+    :rtype: bool
+    """
+    size_values = x.split(',')
+    if not all([autosql.is_int(x) for x in size_values]):
+        return False
+    size_numbers = [int(x) for x in size_values]
+    # the first block must start with 0
+    if size_numbers[0] != 0:
+        return False
+    if len(size_numbers) > 1:
+        # block starts must be ascending numbers
+        for x, y in zip(size_numbers[:-1], size_numbers[1:]):
+            if not (x < y):
+                return False
+    return True
