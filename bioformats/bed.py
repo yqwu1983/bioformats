@@ -142,7 +142,7 @@ def is_strand(x):
     return x in ('+', '-')
 
 
-def is_coordinate(x):
+def is_coord(x):
     """
     Given a value, determine if it can represent a BED coordinate.
 
