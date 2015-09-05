@@ -12,21 +12,58 @@ from . import seqname
 from argparse import RawTextHelpFormatter
 
 
-def randomfasta():
+def bioformats():
     """
-    This function corresponds to a command-line tool which creates a
-    FASTA file with random sequences of the specified number and
-    length.
+    The main function that is run if bioformats was launched. It
+    processes command-line arguments to be passed to subroutines.
     """
-    parser = argparse.ArgumentParser('Create a FASTA file with random '
-                                     'nucleotide sequences')
+    parser = argparse.ArgumentParser(
+        description='A collection of tools to process bioinformatic '
+                    'data.',
+        version='0.1.5'
+    )
+    subparsers = parser.add_subparsers(dest='command')
+
+    randomfasta_parser(subparsers)
+    fastagaps_parser(subparsers)
+    renameseq_parser(subparsers)
+    ncbirenameseq_parser(subparsers)
+    fastareorder_parser(subparsers)
+
+    args = parser.parse_args()
+
+    launchers = dict([
+        ('randomfasta', randomfasta_launcher),
+        ('fastagaps', fastagaps_launcher),
+        ('renameseq', renameseq_launcher),
+        ('ncbirenameseq', ncbirenameseq_launcher),
+        ('fastareorder', fastareorder_launcher)
+    ])
+
+    launchers[args.command](args)
+
+
+def randomfasta_parser(subparsers):
+    """
+    Parser for the randomfasta tool.
+    """
+    parser = subparsers.add_parser(
+        'randomfasta',
+        help='create a random FASTA file',
+        description='Create a FASTA file with random nucleotide '
+                    'sequences.'
+    )
     parser.add_argument('seq_length', type=int,
                         help='random sequence length')
     parser.add_argument('seq_num', type=int, help='random sequence '
                                                   'number')
     parser.add_argument('output', help='output filename')
-    args = parser.parse_args()
 
+
+def randomfasta_launcher(args):
+    """
+    Launcher for the randomfasta tool.
+    """
     seq_generator = fasta.RandomSequence(args.seq_length)
     with fasta.Writer(args.output) as output_fasta:
         for i in range(args.seq_num):
@@ -34,20 +71,25 @@ def randomfasta():
                                seq_generator.get())
 
 
-def fastagaps():
+def fastagaps_parser(subparsers):
     """
-    This functions corresponds to a command-line tool which detect
-    gap regions in sequences of the specified FASTA file.
-    :return:
+    Parser for the fastagaps tool.
     """
-    parser = argparse.ArgumentParser(
-        description='Get coordinates of gap regions in FASTA file '
-                    'sequences')
+    parser = subparsers.add_parser(
+        'fastagaps',
+        help='get gaps from a FASTA file',
+        description='Get coordinates of gap regions in sequences of '
+                    'a FASTA file.'
+    )
     parser.add_argument('fasta_file', help='a FASTA file')
     parser.add_argument('bed_gaps', help='an output BED file of gap'
                                          'regions')
-    args = parser.parse_args()
 
+
+def fastagaps_launcher(args):
+    """
+    Launcher for the fastagaps tool.
+    """
     gap_pattern = "[Nn-]+"
     with open(args.bed_gaps, 'w') as output:
         for seq in pyfaidx.Fasta(args.fasta_file):
@@ -58,12 +100,13 @@ def fastagaps():
                     seq.name, start, end))
 
 
-def renameseq():
+def renameseq_parser(subparsers):
     """
-    This function corresponds to a command-line tool which renames
-    sequences according to the specified renaming table.
+    Parser for the renameseq tool.
     """
-    parser = argparse.ArgumentParser(
+    parser = subparsers.add_parser(
+        'renameseq',
+        help='rename sequences in a FASTA or tabular file',
         description='Change sequence names in a FASTA or plain text '
                     'tabular file.'
     )
@@ -100,8 +143,11 @@ def renameseq():
                         help='a symbol that separates columns in the '
                              'specified plain-text file')
 
-    args = parser.parse_args()
 
+def renameseq_launcher(args):
+    """
+    Launcher for the renameseq tool.
+    """
     # according to the -f (--fasta) command-line option, choose the
     # appropriate renamer object
     if args.fasta:
@@ -130,12 +176,13 @@ def renameseq():
             output.write(line)
 
 
-def ncbirenameseq():
+def ncbirenameseq_parser(subparsers):
     """
-    This function corresponds to a command-line tool that changes
-    NCBI-style identificators of sequences in a tabular or FASTA file.
+    Parser for the ncbirenameseq tool.
     """
-    parser = argparse.ArgumentParser(
+    parser = subparsers.add_parser(
+        'ncbirenameseq',
+        help='rename NCBI-named sequences in a FASTA if tabular file',
         description='Change NCBI-style sequence names in a FASTA file'
                     'or plain text tabular file',
         epilog='Format values: \n'
@@ -234,9 +281,12 @@ def ncbirenameseq():
     parser.add_argument('--output_table',
                         help='write the renaming table to the '
                              'specified file')
-    
-    args = parser.parse_args()
-    
+
+
+def ncbirenameseq_launcher(args):
+    """
+    Launcher for the ncbirenameseq tool.
+    """
     # choose the renaming object according to the specified 
     # command-line option
     if args.fasta:
@@ -303,12 +353,13 @@ def ncbirenameseq():
         renamer.write_renaming_dict(args.output_table)
 
 
-def fastareorder():
+def fastareorder_parser(subparsers):
     """
-    This function corresponds to a command-line tool that reorders
-    sequences in a FASTA file.
+    Parser for the fastareorder tool.
     """
-    parser = argparse.ArgumentParser(
+    parser = subparsers.add_parser(
+        'fastareorder',
+        help='reorder sequences in a FASTA file',
         description='Reorder sequences in a FASTA file.'
     )
 
@@ -324,8 +375,11 @@ def fastareorder():
                              'file that are missing in the input '
                              'FASTA file')
 
-    args = parser.parse_args()
 
+def fastareorder_launcher(args):
+    """
+    Launcher for the fastareorder tool.
+    """
     reorderer = fasta.Reorder(args.order_file)
     reorderer.write(args.fasta, args.output,
                     ignore_missing=args.ignore_missing)

@@ -34,10 +34,7 @@ setup(name='bioformats',
 
       entry_points={
           'console_scripts': [
-              'randomfasta = bioformats.cli:randomfasta',
-              'fastagaps = bioformats.cli:fastagaps',
-              'renameseq = bioformats.cli:renameseq',
-              'ncbirenameseq = bioformats.cli:ncbirenameseq',
-              'fastareorder = bioformats.cli:fastareorder']
+              'bioformats = bioformats.cli:bioformats'
+          ]
       },
       )
