@@ -19,6 +19,6 @@ class TestRandomFasta(unittest.TestCase):
         """
         Check if a random FASTA file is created.
         """
-        sys.argv = ['', '10', '10', self.__output_file]
-        bioformats.cli.randomfasta()
+        sys.argv = ['', 'randomfasta', '10', '10', self.__output_file]
+        bioformats.cli.bioformats()
         os.unlink(self.__output_file)

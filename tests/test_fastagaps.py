@@ -30,8 +30,8 @@ class TestFastaGaps(unittest.TestCase):
         """
         Test if gaps are correctly identified in a FASTA file.
         """
-        sys.argv = ['', self.__fasta, self.__output_file]
-        bioformats.cli.fastagaps()
+        sys.argv = ['', 'fastagaps', self.__fasta, self.__output_file]
+        bioformats.cli.bioformats()
 
         # compare the obtained BED file with the correct one
         correct_bed = Reader(self.__correct_bed)

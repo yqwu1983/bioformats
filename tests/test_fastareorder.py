@@ -25,8 +25,9 @@ class TestFastaReorder(unittest.TestCase):
         """
         Test if the tool runs correctly.
         """
-        sys.argv = ['', '-i', self.__fasta, self.__order, self.__output]
-        bioformats.cli.fastareorder()
+        sys.argv = ['', 'fastareorder', '-i', self.__fasta,
+                    self.__order, self.__output]
+        bioformats.cli.bioformats()
 
     def tearDown(self):
         for i in (self.__fasta + '.fai',

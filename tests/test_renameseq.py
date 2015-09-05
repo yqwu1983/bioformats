@@ -37,15 +37,15 @@ class TestRenameSeq(unittest.TestCase):
         """
         Check if sequence names in a FASTA file are properly changed.
         """
-        sys.argv = ['', self.__renaming_dict, self.__fasta,
-                    self.__output, '-f']
+        sys.argv = ['', 'renameseq', self.__renaming_dict,
+                    self.__fasta, self.__output, '-f']
 
-        bioformats.cli.renameseq()
+        bioformats.cli.bioformats()
 
-        sys.argv = ['', self.__renaming_dict, self.__output,
-                    self.__rev_output, '-f', '-r']
+        sys.argv = ['', 'renameseq', self.__renaming_dict,
+                    self.__output, self.__rev_output, '-f', '-r']
 
-        bioformats.cli.renameseq()
+        bioformats.cli.bioformats()
 
         # check if the obtained and original files are the same
         original_fasta = Fasta(self.__fasta)
@@ -56,10 +56,11 @@ class TestRenameSeq(unittest.TestCase):
             self.assertEqual(x, y)
 
         # check if sequence descriptions are removed
-        sys.argv = ['', self.__renaming_dict, self.__fasta,
-                    self.__rev_output, '-f', '--no_description']
+        sys.argv = ['', 'renameseq', self.__renaming_dict,
+                    self.__fasta, self.__rev_output, '-f',
+                    '--no_description']
 
-        bioformats.cli.renameseq()
+        bioformats.cli.bioformats()
 
         with open(self.__output) as renamed_fasta:
             with open(self.__rev_output) as nodesc_renamed_fasta:
@@ -75,15 +76,15 @@ class TestRenameSeq(unittest.TestCase):
         """
         Check if sequence names in a tabular file are properly changed.
         """
-        sys.argv = ['', self.__renaming_dict, self.__table,
-                    self.__output]
+        sys.argv = ['', 'renameseq', self.__renaming_dict,
+                    self.__table, self.__output]
 
-        bioformats.cli.renameseq()
+        bioformats.cli.bioformats()
 
-        sys.argv = ['', self.__renaming_dict, self.__output,
-                    self.__rev_output, '-r']
+        sys.argv = ['', 'renameseq', self.__renaming_dict,
+                    self.__output, self.__rev_output, '-r']
 
-        bioformats.cli.renameseq()
+        bioformats.cli.bioformats()
 
         # check if the obtained and original files are the same
         # compare the original and reverse-renamed tables

@@ -19,9 +19,12 @@ def bioformats():
     """
     parser = argparse.ArgumentParser(
         description='A collection of tools to process bioinformatic '
-                    'data.',
-        version='0.1.5'
+                    'data.'
     )
+
+    parser.add_argument('-v', '--version', action='version',
+                        version='%(prog)s 0.1.5')
+
     subparsers = parser.add_subparsers(dest='command')
 
     randomfasta_parser(subparsers)

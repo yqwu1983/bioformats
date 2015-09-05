@@ -46,11 +46,12 @@ class TestNcbiRenameSeq(unittest.TestCase):
         Check if NCBI sequence names in a FASTA file are properly
         changed.
         """
-        sys.argv = ['', self.__fasta, 'genbank', self.__output, 'ucsc',
+        sys.argv = ['', 'ncbirenameseq', self.__fasta, 'genbank',
+                    self.__output, 'ucsc',
                     '--chr', self.__chr, '--unloc', self.__unloc,
                     '--unpl', self.__unpl, '--fasta']
 
-        bioformats.cli.ncbirenameseq()
+        bioformats.cli.bioformats()
 
         # check if the obtained and original files are the same
         original_fasta = Fasta(self.__ucsc_fasta)
@@ -66,24 +67,24 @@ class TestNcbiRenameSeq(unittest.TestCase):
         """
         Check if NCBI sequence names in a table are properly changed.
         """
-        sys.argv = ['', self.__table, 'genbank', self.__output,
-                    'refseq',
+        sys.argv = ['', 'ncbirenameseq', self.__table, 'genbank',
+                    self.__output, 'refseq',
                     '--chr', self.__chr, '--unloc', self.__unloc,
                     '--unpl', self.__unpl,
                     '--output_table', self.__output_table]
 
-        bioformats.cli.ncbirenameseq()
+        bioformats.cli.bioformats()
 
         # check if the produced renaming table is correct
         test_renamer = BaseSeqRenamer()
         test_renamer.read_renaming_dict(self.__output_table)
 
-        sys.argv = ['', self.__output, 'refseq', self.__rev_output,
-                    'genbank',
+        sys.argv = ['', 'ncbirenameseq', self.__output, 'refseq',
+                    self.__rev_output, 'genbank',
                     '--chr', self.__chr, '--unloc', self.__unloc,
                     '--unpl', self.__unpl]
 
-        bioformats.cli.ncbirenameseq()
+        bioformats.cli.bioformats()
 
         # check if the obtained and original files are the same
         # compare the original and reverse-renamed tables
