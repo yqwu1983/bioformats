@@ -235,7 +235,7 @@ class Reader(object):
 
         if self.__bed_col < 3:
             # The first three columns of a BED file are mandatory.
-            logger.error('incorrect BED file %d', self.__lineno)
+            logger.debug('incorrect BED line %d', self.__lineno)
             raise BedError
 
         # convert numeric values: start, end, score, thick_start,

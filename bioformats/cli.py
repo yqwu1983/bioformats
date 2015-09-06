@@ -7,9 +7,11 @@
 import argparse
 import pyfaidx
 import re
+import sys
 from . import fasta
 from . import seqname
 from . import bed
+from . import exception
 from argparse import RawTextHelpFormatter
 
 
@@ -43,7 +45,7 @@ def bioformats():
         ('renameseq', renameseq_launcher),
         ('ncbirenameseq', ncbirenameseq_launcher),
         ('fastareorder', fastareorder_launcher),
-        ('bedcolumns', bedcolumns_launchger)
+        ('bedcolumns', bedcolumns_launcher)
     ])
 
     launchers[args.command](args)
@@ -405,17 +407,20 @@ def bedcolumns_parser(subparsers):
     parser.add_argument('bed_file', help='a BED file')
 
 
-def bedcolumns_launchger(args):
+def bedcolumns_launcher(args):
     """
     Launcher for the bedcolumns tool.
     """
     with open(args.bed_file) as bed_file:
         reader = bed.Reader(bed_file)
-        for _ in reader.records():
-            pass
+        try:
+            for _ in reader.records():
+                pass
+            if reader.aux_columns > 0:
+                print('{}+{}'.format(reader.bed_columns,
+                                     reader.aux_columns))
+            else:
+                print('{}'.format(reader.bed_columns))
+        except exception.BedError:
+            sys.stderr.write('Incorrect BED file.\n')
 
-        if reader.aux_columns > 0:
-            print('{}+{}'.format(reader.bed_columns,
-                                 reader.aux_columns))
-        else:
-            print('{}'.format(reader.bed_columns))
