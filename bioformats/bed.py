@@ -22,102 +22,6 @@ bed_numeric_fields = (1, 2, 4, 6, 7, 9)
 Record = namedtuple('Record', bed_columns)
 
 
-class Reader(object):
-    """
-    This class implements a parser to read data from a file in the
-    BED format.
-    """
-    def __init__(self, handle):
-        """
-        Given a handle of a file, create a BED reader object to read
-        data from it.
-
-        :param handle: a handle of a BED file
-        """
-        self.__handle = handle
-        self.__lineno = 0
-        self.__line_parts = []
-
-    def records(self):
-        """
-        Iterate through records in the BED file the object was
-        created from.
-
-        :return: a record from the BED file the object was created from
-        :rtype: Record
-        """
-        reader = csv.reader(self.__handle, delimiter='\t')
-        for self.__line_parts in reader:
-            self.__lineno += 1
-            yield self.__parse_bed_line()
-
-    def __parse_bed_line(self):
-        """
-        Parse the current line from the BED file.
-
-        :return: a record from the BED file the object was created from
-        :rtype: Record
-        """
-        line_parts = self.__line_parts
-
-        # convert numeric values: start, end, score, thick_start,
-        # thick_end, block_num, blocks_sizes and block_starts; the
-        # given BED line may contain the lesser number of columns,
-        # so we adjust the tuple of numeric value positions
-        line_numeric_pos = [x for x in bed_numeric_fields
-                            if x < len(line_parts)]
-        for i in line_numeric_pos:
-            try:
-                line_parts[i] = int(line_parts[i])
-            except ValueError:
-                logger.error('line %d: the incorrect numeric value '
-                             '%s', self.__lineno, line_parts[i])
-                raise BedError
-
-        # form the tuple to be returned as a result
-        line_parts += ([None] * (len(bed_columns) - len(line_parts)))
-        result = Record(*line_parts)
-
-        return result
-
-
-class Writer(object):
-    """
-    The class implements writing to a file in the BED format.
-    """
-    def __init__(self, filename):
-        """
-        Given a name of a file, create a BED writer object to write
-        data to it.
-
-        :param filename: a name of a file to write BED records to
-        :type filename: str
-        """
-        self.__filename = filename
-
-    def __enter__(self):
-        self.__output = open(self.__filename, 'w')
-        return self
-
-    def write(self, bed_record):
-        """
-        Given a BED record, write it to the file specified when the
-        object was creted.
-
-        :param bed_record: a BED record to be written to the file
-        :type: Record
-        """
-        num_fields = len(bed_record)
-        # check if the last column contains any values
-        if bed_record.extra is None:
-            num_fields -= 1
-        template = '\t'.join(['{}'] * num_fields) + '\n'
-        self.__output.write(template.format(*bed_record))
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.__output.close()
-
-
 def is_score(x):
     """
     Given a value, check if it can represent a BED score.
@@ -230,3 +134,157 @@ def is_block_starts(x):
             if not (x < y):
                 return False
     return True
+
+bed_field_check = (
+    lambda x: True,
+    is_coord,
+    is_coord,
+    lambda x: True,
+    is_score,
+    is_strand,
+    is_coord,
+    is_coord,
+    is_itemrgb,
+    is_block_count,
+    is_block_sizes,
+    is_block_starts
+)
+
+
+class Reader(object):
+    """
+    This class implements a parser to read data from a file in the
+    BED format.
+    """
+
+    def __init__(self, handle):
+        """
+        Given a handle of a file, create a BED reader object to read
+        data from it.
+
+        :param handle: a handle of a BED file
+        """
+        self.__handle = handle
+        self.__lineno = 0
+        self.__line_parts = []
+        self.__bed_col = 12 # the number of BED columns
+        self.__aux_col = 0  # the number of auxiliary columns
+
+    def records(self):
+        """
+        Iterate through records in the BED file the object was
+        created from.
+
+        :return: a record from the BED file the object was created from
+        :rtype: Record
+        """
+        reader = csv.reader(self.__handle, delimiter='\t')
+        for self.__line_parts in reader:
+            self.__lineno += 1
+            yield self.__parse_bed_line()
+
+    def __get_bed_format(self):
+        """
+        Determine the number of BED columns and the number of extra
+        columns in a BED file.
+
+        :return: a tuple of two numbers: the number of BED columns
+            and the number of extra columns
+        :rtype: tuple
+        """
+        i = 0
+        for i, value in enumerate(self.__line_parts):
+            if not bed_field_check[i](value):
+                i -= 1
+                break
+        return i + 1, len(self.__line_parts) - (i + 1)
+
+    @property
+    def bed_columns(self):
+        """
+        Get the number of BED columns in a BED file being read.
+
+        :return: the number of BED columns
+        :rtype: int
+        """
+        return self.__bed_col
+
+    @property
+    def aux_columns(self):
+        """
+        Get the number of auxiliary columns in a BED file being read.
+
+        :return: the number of auxiliary BED columns
+        :rtype: int
+        """
+        return self.__aux_col
+
+    def __parse_bed_line(self):
+        """
+        Parse the current line from the BED file.
+
+        :return: a record from the BED file the object was created from
+        :rtype: Record
+        """
+        bed_col, aux_col = self.__get_bed_format()
+        self.__bed_col = min(self.__bed_col, bed_col)
+        self.__aux_col = max(self.__aux_col, aux_col)
+
+        if self.__bed_col < 3:
+            # The first three columns of a BED file are mandatory.
+            logger.error('incorrect BED file %d', self.__lineno)
+            raise BedError
+
+        # convert numeric values: start, end, score, thick_start,
+        # thick_end, block_num, blocks_sizes and block_starts; the
+        # given BED line may contain the lesser number of columns,
+        # so we adjust the tuple of numeric value positions
+        line_numeric_pos = [x for x in bed_numeric_fields
+                            if x < self.__bed_col]
+        for i in line_numeric_pos:
+            self.__line_parts[i] = int(self.__line_parts[i])
+
+        # form the tuple to be returned as a result
+        bed_parts = self.__line_parts[:bed_col]
+        bed_parts += ([None] * (12 - bed_col))
+        aux_parts = self.__line_parts[bed_col:]
+        result = Record(*bed_parts, extra=aux_parts)
+
+        return result
+
+
+class Writer(object):
+    """
+    The class implements writing to a file in the BED format.
+    """
+    def __init__(self, filename):
+        """
+        Given a name of a file, create a BED writer object to write
+        data to it.
+
+        :param filename: a name of a file to write BED records to
+        :type filename: str
+        """
+        self.__filename = filename
+
+    def __enter__(self):
+        self.__output = open(self.__filename, 'w')
+        return self
+
+    def write(self, bed_record):
+        """
+        Given a BED record, write it to the file specified when the
+        object was creted.
+
+        :param bed_record: a BED record to be written to the file
+        :type: Record
+        """
+        num_fields = len(bed_record)
+        # check if the last column contains any values
+        if not bed_record.extra:
+            num_fields -= 1
+        template = '\t'.join(['{}'] * num_fields) + '\n'
+        self.__output.write(template.format(*bed_record))
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.__output.close()

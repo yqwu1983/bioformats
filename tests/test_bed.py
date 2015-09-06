@@ -23,11 +23,14 @@ os.chdir(path)
 
 class TestBedReader(unittest.TestCase):
     def setUp(self):
-        self.__correct_file = os.path.join(
-            'data', 'bed', 'correct.bed'
+        self.__correct_file_names = (
+            'correct.bed12',
+            'correct_aux.bed6'
         )
+        self.__correct_files = [os.path.join('data', 'bed', x)
+                                for x in self.__correct_file_names]
         self.__incorrect_file = os.path.join(
-            'data', 'bed', 'incorrect.bed'
+            'data', 'bed', 'incorrect_aux.bed6'
         )
         # silence the logging messages
         logging.disable(logging.ERROR)
@@ -37,11 +40,12 @@ class TestBedReader(unittest.TestCase):
         Check if the parser reads a file in the BED format in the
         correct way.
         """
-        # test against the correct input file
-        with open(self.__correct_file) as bed_file:
-            parser = Reader(bed_file)
-            for record in parser.records():
-                self.assertIsInstance(record, Record)
+        # test against the correct input files
+        for i in self.__correct_files:
+            with open(i) as bed_file:
+                parser = Reader(bed_file)
+                for record in parser.records():
+                    self.assertIsInstance(record, Record)
         # test against the incorrect input file
         with open(self.__incorrect_file) as bed_file:
             parser = Reader(bed_file)
@@ -53,7 +57,7 @@ class TestBedReader(unittest.TestCase):
 class TestBedWriter(unittest.TestCase):
     def setUp(self):
         self.__input_file = os.path.join(
-            'data', 'bed', 'correct.bed'
+            'data', 'bed', 'correct.bed12'
         )
         self.__output_file = tempfile.NamedTemporaryFile().name
         
@@ -74,7 +78,7 @@ class TestBedWriter(unittest.TestCase):
         with open(self.__input_file) as original_file, \
                 open(self.__output_file) as written_file:
             for x, y in zip(original_file, written_file):
-                self.assertEqual(x, y)
+                self.assertEqual(x.rstrip(), y.rstrip())
 
     def tearDown(self):
         if os.path.isfile(self.__output_file):
