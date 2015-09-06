@@ -34,10 +34,14 @@ class TestFastaGaps(unittest.TestCase):
         bioformats.cli.bioformats()
 
         # compare the obtained BED file with the correct one
-        correct_bed = Reader(self.__correct_bed)
-        output_bed = Reader(self.__output_file)
-        for x, y in zip(correct_bed.records(), output_bed.records()):
-            self.assertEqual(x, y)
+        with open(self.__correct_bed) as correct_bed:
+            with open(self.__output_file) as output_bed:
+                correct_reader = Reader(correct_bed)
+                output_reader = Reader(output_bed)
+                for x, y in zip(
+                        correct_reader.records(),
+                        output_reader.records()):
+                    self.assertEqual(x, y)
 
         os.unlink(self.__output_file)
         os.unlink(self.__fasta + '.fai')

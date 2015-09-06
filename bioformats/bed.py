@@ -4,6 +4,7 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import csv
 import logging
 from collections import namedtuple
 from . import autosql
@@ -26,17 +27,16 @@ class Reader(object):
     This class implements a parser to read data from a file in the
     BED format.
     """
-    def __init__(self, filename):
+    def __init__(self, handle):
         """
-        Given a name of a file, create a BED reader object to read
+        Given a handle of a file, create a BED reader object to read
         data from it.
 
-        :param filename: a name of a BED file
-        :type filename: str
+        :param handle: a handle of a BED file
         """
-        self.__filename = filename
+        self.__handle = handle
         self.__lineno = 0
-        self.__line = ''
+        self.__line_parts = []
 
     def records(self):
         """
@@ -46,10 +46,10 @@ class Reader(object):
         :return: a record from the BED file the object was created from
         :rtype: Record
         """
-        with open(self.__filename) as bed_file:
-            for self.__line in bed_file:
-                self.__lineno += 1
-                yield self.__parse_bed_line()
+        reader = csv.reader(self.__handle, delimiter='\t')
+        for self.__line_parts in reader:
+            self.__lineno += 1
+            yield self.__parse_bed_line()
 
     def __parse_bed_line(self):
         """
@@ -58,7 +58,7 @@ class Reader(object):
         :return: a record from the BED file the object was created from
         :rtype: Record
         """
-        line_parts = self.__line.split()
+        line_parts = self.__line_parts
 
         # convert numeric values: start, end, score, thick_start,
         # thick_end, block_num, blocks_sizes and block_starts; the

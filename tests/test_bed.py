@@ -38,14 +38,16 @@ class TestBedReader(unittest.TestCase):
         correct way.
         """
         # test against the correct input file
-        parser = Reader(self.__correct_file)
-        for record in parser.records():
-            self.assertIsInstance(record, Record)
-        # test against the incorrect input file
-        parser = Reader(self.__incorrect_file)
-        with self.assertRaises(BedError):
+        with open(self.__correct_file) as bed_file:
+            parser = Reader(bed_file)
             for record in parser.records():
                 self.assertIsInstance(record, Record)
+        # test against the incorrect input file
+        with open(self.__incorrect_file) as bed_file:
+            parser = Reader(bed_file)
+            with self.assertRaises(BedError):
+                for record in parser.records():
+                    self.assertIsInstance(record, Record)
 
 
 class TestBedWriter(unittest.TestCase):
@@ -62,10 +64,11 @@ class TestBedWriter(unittest.TestCase):
         """
         Check if BED records are written in the correct way.
         """
-        bed_input = Reader(self.__input_file)
-        with Writer(self.__output_file) as bed_output:
-            for record in bed_input.records():
-                bed_output.write(record)
+        with open(self.__input_file) as bed_file:
+            bed_input = Reader(bed_file)
+            with Writer(self.__output_file) as bed_output:
+                for record in bed_input.records():
+                    bed_output.write(record)
 
         # check if the lines are identical
         with open(self.__input_file) as original_file, \
