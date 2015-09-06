@@ -56,9 +56,12 @@ class TestBedReader(unittest.TestCase):
 
 class TestBedWriter(unittest.TestCase):
     def setUp(self):
-        self.__input_file = os.path.join(
-            'data', 'bed', 'correct.bed12'
+        self.__input_file_names = (
+            'correct.bed12',
+            'correct_aux.bed6'
         )
+        self.__input_file = [os.path.join('data', 'bed', x)
+                             for x in self.__input_file_names]
         self.__output_file = tempfile.NamedTemporaryFile().name
         
         # silence the logging messages
@@ -68,17 +71,18 @@ class TestBedWriter(unittest.TestCase):
         """
         Check if BED records are written in the correct way.
         """
-        with open(self.__input_file) as bed_file:
-            bed_input = Reader(bed_file)
-            with Writer(self.__output_file) as bed_output:
-                for record in bed_input.records():
-                    bed_output.write(record)
+        for i in self.__input_file:
+            with open(i) as bed_file:
+                bed_input = Reader(bed_file)
+                with Writer(self.__output_file) as bed_output:
+                    for record in bed_input.records():
+                        bed_output.write(record)
 
-        # check if the lines are identical
-        with open(self.__input_file) as original_file, \
-                open(self.__output_file) as written_file:
-            for x, y in zip(original_file, written_file):
-                self.assertEqual(x.rstrip(), y.rstrip())
+            # check if the lines are identical
+            with open(i) as original_file, \
+                    open(self.__output_file) as written_file:
+                for x, y in zip(original_file, written_file):
+                    self.assertEqual(x.rstrip(), y.rstrip())
 
     def tearDown(self):
         if os.path.isfile(self.__output_file):

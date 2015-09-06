@@ -279,10 +279,14 @@ class Writer(object):
         :param bed_record: a BED record to be written to the file
         :type: Record
         """
+        bed_record = [x for x in bed_record if x is not None]
         num_fields = len(bed_record)
         # check if the last column contains any values
-        if not bed_record.extra:
+        if not bed_record[-1]:
             num_fields -= 1
+        else:
+            num_fields += (len(bed_record[-1]) - 1)
+            bed_record = bed_record[:-1] + bed_record[-1]
         template = '\t'.join(['{}'] * num_fields) + '\n'
         self.__output.write(template.format(*bed_record))
 
