@@ -194,9 +194,12 @@ class Reader(object):
         """
         i = 0
         for i, value in enumerate(self.__line_parts):
-            if not bed_field_check[i](value):
-                i -= 1
-                break
+            if i < 12:
+                if not bed_field_check[i](value):
+                    i -= 1
+                    break
+            else:
+                return 12, len(self.__line_parts) - 12
         return i + 1, len(self.__line_parts) - (i + 1)
 
     @property

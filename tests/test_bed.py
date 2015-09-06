@@ -27,6 +27,20 @@ class TestBedReader(unittest.TestCase):
             'correct.bed12',
             'correct_aux.bed6'
         )
+        self.__column_test_file = os.path.join(
+            'data', 'bed', 'column_test.bed'
+        )
+        self.__correct_columns = (
+            (12, 1),
+            (11, 2),
+            (10, 3),
+            (9, 4),
+            (8, 5),
+            (7, 6),
+            (6, 7),
+            (5, 8),
+            (4, 9),
+        )
         self.__correct_files = [os.path.join('data', 'bed', x)
                                 for x in self.__correct_file_names]
         self.__incorrect_file = os.path.join(
@@ -52,6 +66,18 @@ class TestBedReader(unittest.TestCase):
             with self.assertRaises(BedError):
                 for record in parser.records():
                     self.assertIsInstance(record, Record)
+
+    def test_columns(self):
+        """
+        Check if BED and auxiliary columns are correctly counted.
+        """
+        with open(self.__column_test_file) as bed_file:
+            reader = Reader(bed_file)
+            for i, record in enumerate(reader.records()):
+                self.assertEqual(reader.bed_columns,
+                                 self.__correct_columns[i][0])
+                self.assertEqual(reader.aux_columns,
+                                 self.__correct_columns[i][1])
 
 
 class TestBedWriter(unittest.TestCase):
