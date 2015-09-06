@@ -73,7 +73,9 @@ class TestBedWriter(unittest.TestCase):
             for x, y in zip(original_file, written_file):
                 self.assertEqual(x, y)
 
-        os.unlink(self.__output_file)
+    def tearDown(self):
+        if os.path.isfile(self.__output_file):
+            os.unlink(self.__output_file)
 
 
 class TestBedContentsCheckRoutines(unittest.TestCase):
