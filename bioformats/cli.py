@@ -9,6 +9,7 @@ import pyfaidx
 import re
 from . import fasta
 from . import seqname
+from . import bed
 from argparse import RawTextHelpFormatter
 
 
@@ -32,6 +33,7 @@ def bioformats():
     renameseq_parser(subparsers)
     ncbirenameseq_parser(subparsers)
     fastareorder_parser(subparsers)
+    bedcolumns_parser(subparsers)
 
     args = parser.parse_args()
 
@@ -40,7 +42,8 @@ def bioformats():
         ('fastagaps', fastagaps_launcher),
         ('renameseq', renameseq_launcher),
         ('ncbirenameseq', ncbirenameseq_launcher),
-        ('fastareorder', fastareorder_launcher)
+        ('fastareorder', fastareorder_launcher),
+        ('bedcolumns', bedcolumns_launchger)
     ])
 
     launchers[args.command](args)
@@ -386,3 +389,33 @@ def fastareorder_launcher(args):
     reorderer = fasta.Reorder(args.order_file)
     reorderer.write(args.fasta, args.output,
                     ignore_missing=args.ignore_missing)
+
+
+def bedcolumns_parser(subparsers):
+    """
+    Parser for the bedcolumns tool.
+    """
+    parser = subparsers.add_parser(
+        'bedcolumns',
+        help='determine the numbers of BED and extra columns',
+        description='Determine the number of BED columns and the '
+                    'number of extra columns in a BED file'
+    )
+
+    parser.add_argument('bed_file', help='a BED file')
+
+
+def bedcolumns_launchger(args):
+    """
+    Launcher for the bedcolumns tool.
+    """
+    with open(args.bed_file) as bed_file:
+        reader = bed.Reader(bed_file)
+        for _ in reader.records():
+            pass
+
+        if reader.aux_columns > 0:
+            print('{}+{}'.format(reader.bed_columns,
+                                 reader.aux_columns))
+        else:
+            print('{}'.format(reader.bed_columns))
