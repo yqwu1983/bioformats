@@ -50,7 +50,7 @@ class Reader(object):
         self.__desc = line.strip('"')
 
         # read a line denoting the start of entry records
-        line = self.__handle.readline().rstrip()
+        self.__handle.readline().rstrip()
 
         logging.debug('started reading table %s (%s)...', self.__name,
                       self.__desc)
