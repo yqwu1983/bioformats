@@ -21,6 +21,34 @@ bed_numeric_fields = (1, 2, 4, 6, 7, 9)
 
 Record = namedtuple('Record', bed_columns)
 
+bed_autosql_fields = (
+    autosql.TableEntry(type='string', num=None, name='chrom',
+                       desc='Reference sequence chromosome or '
+                            'scaffold'),
+    autosql.TableEntry(type='uint', num=None, name='chromStart',
+                       desc='Start position of feature on chromosome'),
+    autosql.TableEntry(type='uint', num=None, name='chromEnd',
+                       desc='End position of feature on chromosome'),
+    autosql.TableEntry(type='string', num=None, name='name',
+                       desc='Name of feature'),
+    autosql.TableEntry(type='uint', num=None, name='score',
+                       desc='Score'),
+    autosql.TableEntry(type='char', num=1, name='strand',
+                       desc='+ or - for strand'),
+    autosql.TableEntry(type='uint', num=None, name='thickStart',
+                       desc='Coding region start'),
+    autosql.TableEntry(type='uint', num=None, name='thickEnd',
+                       desc='Coding region end'),
+    autosql.TableEntry(type='string', num=None, name='itemRgb',
+                       desc='Color set'),
+    autosql.TableEntry(type='uint', num=None, name='blockCount',
+                       desc='The number of blocks in feature'),
+    autosql.TableEntry(type='string', num=None, name='blockSizes',
+                       desc='Block sizes'),
+    autosql.TableEntry(type='string', num=None, name='blockStarts',
+                       desc='Block start positions')
+)
+
 
 def is_score(x):
     """
