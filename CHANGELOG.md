@@ -1,6 +1,13 @@
 Changes
 =======
 
+0.1.5
+-----
+- Unified launcher `bioformats` for package tools.
+- Tool `bedcolumns` to determine the numbers of BED and extra columns
+ in a BED file.
+- Tool `bedautosql` to build an autoSql table for a BED file.
+
 0.1.4
 -----
 - Tool `fastareorder` to reorder sequences in a FASTA file added.
