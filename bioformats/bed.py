@@ -342,16 +342,11 @@ def get_autosql_table(bed_reader, name='Table', desc='Description'):
     # process the first record from the BED reader to determine the
     # number of colums in the associated file
     first_record = next(bed_reader.records())
-    num_bed_columns = sum(map(lambda x: x is not None,
-                              first_record[:-1]))
     num_aux_columns = len(first_record.extra)
 
-    # create autoSql type classifiers for BED and extra columns
+    # create autoSql type classifiers for extra columns; for BED
+    # columns, we already know their format and do not need classifiers
     column_types = []
-    for i in range(num_bed_columns):
-        new_classifier = autosql.Classifier()
-        new_classifier.add_value(str(first_record[i]))
-        column_types.append(new_classifier)
     for i in range(num_aux_columns):
         new_classifier = autosql.Classifier()
         new_classifier.add_value(str(first_record.extra[i]))
@@ -359,19 +354,15 @@ def get_autosql_table(bed_reader, name='Table', desc='Description'):
 
     # process entries from the specified BED reader
     for record in bed_reader.records():
-        for i in range(num_bed_columns):
-            column_types[i].add_value(str(record[i]))
         for i in range(num_aux_columns):
-            column_types[num_bed_columns + i].add_value(str(
-                record.extra[i]))
+            column_types[i].add_value(str(record.extra[i]))
 
     # form the table of autoSql entries
     entries = []
     for i in range(bed_reader.bed_columns):
         entries.append(bed_autosql_fields[i])
 
-    for i in range(bed_reader.bed_columns,
-                   bed_reader.bed_columns + bed_reader.aux_columns):
+    for i in range(bed_reader.aux_columns):
         entries.append(autosql.TableEntry(
             type=column_types[i].data_type,
             name='column_{}'.format(i+1),
