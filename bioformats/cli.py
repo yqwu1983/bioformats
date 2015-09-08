@@ -8,6 +8,7 @@ import argparse
 import pyfaidx
 import re
 import sys
+from . import autosql
 from . import fasta
 from . import seqname
 from . import bed
@@ -36,6 +37,7 @@ def bioformats():
     ncbirenameseq_parser(subparsers)
     fastareorder_parser(subparsers)
     bedcolumns_parser(subparsers)
+    bedautosql_parser(subparsers)
 
     args = parser.parse_args()
 
@@ -45,7 +47,8 @@ def bioformats():
         ('renameseq', renameseq_launcher),
         ('ncbirenameseq', ncbirenameseq_launcher),
         ('fastareorder', fastareorder_launcher),
-        ('bedcolumns', bedcolumns_launcher)
+        ('bedcolumns', bedcolumns_launcher),
+        ('bedautosql', bedautosql_launcher)
     ])
 
     launchers[args.command](args)
@@ -424,3 +427,40 @@ def bedcolumns_launcher(args):
         except exception.BedError:
             sys.stderr.write('Incorrect BED file.\n')
 
+
+def bedautosql_parser(subparsers):
+    """
+    Parser for the bedautosql tool.
+    """
+    parser = subparsers.add_parser(
+        'bedautosql',
+        help='get an autoSql table for a BED file',
+        description='Get an autoSql table structure for the specified '
+                    'BED file'
+    )
+
+    parser.add_argument('bed_file', help='a BED file')
+    parser.add_argument('output_file', help='an output file')
+
+    # optional arguments
+    parser.add_argument('-n', '--name', default='Table',
+                        help='a table name')
+    parser.add_argument('-d', '--description', default='Description',
+                        help='a table description')
+
+
+def bedautosql_launcher(args):
+    """
+    Launcher for the bedautosql tool.
+    """
+    with open(args.bed_file) as bed_file:
+        reader = bed.Reader(bed_file)
+        try:
+            table = bed.get_autosql_table(reader, args.name,
+                                          args.description)
+            with autosql.Writer(args.output_file, table.name,
+                                table.desc) as writer:
+                for i in table.entries:
+                    writer.write(i)
+        except exception.BedError:
+                sys.stderr.write('Incorrect BED file.\n')
