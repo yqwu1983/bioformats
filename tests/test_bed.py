@@ -8,6 +8,7 @@ import os
 import logging
 import tempfile
 import unittest
+import bioformats.autosql
 import bioformats.bed
 from bioformats.bed import Record, Reader, Writer
 from bioformats.exception import BedError
@@ -186,3 +187,26 @@ class TestBedContentsCheckRoutines(unittest.TestCase):
         ]
         for x, y in test_values:
             self.assertEqual(bioformats.bed.is_block_starts(x), y)
+
+
+class TestGetAutoSqlTable(unittest.TestCase):
+    def setUp(self):
+        self.__input_file_names = (
+            'correct.bed12',
+            'correct_aux.bed6'
+        )
+        self.__input_file = [os.path.join('data', 'bed', x)
+                             for x in self.__input_file_names]
+
+    def test_get_autosql_table(self):
+        for i in self.__input_file:
+            with open(i) as bed_file:
+                reader = Reader(bed_file)
+                autosql_table = bioformats.bed.get_autosql_table(
+                    reader
+                )
+                self.assertIsInstance(autosql_table,
+                                      bioformats.autosql.Table)
+                self.assertEqual(len(autosql_table.entries),
+                                 reader.bed_columns +
+                                 reader.aux_columns)
