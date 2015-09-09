@@ -25,4 +25,3 @@ ctg123	example	CDS	3301	3902	.	+	0	Parent=EDEN.3
 ctg123	example	CDS	5000	5500	.	+	1	Parent=EDEN.3
 ctg123	example	CDS	7000	7600	.	+	1	Parent=EDEN.3
 ctg123	example	three_prime_UTR	7601	9000	.	+	.	Parent=EDEN.3
-

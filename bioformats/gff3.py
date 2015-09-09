@@ -4,6 +4,7 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import csv
 import logging
 from collections import namedtuple, OrderedDict
 from future.utils import iteritems
@@ -23,17 +24,16 @@ class Reader(object):
     This class implements a parser to read data from a file in the
     GFF3 format.
     """
-    def __init__(self, filename):
+    def __init__(self, handle):
         """
-        Given a name of a file, create a GFF3 reader object to read
+        Given a handle of a file, create a GFF3 reader object to read
         data from it.
 
-        :param filename: a name of a GFF3 file
-        :type filename: str
+        :param handle: a handle of a GFF3 file
         """
-        self.__filename = filename
+        self.__handle = handle
         self.__lineno = 0
-        self.__line = ''
+        self.__line_parts = []
 
     def records(self):
         """
@@ -44,20 +44,12 @@ class Reader(object):
         from
         :rtype: Record
         """
-        with open(self.__filename) as gff3_file:
-            # check the first line of the file
-            self.__line = next(gff3_file)
-            self.__line = self.__line.rstrip()
+        reader = csv.reader(self.__handle, delimiter='\t')
+        # skip the first line of the file
+        next(reader)
+        for self.__line_parts in reader:
             self.__lineno += 1
-            if self.__line != '##gff-version 3':
-                logger.error('line %d: the incorrect GFF3 header '
-                             '%s', self.__lineno, self.__line)
-                raise Gff3Error
-            for self.__line in gff3_file:
-                self.__line = self.__line.rstrip()
-                self.__lineno += 1
-                if self.__line:
-                    yield self.__parse_gff3_line()
+            yield self.__parse_gff3_line()
 
     def __parse_gff3_line(self):
         """
@@ -67,38 +59,45 @@ class Reader(object):
             from
         :rtype: Record
         """
-        line_parts = self.__line.split('\t', 8)
-        if len(line_parts) < 8:
+        if len(self.__line_parts) < 8:
             logger.error('line %d: the incorrect number of columns - '
-                         '%d', self.__lineno, len(line_parts))
+                         '%d', self.__lineno, len(self.__line_parts))
             raise Gff3Error
+
+        if len(self.__line_parts) > 9:
+            # in the attributes column, some values may contain tab
+            # characters that leads to multiple fields; so we
+            # concatenate these fields to a single field
+            self.__line_parts[8] = '\t'.join(self.__line_parts[8:])
+            self.__line_parts = self.__line_parts[:9]
 
         # convert numeric values: start, end, score (if present) and
         # phase (if present)
         line_int_pos = [3, 4]
-        if line_parts[7] != '.':
+        if self.__line_parts[7] != '.':
             line_int_pos += [7]
         for i in line_int_pos:
             try:
-                line_parts[i] = int(line_parts[i])
+                self.__line_parts[i] = int(self.__line_parts[i])
             except ValueError:
                 logger.error('line %d: the incorrect numeric value '
-                             '%s', self.__lineno, line_parts[i])
+                             '%s', self.__lineno, self.__line_parts[i])
                 raise Gff3Error
-        if line_parts[5] != '.':
+        if self.__line_parts[5] != '.':
             # if the score is specified, try to convert it to a float
             # number value
             try:
-                line_parts[5] = float(line_parts[5])
+                self.__line_parts[5] = float(self.__line_parts[5])
             except ValueError:
                 logger.error('line %d: the incorrect float number '
-                             'value %s', self.__lineno, line_parts[5])
+                             'value %s', self.__lineno,
+                             self.__line_parts[5])
                 raise Gff3Error
 
-        if len(line_parts) == 9:
+        if len(self.__line_parts) == 9:
             # parse the attributes
             attributes = OrderedDict()
-            for x in line_parts[8].split(';'):
+            for x in self.__line_parts[8].split(';'):
                 try:
                     tag, value = x.split('=', 2)
                 except ValueError:
@@ -110,11 +109,11 @@ class Reader(object):
                                  'attribute %s', self.__lineno, x)
                     raise Gff3Error
                 attributes[tag] = value
-            line_parts[8] = attributes
+            self.__line_parts[8] = attributes
         else:
-            line_parts += [None]
+            self.__line_parts += [None]
 
-        return Record(*line_parts)
+        return Record(*self.__line_parts)
 
 
 class Writer(object):

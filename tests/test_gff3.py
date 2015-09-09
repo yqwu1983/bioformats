@@ -28,8 +28,9 @@ class TestGff3Reader(unittest.TestCase):
         self.__incorrect_file_dir = os.path.join(
             'data', 'gff3', 'incorrect_input'
         )
-        self.__incorrect_files = glob.glob1(
-            self.__incorrect_file_dir, '*.gff')
+        self.__incorrect_files = [
+            os.path.join(self.__incorrect_file_dir, x) for x in
+            glob.glob1(self.__incorrect_file_dir, '*.gff')]
         # silence the logging messages
         logging.disable(logging.ERROR)
 
@@ -39,16 +40,17 @@ class TestGff3Reader(unittest.TestCase):
         correct way.
         """
         # test against the correct input file
-        parser = Reader(self.__correct_file)
-        for record in parser.records():
-            self.assertIsInstance(record, Record)
+        with open(self.__correct_file) as gff_file:
+            parser = Reader(gff_file)
+            for record in parser.records():
+                self.assertIsInstance(record, Record)
         # test against incorrect input files
-        for gff_file in self.__incorrect_files:
-            parser = Reader(os.path.join(self.__incorrect_file_dir,
-                                         gff_file))
-            with self.assertRaises(Gff3Error):
-                for _ in parser.records():
-                    pass
+        for i in self.__incorrect_files:
+            with open(i) as gff_file:
+                parser = Reader(gff_file)
+                with self.assertRaises(Gff3Error):
+                    for _ in parser.records():
+                        pass
 
 
 class TestGff3Writer(unittest.TestCase):
@@ -60,14 +62,15 @@ class TestGff3Writer(unittest.TestCase):
         """
         Check if GFF3 lines are written properly to the output file.
         """
-        test_input = Reader(self.__input_file)
-        with Writer(self.__output_file) as test_output:
-            for record in test_input.records():
-                test_output.write(record)
+        with open(self.__input_file) as input_file:
+            test_input = Reader(input_file)
+            with Writer(self.__output_file) as test_output:
+                for record in test_input.records():
+                    test_output.write(record)
 
-        # compare the test output file to the original one
-        with open(self.__input_file) as test_input:
-            with open(self.__output_file) as test_output:
-                for input_line, output_line in zip(test_input,
-                                                   test_output):
-                    self.assertEqual(input_line, output_line)
+            # compare the test output file to the original one
+            with open(self.__input_file) as test_input:
+                with open(self.__output_file) as test_output:
+                    for input_line, output_line in zip(test_input,
+                                                       test_output):
+                        self.assertEqual(input_line, output_line)
