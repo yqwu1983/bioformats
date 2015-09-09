@@ -31,8 +31,7 @@ class Reader(object):
 
         :param handle: a handle of a GFF3 file
         """
-        self.__handle = handle
-        self.__lineno = 0
+        self.__reader = csv.reader(handle, delimiter='\t')
         self.__line_parts = []
 
     def records(self):
@@ -44,11 +43,9 @@ class Reader(object):
         from
         :rtype: Record
         """
-        reader = csv.reader(self.__handle, delimiter='\t')
         # skip the first line of the file
-        next(reader)
-        for self.__line_parts in reader:
-            self.__lineno += 1
+        next(self.__reader)
+        for self.__line_parts in self.__reader:
             yield self.__parse_gff3_line()
 
     def __parse_gff3_line(self):
@@ -61,7 +58,8 @@ class Reader(object):
         """
         if len(self.__line_parts) < 8:
             logger.error('line %d: the incorrect number of columns - '
-                         '%d', self.__lineno, len(self.__line_parts))
+                         '%d', self.__reader.line_num,
+                         len(self.__line_parts))
             raise Gff3Error
 
         if len(self.__line_parts) > 9:
@@ -81,7 +79,8 @@ class Reader(object):
                 self.__line_parts[i] = int(self.__line_parts[i])
             except ValueError:
                 logger.error('line %d: the incorrect numeric value '
-                             '%s', self.__lineno, self.__line_parts[i])
+                             '%s', self.__reader.line_num,
+                             self.__line_parts[i])
                 raise Gff3Error
         if self.__line_parts[5] != '.':
             # if the score is specified, try to convert it to a float
@@ -90,7 +89,7 @@ class Reader(object):
                 self.__line_parts[5] = float(self.__line_parts[5])
             except ValueError:
                 logger.error('line %d: the incorrect float number '
-                             'value %s', self.__lineno,
+                             'value %s', self.__reader.line_num,
                              self.__line_parts[5])
                 raise Gff3Error
 
@@ -102,11 +101,13 @@ class Reader(object):
                     tag, value = x.split('=', 2)
                 except ValueError:
                     logger.error('line %d: the incorrect GFF3 '
-                                 'attribute %s', self.__lineno, x)
+                                 'attribute %s',
+                                 self.__reader.line_num, x)
                     raise Gff3Error
                 if not tag or not value:
                     logger.error('line %d: the incorrect GFF3 '
-                                 'attribute %s', self.__lineno, x)
+                                 'attribute %s',
+                                 self.__reader.line_num, x)
                     raise Gff3Error
                 attributes[tag] = value
             self.__line_parts[8] = attributes

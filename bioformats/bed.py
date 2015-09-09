@@ -192,11 +192,10 @@ class Reader(object):
 
         :param handle: a handle of a BED file
         """
-        self.__handle = handle
-        self.__lineno = 0
+        self.__reader = csv.reader(handle, delimiter='\t')
         self.__line_parts = []
-        self.__bed_col = 12 # the number of BED columns
-        self.__aux_col = 0  # the number of auxiliary columns
+        self.__bed_col = 12     # the number of BED columns
+        self.__aux_col = 0      # the number of auxiliary columns
 
     def records(self):
         """
@@ -206,9 +205,7 @@ class Reader(object):
         :return: a record from the BED file the object was created from
         :rtype: Record
         """
-        reader = csv.reader(self.__handle, delimiter='\t')
-        for self.__line_parts in reader:
-            self.__lineno += 1
+        for self.__line_parts in self.__reader:
             yield self.__parse_bed_line()
 
     def __get_bed_format(self):
@@ -263,7 +260,8 @@ class Reader(object):
 
         if self.__bed_col < 3:
             # The first three columns of a BED file are mandatory.
-            logger.debug('incorrect BED line %d', self.__lineno)
+            logger.debug('incorrect BED line %d',
+                         self.__reader.line_num)
             raise BedError
 
         # convert numeric values: start, end, score, thick_start,
