@@ -74,3 +74,7 @@ class TestGff3Writer(unittest.TestCase):
                     for input_line, output_line in zip(test_input,
                                                        test_output):
                         self.assertEqual(input_line, output_line)
+
+    def tearDown(self):
+        if os.path.isfile(self.__output_file):
+            os.unlink(self.__output_file)
