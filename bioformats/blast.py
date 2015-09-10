@@ -4,6 +4,7 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import csv
 from builtins import range  # pylint:disable=redefined-builtin
 from collections import namedtuple
 from .exception import BlastTabError
@@ -35,8 +36,8 @@ class BlastTab(object):
         :type filename: str
         """
         self.__filename = filename
-        self.__lineno = 0
-        self.__line = None
+        self.__line_parts = []
+        self.__reader = None
 
     def alignments(self):
         """
@@ -47,9 +48,9 @@ class BlastTab(object):
         :rtype: Blast.Alignment
         """
         with open(self.__filename) as blast_file:
-            for self.__line in blast_file:
-                self.__lineno += 1
-                if not self.__line.startswith('#'):
+            self.__reader = csv.reader(blast_file, delimiter='\t')
+            for self.__line_parts in self.__reader:
+                if not self.__line_parts[0].startswith('#'):
                     # if the line starts with '#', then it is a
                     # comment and we skip it
                     yield self.__parse_blast_line()
@@ -61,12 +62,12 @@ class BlastTab(object):
         :return: an alignment from the file the object was created from
         :rtype: Blast.Alignment
         """
-        line_parts = self.__line.split('\t', 12)
+        line_parts = self.__line_parts
 
         # check if the line contains the proper number of columns
-        if len(line_parts) < 12:
+        if len(line_parts) != 12:
             logging.error('line %d: the incorrect number of '
-                          'columns', self.__lineno)
+                          'columns', self.__reader.line_num)
             raise BlastTabError
 
         # convert numeric values of identity, e-value and bit score
@@ -77,7 +78,7 @@ class BlastTab(object):
             except ValueError:
                 logging.error(
                     'line %d: the incorrect numerical value '
-                    '%s', self.__lineno, line_parts[i])
+                    '%s', self.__reader.line_num, line_parts[i])
                 raise BlastTabError
 
         # convert numeric values of alignment length, the number of
@@ -89,7 +90,7 @@ class BlastTab(object):
             except ValueError:
                 logging.error(
                     'line %d: the incorrect integer value '
-                    '%s', self.__lineno, line_parts[i])
+                    '%s', self.__reader.line_num, line_parts[i])
                 raise BlastTabError
 
         return BlastTab.Alignment(*line_parts)
