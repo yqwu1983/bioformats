@@ -33,11 +33,22 @@ class TestBlastTab(unittest.TestCase):
         Check if the parser reads a file in the BLAST tabular format
         in the correct way.
         """
-        # test against the correct input file
+        # test against the correct input file; also make sure that
+        # all alignment records from the correct input file are read
+        num_records = 0
+        with open(self.__correct_file) as correct_file:
+            for line in correct_file:
+                if not line.startswith('#'):
+                    num_records += 1
+
+        records_read = 0
         with open(self.__correct_file) as correct_file:
             parser = BlastTab(correct_file)
             for alignment in parser.alignments():
                 self.assertEqual(len(alignment), 12)
+                records_read += 1
+
+        self.assertEqual(num_records, records_read)
 
         # test against the correct input line and check the entries
         with open(self.__correct_file) as correct_file:
