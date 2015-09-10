@@ -27,17 +27,15 @@ class BlastTab(object):
 
     Alignment = namedtuple('Alignment', blast_field_names)
 
-    def __init__(self, filename):
+    def __init__(self, handle):
         """
-        Given a name of a file, create a BLAST tabular format parser
+        Given a handle of a file, create a BLAST tabular format parser
         object to read data from it.
 
-        :param filename: a name of a file in the BLAST tabular format
-        :type filename: str
+        :param handle: a handle of a file in the BLAST tabular format
         """
-        self.__filename = filename
         self.__line_parts = []
-        self.__reader = None
+        self.__reader = csv.reader(handle, delimiter='\t')
 
     def alignments(self):
         """
@@ -47,13 +45,11 @@ class BlastTab(object):
         :return: an alignment for the file the object was created from
         :rtype: Blast.Alignment
         """
-        with open(self.__filename) as blast_file:
-            self.__reader = csv.reader(blast_file, delimiter='\t')
-            for self.__line_parts in self.__reader:
-                if not self.__line_parts[0].startswith('#'):
-                    # if the line starts with '#', then it is a
-                    # comment and we skip it
-                    yield self.__parse_blast_line()
+        for self.__line_parts in self.__reader:
+            if not self.__line_parts[0].startswith('#'):
+                # if the line starts with '#', then it is a
+                # comment and we skip it
+                yield self.__parse_blast_line()
 
     def __parse_blast_line(self):
         """

@@ -34,32 +34,36 @@ class TestBlastTab(unittest.TestCase):
         in the correct way.
         """
         # test against the correct input file
-        parser = BlastTab(self.__correct_file)
-        for alignment in parser.alignments():
-            self.assertEqual(len(alignment), 12)
+        with open(self.__correct_file) as correct_file:
+            parser = BlastTab(correct_file)
+            for alignment in parser.alignments():
+                self.assertEqual(len(alignment), 12)
 
         # test against the correct input line and check the entries
-        parser = BlastTab(self.__correct_file)
-        alignment = next(parser.alignments())
-        self.assertIsInstance(alignment, BlastTab.Alignment)
-        self.assertEqual(alignment.query, 'lcl|BA000007.2_gene_5374')
-        self.assertEqual(alignment.subject,
-                         'gi|556503834|ref|NC_000913.3|')
-        self.assertEqual(alignment.identity, 98.14)
-        self.assertEqual(alignment.length, 2856)
-        self.assertEqual(alignment.mismatches, 53)
-        self.assertEqual(alignment.gap_openings, 0)
-        self.assertEqual(alignment.q_start, 1)
-        self.assertEqual(alignment.q_end, 2856)
-        self.assertEqual(alignment.s_start, 4483837)
-        self.assertEqual(alignment.s_end, 4480982)
-        self.assertEqual(alignment.e_value, 0.0)
-        self.assertEqual(alignment.bit_score, 4981)
+        with open(self.__correct_file) as correct_file:
+            parser = BlastTab(correct_file)
+            alignment = next(parser.alignments())
+            self.assertIsInstance(alignment, BlastTab.Alignment)
+            self.assertEqual(alignment.query,
+                             'lcl|BA000007.2_gene_5374')
+            self.assertEqual(alignment.subject,
+                             'gi|556503834|ref|NC_000913.3|')
+            self.assertEqual(alignment.identity, 98.14)
+            self.assertEqual(alignment.length, 2856)
+            self.assertEqual(alignment.mismatches, 53)
+            self.assertEqual(alignment.gap_openings, 0)
+            self.assertEqual(alignment.q_start, 1)
+            self.assertEqual(alignment.q_end, 2856)
+            self.assertEqual(alignment.s_start, 4483837)
+            self.assertEqual(alignment.s_end, 4480982)
+            self.assertEqual(alignment.e_value, 0.0)
+            self.assertEqual(alignment.bit_score, 4981)
 
         # test again incorrect input lines, the exception must be
         # raised
         for incorrect_input in self.__incorrect_lines:
-            parser = BlastTab(os.path.join(
-                'data', 'blast', 'incorrect_input', incorrect_input))
-            with self.assertRaises(BlastTabError):
-                next(parser.alignments())
+            with open(os.path.join('data', 'blast', 'incorrect_input',
+                                   incorrect_input)) as incorrect_file:
+                parser = BlastTab(incorrect_file)
+                with self.assertRaises(BlastTabError):
+                    next(parser.alignments())
