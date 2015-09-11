@@ -92,7 +92,7 @@ class MissingSeqNameError(SeqRenameError):
     pass
 
 
-class RepeatMaskerReaderError(BioformatsError):
+class RepeatMaskerError(BioformatsError):
     """
     This class describes an error related to the RepeatMasker out
     file parser.

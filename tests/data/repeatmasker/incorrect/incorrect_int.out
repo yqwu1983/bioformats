@@ -1,0 +1,5 @@
+   SW   perc perc perc  query           position in query           matching          repeat                     position in repeat
+score   div. del. ins.  sequence        begin   end        (left)   repeat            class/family           begin   end    (left)       ID
+
+ 1638   10.2  0.8  2.3  scaffold_0            1     355 (3773572) C L1_BT             LINE/L1                 (1803)   6587    6336       1  
+ERROR   25.5  6.0  1.4  scaffold_0          398     679 (3773248) C L1-4_PVa          LINE/L1                  (135)   6686    6392       2  

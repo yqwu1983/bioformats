@@ -4,10 +4,9 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
-import csv
 import logging
 from collections import namedtuple
-from .exception import RepeatMaskerReaderError
+from .exception import RepeatMaskerError
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -17,7 +16,7 @@ repeatmasker_out_columns = ('sw_score', 'subst_perc', 'del_perc',
                             'query_end', 'query_past',
                             'is_complement', 'repeat_name',
                             'repeat_class', 'repeat_prior',
-                            'repeat_start', 'repeat_end',
+                            'repeat_start', 'repeat_end', 'id',
                             'is_overlapping')
 
 Record = namedtuple('Record', repeatmasker_out_columns)
@@ -38,8 +37,9 @@ class Reader(object):
 
         :param handle: a handle of a RepeatMasker out file
         """
-        self.__reader = csv.reader(handle, delimiter='\t')
-        self.__line_parts = []
+        self.__handle = handle
+        self.__line = ''
+        self.__lineno = 0
 
     def repeats(self):
         """
@@ -51,8 +51,10 @@ class Reader(object):
         # skip the first three lines of the input file because they
         # contain a header
         for _ in range(3):
-            next(self.__reader)
-        for self.__line_parts in self.__reader:
+            next(self.__handle)
+
+        for self.__line in self.__handle:
+            self.__lineno += 1
             yield self.__parse_rmout_line()
 
     def __parse_rmout_line(self):
@@ -63,31 +65,30 @@ class Reader(object):
             was created from
         :rtype: Record
         """
-        if not (14 <= len(self.__line_parts) <= 15):
+        line_parts = self.__line.split(None, 14)
+        if len(line_parts) < 15:
             logger.error('line %d: the incorrect number of '
-                         'columns', self.__reader.line_num)
-            raise RepeatMaskerReaderError
+                         'columns', self.__lineno)
+            raise RepeatMaskerError
 
         # add the last column value 'None' if it is missing
-        if len(self.__line_parts) == 14:
-            self.__line_parts += [None]
+        if len(line_parts) == 15:
+            line_parts += [None]
 
         for i in self.int_fields:
             try:
-                self.__line_parts[i] = int(self.__line_parts[i])
+                line_parts[i] = int(line_parts[i])
             except ValueError:
                 logger.error('line %d: the incorrect integer value '
-                             '%s', self.__reader.line_num,
-                             self.__line_parts[i])
-                raise RepeatMaskerReaderError
+                             '%s', self.__lineno, line_parts)
+                raise RepeatMaskerError
 
         for i in self.float_fields:
             try:
-                self.__line_parts[i] = float(self.__line_parts[i])
+                line_parts[i] = float(line_parts[i])
             except ValueError:
                 logger.error('line %d: the incorrect float value %s',
-                             self.__reader.line_num,
-                             self.__line_parts[i])
-                raise RepeatMaskerReaderError
+                             self.__lineno, line_parts[i])
+                raise RepeatMaskerError
 
-        return Record(*self.__line_parts)
+        return Record(*line_parts)
