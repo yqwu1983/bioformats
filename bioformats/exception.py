@@ -90,3 +90,11 @@ class MissingSeqNameError(SeqRenameError):
     is missing from the dictionary of a sequence renamer object.
     """
     pass
+
+
+class RepeatMaskerReaderError(BioformatsError):
+    """
+    This class describes an error related to the RepeatMasker out
+    file parser.
+    """
+    pass
