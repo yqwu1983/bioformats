@@ -182,10 +182,10 @@ def rmout2bed_record(rm_record, name='id', color='class',
             float(rm_record.subst_perc) +
             float(rm_record.del_perc) +
             float(rm_record.ins_perc))))
+        if repeat_class not in repeat_class_colors:
+            logger.error('missing repeat class %s', repeat_class)
+            raise RepeatMaskerError
         if color == 'class':
-            if repeat_class not in repeat_class_colors:
-                logger.error('missing repeat class %s', repeat_class)
-                raise RepeatMaskerError
             bed_color = repeat_class_colors[repeat_class]
         elif color == 'identity':
             bed_color = whiten_color((0, 0, 0), repeat_identity)
