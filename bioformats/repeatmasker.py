@@ -65,7 +65,7 @@ class Reader(object):
             was created from
         :rtype: Record
         """
-        line_parts = self.__line.split(None, 14)
+        line_parts = self.__line.rstrip().split(None, 14)
         if len(line_parts) < 15:
             logger.error('line %d: the incorrect number of '
                          'columns', self.__lineno)
