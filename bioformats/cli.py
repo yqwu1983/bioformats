@@ -14,7 +14,6 @@ from . import seqname
 from . import bed
 from . import exception
 from . import repeatmasker
-from argparse import RawTextHelpFormatter
 
 
 def bioformats():
@@ -208,7 +207,7 @@ def ncbirenameseq_parser(subparsers):
                '\tgenbank:\tCM000663.2\n'
                '\tchr_refseq:\t1_NC_000001.11\n'
                '\tchr_genbank:\t1_CM000663.2',
-        formatter_class=RawTextHelpFormatter
+        formatter_class=argparse.RawTextHelpFormatter
     )
 
     format_values = ['refseq_full', 'genbank_full', 'refseq_gi',
@@ -477,12 +476,32 @@ def rmout2bed_parser(subparsers):
         'rmout2bed',
         help='convert a RepeatMasker out file to the BED format',
         description='Convert a RepeatMasker out file to the BED '
-                    'format.'
+                    'format.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('rmout_file',
                         help='a RepeatMasker out file')
     parser.add_argument('bed_file',
                         help='the output BED file')
+
+    # optional arguments
+    parser.add_argument('-c', '--color', default='class',
+                        choices=('class',
+                                 'identity',
+                                 'class_identity'),
+                        help='how to choose colors of BED repeat '
+                             'records')
+    parser.add_argument('-n', '--name', default='id',
+                        choices=('id',
+                                 'name',
+                                 'class',
+                                 'family',
+                                 'class_family'),
+                        help='how to choose names of BED repeat '
+                             'records')
+    parser.add_argument('-s', '--short', action='store_true',
+                        help='output only repeat loci (the output is '
+                             'a BED3 file)')
 
 
 def rmout2bed_launcher(args):
@@ -493,30 +512,6 @@ def rmout2bed_launcher(args):
         with bed.Writer(args.bed_file) as bed_writer:
             rm_reader = repeatmasker.Reader(repeatmasker_file)
             for record in rm_reader.repeats():
-                bed_record = bed.Record(
-                    seq=record.query,
-                    start=record.query_start - 1,
-                    end=record.query_end,
-                    name=record.id,
-                    score=1000,
-                    strand='-' if record.is_complement else '+',
-                    thick_start=None,
-                    thick_end=None,
-                    color=None,
-                    block_num=None,
-                    block_sizes=None,
-                    block_starts=None,
-                    extra=[
-                        record.sw_score,
-                        record.subst_perc,
-                        record.del_perc,
-                        record.ins_perc,
-                        record.query_past,
-                        record.repeat_name,
-                        record.repeat_class,
-                        record.repeat_prior,
-                        record.repeat_start,
-                        record.repeat_end
-                    ]
-                )
+                bed_record = repeatmasker.rmout2bed_record(
+                    record, args.name, args.color, args.short)
                 bed_writer.write(bed_record)

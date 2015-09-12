@@ -5,6 +5,7 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 import logging
+from . import bed
 from collections import namedtuple
 from .exception import RepeatMaskerError
 
@@ -15,7 +16,7 @@ repeatmasker_out_columns = ('sw_score', 'subst_perc', 'del_perc',
                             'ins_perc', 'query', 'query_start',
                             'query_end', 'query_past',
                             'is_complement', 'repeat_name',
-                            'repeat_class', 'repeat_prior',
+                            'repeat_class_family', 'repeat_prior',
                             'repeat_start', 'repeat_end', 'id',
                             'is_overlapping')
 
@@ -92,3 +93,134 @@ class Reader(object):
                 raise RepeatMaskerError
 
         return Record(*line_parts)
+
+
+repeat_class_colors = {
+    'LINE': (0, 0, 0),      # black
+    'SINE': (255, 0, 0),    # red
+    'LTR': (0, 205, 0),     # green3
+    'DNA': (0, 0, 255),     # blue
+    'Simple_repeat': (0, 255, 255),     # cyan
+    'Low_complexity': (255, 0, 255),    # magenta
+    'Satellite': (255, 255, 0),     # yellow
+    'RNA': (190, 190, 190),         # gray
+    'Other': (30, 144, 255),        # dodgerblue
+    'Unknown': (178, 34, 34)        # firebrick
+    }
+
+
+def whiten_color(color, alpha):
+    """
+    Given an RGB color, whiten it to the specified alpha.
+
+    :param color: an RGB color as a tuple of three numbers
+    :param alpha: a whitening alpha from 0 to 100
+    :type color: tuple
+    :type alpha: float
+    :return: a whitened color
+    :rtype: tuple
+    """
+    if not (0 <= alpha <= 100):
+        logger.error('incorrect color whitening alpha %d', alpha)
+        raise RepeatMaskerError
+    return tuple(int(round(x + (255 - x)/100.0*alpha)) for x in color)
+
+
+def rmout2bed_record(rm_record, name='id', color='class',
+                     is_short=False):
+    """
+    Convert a record from a RepeatMasker out file to a BED record.
+
+    :param rm_record: a record from a RepeatMasker out file
+    :param name: how to form a BED record name
+    :param color: how to form a BED record color
+    :param is_short: if True, then only repeat coordinates are given
+        in the BED record
+    :type rm_record: Record
+    :param name: str
+    :param color: str
+    :param is_short: bool
+    :return: the BED record corresponding to the specified
+        RepeatMasker out record
+    :rtype: bed.Record
+    """
+    if is_short:
+        bed_record = bed.Record(
+            seq=rm_record.query,
+            start=rm_record.query_start,
+            end=rm_record.query_end,
+            name=None,
+            score=None,
+            strand=None,
+            thick_start=None,
+            thick_end=None,
+            color=None,
+            block_num=None,
+            block_sizes=None,
+            block_starts=None,
+            extra=[]
+        )
+    else:
+        # choose a BED record name
+        if name == 'id':
+            bed_name = rm_record.id
+        elif name == 'name':
+            bed_name = rm_record.repeat_name
+        elif name == 'class':
+            bed_name = rm_record.repeat_class_family.split('/')[0]
+        elif name == 'family':
+            bed_name = rm_record.repeat_class_family.split('/')[1]
+        elif name == 'class_family':
+            bed_name = rm_record.repeat_class_family
+        else:
+            logger.error('incorrect name parameter %s', name)
+            raise RepeatMaskerError
+
+        # choose a BED record color
+        repeat_class = rm_record.repeat_class_family.split('/')[0]
+        repeat_identity = int(round(100 - (
+            float(rm_record.subst_perc) +
+            float(rm_record.del_perc) +
+            float(rm_record.ins_perc))))
+        if color == 'class':
+            if repeat_class not in repeat_class_colors:
+                logger.error('missing repeat class %s', repeat_class)
+                raise RepeatMaskerError
+            bed_color = repeat_class_colors[repeat_class]
+        elif color == 'identity':
+            bed_color = whiten_color((0, 0, 0), repeat_identity)
+        elif color == 'class_identity':
+            bed_color = whiten_color(repeat_class_colors[repeat_class],
+                                     repeat_identity)
+        else:
+            logger.error('incorrect color parameter %s', color)
+            raise RepeatMaskerError
+
+        bed_record = bed.Record(
+            seq=rm_record.query,
+            start=rm_record.query_start,
+            end=rm_record.query_end,
+            name=bed_name,
+            score=repeat_identity,
+            strand='-' if rm_record.is_complement == 'C' else '+',
+            thick_start=rm_record.query_start,
+            thick_end=rm_record.query_end,
+            color=bed_color,
+            block_num=None,
+            block_sizes=None,
+            block_starts=None,
+            extra=[
+                rm_record.sw_score,
+                rm_record.subst_perc,
+                rm_record.del_perc,
+                rm_record.ins_perc,
+                rm_record.query_past,
+                rm_record.repeat_name,
+                rm_record.repeat_class_family,
+                rm_record.repeat_prior,
+                rm_record.repeat_start,
+                rm_record.repeat_end,
+                rm_record.id
+            ]
+        )
+    return bed_record
