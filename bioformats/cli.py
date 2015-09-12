@@ -13,6 +13,7 @@ from . import fasta
 from . import seqname
 from . import bed
 from . import exception
+from . import repeatmasker
 from argparse import RawTextHelpFormatter
 
 
@@ -38,6 +39,7 @@ def bioformats():
     fastareorder_parser(subparsers)
     bedcolumns_parser(subparsers)
     bedautosql_parser(subparsers)
+    rmout2bed_parser(subparsers)
 
     args = parser.parse_args()
 
@@ -48,7 +50,8 @@ def bioformats():
         ('ncbirenameseq', ncbirenameseq_launcher),
         ('fastareorder', fastareorder_launcher),
         ('bedcolumns', bedcolumns_launcher),
-        ('bedautosql', bedautosql_launcher)
+        ('bedautosql', bedautosql_launcher),
+        ('rmout2bed', rmout2bed_launcher)
     ])
 
     launchers[args.command](args)
@@ -464,3 +467,56 @@ def bedautosql_launcher(args):
                     writer.write(i)
         except exception.BedError:
                 sys.stderr.write('Incorrect BED file.\n')
+
+
+def rmout2bed_parser(subparsers):
+    """
+    Parser for the rmout2bed tool.
+    """
+    parser = subparsers.add_parser(
+        'rmout2bed',
+        help='convert a RepeatMasker out file to the BED format',
+        description='Convert a RepeatMasker out file to the BED '
+                    'format.'
+    )
+    parser.add_argument('rmout_file',
+                        help='a RepeatMasker out file')
+    parser.add_argument('bed_file',
+                        help='the output BED file')
+
+
+def rmout2bed_launcher(args):
+    """
+    Launcher for the rmout2bed tool.
+    """
+    with open(args.rmout_file) as repeatmasker_file:
+        with bed.Writer(args.bed_file) as bed_writer:
+            rm_reader = repeatmasker.Reader(repeatmasker_file)
+            for record in rm_reader.repeats():
+                bed_record = bed.Record(
+                    seq=record.query,
+                    start=record.query_start - 1,
+                    end=record.query_end,
+                    name=record.id,
+                    score=1000,
+                    strand='-' if record.is_complement else '+',
+                    thick_start=None,
+                    thick_end=None,
+                    color=None,
+                    block_num=None,
+                    block_sizes=None,
+                    block_starts=None,
+                    extra=[
+                        record.sw_score,
+                        record.subst_perc,
+                        record.del_perc,
+                        record.ins_perc,
+                        record.query_past,
+                        record.repeat_name,
+                        record.repeat_class,
+                        record.repeat_prior,
+                        record.repeat_start,
+                        record.repeat_end
+                    ]
+                )
+                bed_writer.write(bed_record)
