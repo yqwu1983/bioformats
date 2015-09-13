@@ -285,9 +285,9 @@ class Reader(object):
             self.__line_parts[i] = int(self.__line_parts[i])
 
         # form the tuple to be returned as a result
-        bed_parts = self.__line_parts[:bed_col]
-        bed_parts += ([None] * (12 - bed_col))
-        aux_parts = self.__line_parts[bed_col:]
+        bed_parts = self.__line_parts[:self.__bed_col]
+        bed_parts += ([None] * (12 - self.__bed_col))
+        aux_parts = self.__line_parts[self.__bed_col:]
         result = Record(*bed_parts, extra=aux_parts)
 
         return result
@@ -349,9 +349,9 @@ def get_autosql_table(bed_reader, name='Table', desc='Description'):
     :rtype: autosql.Table
     """
     # process the first record from the BED reader to determine the
-    # number of colums in the associated file
+    # number of columns in the associated file
     first_record = next(bed_reader.records())
-    num_aux_columns = len(first_record.extra)
+    num_aux_columns = bed_reader.aux_columns
 
     # create autoSql type classifiers for extra columns; for BED
     # columns, we already know their format and do not need classifiers

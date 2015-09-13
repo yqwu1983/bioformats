@@ -166,7 +166,7 @@ def rmout2bed_record(rm_record, name='id', color='class',
     else:
         # choose a BED record name
         if name == 'id':
-            bed_name = rm_record.id
+            bed_name = 'ID_' + rm_record.id
         elif name == 'name':
             bed_name = rm_record.repeat_name
         elif name == 'class':
@@ -186,10 +186,8 @@ def rmout2bed_record(rm_record, name='id', color='class',
         # process various RNA classes
         if 'RNA' in repeat_class and repeat_class != 'RNA':
             repeat_class = 'RNA'
-        repeat_identity = int(round(10 * (100 - (
-            float(rm_record.subst_perc) +
-            float(rm_record.del_perc) +
-            float(rm_record.ins_perc)))))
+        repeat_identity = int(round(10 * (100 - float(
+            rm_record.subst_perc))))
         if repeat_class not in repeat_class_colors:
             logger.info('classifying repeat class %s as unknown',
                         repeat_class)
@@ -197,10 +195,11 @@ def rmout2bed_record(rm_record, name='id', color='class',
         if color == 'class':
             bed_color = repeat_class_colors[repeat_class]
         elif color == 'identity':
-            bed_color = whiten_color((0, 0, 0), repeat_identity/10)
+            bed_color = whiten_color((0, 0, 0), 100 -
+                                     repeat_identity/10)
         elif color == 'class_identity':
             bed_color = whiten_color(repeat_class_colors[repeat_class],
-                                     repeat_identity/10)
+                                     100 - repeat_identity/10)
         else:
             logger.error('incorrect color parameter %s', color)
             raise RepeatMaskerError
