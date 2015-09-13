@@ -259,6 +259,15 @@ class Reader(object):
         bed_col, aux_col = self.__get_bed_format()
         self.__bed_col = min(self.__bed_col, bed_col)
         self.__aux_col = max(self.__aux_col, aux_col)
+        if self.__bed_col == 7:
+            # thickStart and thickEnd columns must be present together
+            self.__bed_col = 6
+            self.__aux_col += 1
+        elif 10 <= self.bed_columns < 12:
+            # blockCount, bloclSizes and blockStarts columns must be
+            # present together
+            self.__aux_col += self.__bed_col - 10
+            self.__bed_col = 10
 
         if self.__bed_col < 3:
             # The first three columns of a BED file are mandatory.
