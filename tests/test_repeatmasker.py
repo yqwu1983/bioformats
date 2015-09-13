@@ -88,8 +88,13 @@ class TestRmOut2BedRecord(unittest.TestCase):
             rmout2bed_record(self.__record, name='error!')
         with self.assertRaises(RepeatMaskerError):
             rmout2bed_record(self.__record, color='error!')
+        # test against an RNA-based repeat class
+        rmout2bed_record(
+            self.__record._replace(repeat_class_family='snRNA'),
+            name='class'
+        )
         # test against a missing repeat class for the option name=class
-        with self.assertRaises(RepeatMaskerError):
-            rmout2bed_record(
-                self.__record._replace(repeat_class_family='ERROR'),
-                name='class')
+        rmout2bed_record(
+            self.__record._replace(repeat_class_family='ERROR'),
+            name='class'
+        )

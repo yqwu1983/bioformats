@@ -178,13 +178,19 @@ def rmout2bed_record(rm_record, name='id', color='class',
 
         # choose a BED record color
         repeat_class = rm_record.repeat_class_family.split('/')[0]
+        # remove question marks if there are any
+        repeat_class = repeat_class.strip('?')
+        # process various RNA classes
+        if 'RNA' in repeat_class and repeat_class != 'RNA':
+            repeat_class = 'RNA'
         repeat_identity = int(round(100 - (
             float(rm_record.subst_perc) +
             float(rm_record.del_perc) +
             float(rm_record.ins_perc))))
         if repeat_class not in repeat_class_colors:
-            logger.error('missing repeat class %s', repeat_class)
-            raise RepeatMaskerError
+            logger.info('classifying repeat class %s as unknown',
+                        repeat_class)
+            repeat_class = 'Unknown'
         if color == 'class':
             bed_color = repeat_class_colors[repeat_class]
         elif color == 'identity':
