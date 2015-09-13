@@ -72,8 +72,11 @@ class Reader(object):
                          'columns', self.__lineno)
             raise RepeatMaskerError
 
-        # add the last column value 'None' if it is missing
-        if len(line_parts) == 15:
+        # process the last optional column
+        if line_parts[-1].endswith('*'):
+            line_parts[-1] = line_parts[-1].split(' ', 1)[0]
+            line_parts += ['*']
+        else:
             line_parts += [None]
 
         for i in self.int_fields:
@@ -183,10 +186,10 @@ def rmout2bed_record(rm_record, name='id', color='class',
         # process various RNA classes
         if 'RNA' in repeat_class and repeat_class != 'RNA':
             repeat_class = 'RNA'
-        repeat_identity = int(round(100 - (
+        repeat_identity = int(round(10 * (100 - (
             float(rm_record.subst_perc) +
             float(rm_record.del_perc) +
-            float(rm_record.ins_perc))))
+            float(rm_record.ins_perc)))))
         if repeat_class not in repeat_class_colors:
             logger.info('classifying repeat class %s as unknown',
                         repeat_class)
@@ -194,10 +197,10 @@ def rmout2bed_record(rm_record, name='id', color='class',
         if color == 'class':
             bed_color = repeat_class_colors[repeat_class]
         elif color == 'identity':
-            bed_color = whiten_color((0, 0, 0), repeat_identity)
+            bed_color = whiten_color((0, 0, 0), repeat_identity/10)
         elif color == 'class_identity':
             bed_color = whiten_color(repeat_class_colors[repeat_class],
-                                     repeat_identity)
+                                     repeat_identity/10)
         else:
             logger.error('incorrect color parameter %s', color)
             raise RepeatMaskerError

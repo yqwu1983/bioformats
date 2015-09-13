@@ -33,8 +33,8 @@ class TestBedReader(unittest.TestCase):
         )
         self.__correct_columns = (
             (12, 1),
-            (10, 3),
-            (10, 3),
+            (9, 4),
+            (9, 4),
             (9, 4),
             (8, 5),
             (6, 7),

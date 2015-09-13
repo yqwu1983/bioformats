@@ -266,8 +266,8 @@ class Reader(object):
         elif 10 <= self.bed_columns < 12:
             # blockCount, bloclSizes and blockStarts columns must be
             # present together
-            self.__aux_col += self.__bed_col - 10
-            self.__bed_col = 10
+            self.__aux_col += self.__bed_col - 9
+            self.__bed_col = 9
 
         if self.__bed_col < 3:
             # The first three columns of a BED file are mandatory.
