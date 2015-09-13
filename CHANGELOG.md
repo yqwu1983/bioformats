@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.1.6
+-----
+- Tool `rmout2bed` to convert RepeatMasker out files to the BED format.
+- Routines to process RepeatMasker out files.
+
 0.1.5
 -----
 - Unified launcher `bioformats` for package tools.
