@@ -150,7 +150,7 @@ def rmout2bed_record(rm_record, name='id', color='class',
     if is_short:
         bed_record = bed.Record(
             seq=rm_record.query,
-            start=rm_record.query_start,
+            start=rm_record.query_start - 1,
             end=rm_record.query_end,
             name=None,
             score=None,
@@ -207,7 +207,7 @@ def rmout2bed_record(rm_record, name='id', color='class',
 
         bed_record = bed.Record(
             seq=rm_record.query,
-            start=rm_record.query_start,
+            start=rm_record.query_start - 1,
             end=rm_record.query_end,
             name=bed_name,
             score=repeat_identity,
