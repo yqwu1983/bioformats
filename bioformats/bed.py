@@ -41,11 +41,13 @@ bed_autosql_fields = (
                        desc='Coding region end'),
     autosql.TableEntry(type='string', num=None, name='itemRgb',
                        desc='Color set'),
-    autosql.TableEntry(type='uint', num=None, name='blockCount',
+    autosql.TableEntry(type='int', num=None, name='blockCount',
                        desc='The number of blocks in feature'),
-    autosql.TableEntry(type='string', num=None, name='blockSizes',
+    autosql.TableEntry(type='int[blockCount]', num=None,
+                       name='blockSizes',
                        desc='Block sizes'),
-    autosql.TableEntry(type='string', num=None, name='blockStarts',
+    autosql.TableEntry(type='int[blockCount]', num=None,
+                       name='blockStarts',
                        desc='Block start positions')
 )
 
