@@ -159,3 +159,10 @@ class TestClassifier(unittest.TestCase):
         self.assertEqual(classifier.data_type, 'string')
         classifier.add_value('a' * 1000)
         self.assertEqual(classifier.data_type, 'lstring')
+
+        # check if char arrays are correctly processed
+        classifier = Classifier()
+        classifier.add_value('123')
+        classifier.add_value('ABC')
+        classifier.add_value('CDE')
+        self.assertEqual(classifier.data_type, 'char[3]')

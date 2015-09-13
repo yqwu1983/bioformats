@@ -322,6 +322,16 @@ class Classifier(object):
         """
         return len(set(self.__lengths)) <= 1
 
+    def __check_for_char_array(self):
+        """
+        Check if the given values form a char array.
+
+        :return: if the given values form a char array
+        :rtype: bool
+        """
+        return self.is_array() and self.__data_type in ('string',
+                                                        'lstring')
+
     @property
     def data_type(self):
         """
@@ -330,4 +340,7 @@ class Classifier(object):
         :return: autoSql data type specifying all values
         :rtype: str
         """
-        return self.__data_type
+        if self.__check_for_char_array():
+            return 'char[{}]'.format(self.__lengths[0])
+        else:
+            return self.__data_type
