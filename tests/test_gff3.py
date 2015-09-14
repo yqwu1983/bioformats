@@ -9,7 +9,7 @@ import os
 import logging
 import tempfile
 import unittest
-from bioformats.gff3 import Record, Reader, Writer
+from bioformats.gff3 import Record, Reader, Writer, analyze_tags
 from bioformats.exception import Gff3Error
 try:
     import itertools.izip as zip
@@ -78,3 +78,24 @@ class TestGff3Writer(unittest.TestCase):
     def tearDown(self):
         if os.path.isfile(self.__output_file):
             os.unlink(self.__output_file)
+
+
+class TestAnalyzeTags(unittest.TestCase):
+    def setUp(self):
+        self.__input_file = os.path.join('data', 'gff3', 'correct.gff')
+
+    def test_analyze_tags(self):
+        """
+        Check if tags are analyzed in a proper way.
+        """
+        with open(self.__input_file) as gff_file:
+            result = analyze_tags(gff_file)
+            self.assertIsInstance(result, dict)
+
+        with open(self.__input_file) as gff_file:
+            result = analyze_tags(gff_file, feature_source='example')
+            self.assertIsInstance(result, dict)
+
+        with open(self.__input_file) as gff_file:
+            result = analyze_tags(gff_file, feature_type='CDS')
+            self.assertIsInstance(result, dict)

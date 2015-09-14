@@ -6,7 +6,7 @@
 
 import csv
 import logging
-from collections import namedtuple, OrderedDict
+from collections import defaultdict, namedtuple, OrderedDict
 from future.utils import iteritems
 from .exception import Gff3Error
 
@@ -158,3 +158,42 @@ class Writer(object):
 
         template = '\t'.join(['{}'] * len(gff3_record)) + '\n'
         self.__output.write(template.format(*gff3_record))
+
+
+def analyze_tags(handle, feature_source=None, feature_type=None):
+    """
+    Given a handle of a GFF3 file, collect statistics on attribute
+    tags in it.
+
+    :param handle: a handle of a GFF3 file
+    :param feature_source: if specified, then only features of the
+        specified source are considered
+    :param feature_type: if specified, then only features of the
+        specified type are considered
+    :type feature_source: str
+    :type feature_type: str
+    :return: a dictionary of four values: the total number of
+        processed features, the number of filtered features,
+        the number of features with attributes and the dictionary of
+        attribute tag counts
+    :rtype: dict
+    """
+    total_features = filtered_features = attr_features =  0
+    tag_counts = defaultdict(int)
+    for record in Reader(handle).records():
+        total_features += 1
+        if feature_source is not None and record.source != \
+                feature_source:
+            continue
+        if feature_type is not None and record.type != feature_type:
+            continue
+        filtered_features += 1
+        if record.attributes is not None:
+            attr_features += 1
+            for tag in record.attributes:
+                tag_counts[tag] += 1
+
+    return {'total': total_features,
+            'filtered': filtered_features,
+            'attribute': attr_features,
+            'tag_counts': tag_counts}
