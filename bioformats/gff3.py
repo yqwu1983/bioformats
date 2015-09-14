@@ -172,10 +172,9 @@ def analyze_tags(handle, feature_source=None, feature_type=None):
         specified type are considered
     :type feature_source: str
     :type feature_type: str
-    :return: a dictionary of four values: the total number of
-        processed features, the number of filtered features,
-        the number of features with attributes and the dictionary of
-        attribute tag counts
+    :return: a dictionary of three values: the total number of
+        processed features, the number of filtered features and the
+        dictionary of attribute tag counts
     :rtype: dict
     """
     total_features = filtered_features = attr_features =  0
@@ -189,11 +188,9 @@ def analyze_tags(handle, feature_source=None, feature_type=None):
             continue
         filtered_features += 1
         if record.attributes is not None:
-            attr_features += 1
             for tag in record.attributes:
                 tag_counts[tag] += 1
 
     return {'total': total_features,
             'filtered': filtered_features,
-            'attribute': attr_features,
             'tag_counts': tag_counts}

@@ -12,6 +12,7 @@ from . import autosql
 from . import fasta
 from . import seqname
 from . import bed
+from . import gff3
 from . import exception
 from . import repeatmasker
 
@@ -39,6 +40,7 @@ def bioformats():
     bedcolumns_parser(subparsers)
     bedautosql_parser(subparsers)
     rmout2bed_parser(subparsers)
+    gfftagstat_parser(subparsers)
 
     args = parser.parse_args()
 
@@ -50,7 +52,8 @@ def bioformats():
         ('fastareorder', fastareorder_launcher),
         ('bedcolumns', bedcolumns_launcher),
         ('bedautosql', bedautosql_launcher),
-        ('rmout2bed', rmout2bed_launcher)
+        ('rmout2bed', rmout2bed_launcher),
+        ('gfftagstat', gfftagstat_launcher)
     ])
 
     launchers[args.command](args)
@@ -515,3 +518,62 @@ def rmout2bed_launcher(args):
                 bed_record = repeatmasker.rmout2bed_record(
                     record, args.name, args.color, args.short)
                 bed_writer.write(bed_record)
+
+
+def gfftagstat_parser(subparsers):
+    """
+    Parser for the gfftagstat tool.
+    """
+    parser = subparsers.add_parser(
+        'gfftagstat',
+        help='get statistics on attribute tags of a GFF3 file',
+        description='Get statistics on attribure tags of a GFF file.'
+    )
+    parser.add_argument('gff_file', help='a GFF3 file')
+
+    # optional arguments
+    parser.add_argument('-s', '--source', default=None,
+                        help='filter GFF3 features by the specified '
+                             'source')
+    parser.add_argument('-t', '--type', default=None,
+                        help='filter GFF3 features by the specified '
+                             'type')
+
+
+def gfftagstat_launcher(args):
+    """
+    Launcher for the gfftagstat tool.
+    """
+    with open(args.gff_file) as gff_file:
+        tag_stats = gff3.analyze_tags(gff_file, args.source, args.type)
+        is_filtered = args.source is not None or args.type is not None
+        total_count = tag_stats['total']
+        filtered_count = tag_stats['filtered']
+        if is_filtered:
+            print('Tag\tCount\t% Filtered\t% Total')
+            output_template = '{0}\t{1}\t{2:.2f}\t{3:.2f}'
+        else:
+            print('Tag\tCount\t% Total')
+            output_template = '{0}\t{1}\t{3:.2f}'
+
+        print(output_template.format(
+            '#records',
+            total_count,
+            100.0 * total_count / filtered_count,
+            100
+        ))
+        if is_filtered:
+            print(output_template.format(
+                '#filtered',
+                filtered_count,
+                100,
+                100.0 * filtered_count / total_count
+            ))
+        tag_counts = tag_stats['tag_counts']
+        for tag in sorted(tag_counts.keys()):
+            print(output_template.format(
+                tag,
+                tag_counts[tag],
+                100.0 * tag_counts[tag] / filtered_count,
+                100.0 * tag_counts[tag] / total_count
+            ))
