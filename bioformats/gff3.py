@@ -43,8 +43,11 @@ class Reader(object):
         from
         :rtype: Record
         """
-        # skip the first line of the file
-        next(self.__reader)
+        # check the first line of the file
+        first_line = next(self.__reader)[0]
+        if first_line.rstrip() != '##gff-version 3':
+            logger.error('an incorrect GFF3 header')
+            raise Gff3Error
         for self.__line_parts in self.__reader:
             yield self.__parse_gff3_line()
 
