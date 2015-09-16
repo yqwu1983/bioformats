@@ -220,20 +220,27 @@ def gff2to3(input_handle, output_handle, strict=True):
         if not gff2_line:
             # skip an empty line
             continue
-        line_parts = gff2_line.rstrip().split('\t', 8)
+        line_parts = gff2_line.split('\t', 8)
         if len(line_parts) < 9:
             if strict:
                 logger.error('an incorrect GFF2 line')
                 raise Gff3Error
         else:
             # get the group column and convert it to the GFF3 format
-            group_parts = line_parts[8].split(';')
-            group_parts = map(str.split, map(str.strip, group_parts),
-                              [' '] * len(group_parts))
-            attribures = []
-            for tag, value in group_parts:
-                attribures.append('{}={}'.format(tag, value.strip('"')))
+            if ' ' in line_parts[8]:
+                group_parts = line_parts[8].split(';')
+                group_parts = map(str.split, map(str.strip,
+                                                 group_parts),
+                                  [' '] * len(group_parts))
+                attribures = []
+                for tag, value in group_parts:
+                    attribures.append('{}={}'.format(
+                        tag, value.strip('"')))
 
-            line_parts[8] = ';'.join(attribures)
+                line_parts[8] = ';'.join(attribures)
+            else:
+                # we are dealing with a single attribute value in the
+                # group columns
+                line_parts[8] = 'ATTR={}'.format(line_parts[8])
 
             output_handle.write(output_template.format(*line_parts))
