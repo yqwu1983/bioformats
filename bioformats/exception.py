@@ -98,3 +98,11 @@ class RepeatMaskerError(BioformatsError):
     file parser.
     """
     pass
+
+
+class SnpEffError(BioformatsError):
+    """
+    This class describes an error related to the snpEff annotation
+    parsing.
+    """
+    pass
