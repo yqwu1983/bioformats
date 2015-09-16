@@ -197,3 +197,43 @@ def analyze_tags(handle, feature_source=None, feature_type=None):
     return {'total': total_features,
             'filtered': filtered_features,
             'tag_counts': tag_counts}
+
+
+def gff2to3(input_handle, output_handle, strict=True):
+    """
+    Convert records from a GFF2 file to the GFF3 format and write
+    them to the specified destionation.
+
+    :param input_handle: a handle of an input GFF2 file
+    :param output_handle: a handle of an output file in the GFF3 format
+    :param strict: throw an exception if an incorrect GFF2 record
+        from the specified input file was read; otherwise just ignore
+        it
+    :type strict: bool
+    :return: the number of processed records
+    :rtype: int
+    """
+    output_template = '\t'.join(['{}'] * 9) + '\n'
+    output_handle.write('##gff-version 3\n')
+    for gff2_line in input_handle:
+        gff2_line = gff2_line.rstrip()
+        if not gff2_line:
+            # skip an empty line
+            continue
+        line_parts = gff2_line.rstrip().split('\t', 8)
+        if len(line_parts) < 9:
+            if strict:
+                logger.error('an incorrect GFF2 line')
+                raise Gff3Error
+        else:
+            # get the group column and convert it to the GFF3 format
+            group_parts = line_parts[8].split(';')
+            group_parts = map(str.split, map(str.strip, group_parts),
+                              [' '] * len(group_parts))
+            attribures = []
+            for tag, value in group_parts:
+                attribures.append('{}={}'.format(tag, value.strip('"')))
+
+            line_parts[8] = ';'.join(attribures)
+
+            output_handle.write(output_template.format(*line_parts))

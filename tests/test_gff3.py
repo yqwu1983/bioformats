@@ -10,6 +10,7 @@ import logging
 import tempfile
 import unittest
 from bioformats.gff3 import Record, Reader, Writer, analyze_tags
+from bioformats.gff3 import gff2to3
 from bioformats.exception import Gff3Error
 try:
     import itertools.izip as zip
@@ -99,3 +100,34 @@ class TestAnalyzeTags(unittest.TestCase):
         with open(self.__input_file) as gff_file:
             result = analyze_tags(gff_file, feature_type='CDS')
             self.assertIsInstance(result, dict)
+
+
+class TestGff2to3(unittest.TestCase):
+    def setUp(self):
+        self.__gff2 = os.path.join('data', 'gff3', 'example.gff2')
+        self.__incorrect_gff2 = os.path.join('data', 'gff3',
+                                             'incorrect.gff2')
+        self.__gff3 = os.path.join('data', 'gff3', 'example.gff3')
+        self.__output = tempfile.NamedTemporaryFile().name
+
+    def test_gff2to3(self):
+        with open(self.__gff2) as input_file:
+            with open(self.__output, 'w') as output_file:
+                gff2to3(input_file, output_file)
+
+        # compare the produced GFF3 file to the correct one
+        with open(self.__output) as produced_gff:
+            with open(self.__gff3) as correct_gff:
+                for x, y in zip(produced_gff, correct_gff):
+                    self.assertEqual(x.rstrip(), y.rstrip())
+
+        # try the incorrect GFF2 file in the strict mode
+        with open(self.__incorrect_gff2) as input_file:
+            with open(self.__output, 'w') as output_file:
+                with self.assertRaises(Gff3Error):
+                    gff2to3(input_file, output_file, strict=True)
+
+        # try the incorrect GFF2 file ignoring incorrect input lines
+        with open(self.__incorrect_gff2) as input_file:
+            with open(self.__output, 'w') as output_file:
+                gff2to3(input_file, output_file, strict=False)
