@@ -41,6 +41,7 @@ def bioformats():
     bedautosql_parser(subparsers)
     rmout2bed_parser(subparsers)
     gfftagstat_parser(subparsers)
+    gff2to3_parser(subparsers)
 
     args = parser.parse_args()
 
@@ -53,7 +54,8 @@ def bioformats():
         ('bedcolumns', bedcolumns_launcher),
         ('bedautosql', bedautosql_launcher),
         ('rmout2bed', rmout2bed_launcher),
-        ('gfftagstat', gfftagstat_launcher)
+        ('gfftagstat', gfftagstat_launcher),
+        ('gff2to3', gff2to3_launcher)
     ])
 
     launchers[args.command](args)
@@ -577,3 +579,33 @@ def gfftagstat_launcher(args):
                 100.0 * tag_counts[tag] / filtered_count,
                 100.0 * tag_counts[tag] / total_count
             ))
+
+
+def gff2to3_parser(subparsers):
+    """
+    Parser for the gff2to3 tool.
+    """
+    parser = subparsers.add_parser(
+        'gff2to3',
+        help='convert a GFF2 file to the GFF3 format',
+        description='Convert a GFF2 file to the GFF3 format'
+    )
+    parser.add_argument('gff2_file', help='a GFF2 file')
+    parser.add_argument('output_file', help='the output GFF3 file')
+
+    # optional arguments
+    parser.add_argument('-i', '--ignore_incorrect_records',
+                        action='store_true',
+                        help='ignore incorrect records in the '
+                             'specified input GFF2 file')
+
+
+def gff2to3_launcher(args):
+    """
+    Launcher for the gff2to3 tool.
+    """
+    with open(args.gff2_file) as input_file:
+        with open(args.output_file, 'w') as output_file:
+            gff3.gff2to3(input_file, output_file,
+                         not args.ignore_incorrect_records)
+
