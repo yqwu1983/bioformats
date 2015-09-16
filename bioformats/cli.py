@@ -32,16 +32,21 @@ def bioformats():
 
     subparsers = parser.add_subparsers(dest='command')
 
-    randomfasta_parser(subparsers)
-    fastagaps_parser(subparsers)
-    renameseq_parser(subparsers)
-    ncbirenameseq_parser(subparsers)
-    fastareorder_parser(subparsers)
-    bedcolumns_parser(subparsers)
-    bedautosql_parser(subparsers)
-    rmout2bed_parser(subparsers)
-    gfftagstat_parser(subparsers)
-    gff2to3_parser(subparsers)
+    subparser_routines = {
+        'randomfasta': randomfasta_parser,
+        'fastagaps': fastagaps_parser,
+        'renameseq': renameseq_parser,
+        'ncbirenameseq': ncbirenameseq_parser,
+        'fastareorder': fastareorder_parser,
+        'bedcolumns': bedcolumns_parser,
+        'bedautosql': bedautosql_parser,
+        'rmout2bed': rmout2bed_parser,
+        'gfftagstat': gfftagstat_parser,
+        'gff2to3': gff2to3_parser
+    }
+
+    for i in sorted(subparser_routines):
+        subparser_routines[i](subparsers)
 
     args = parser.parse_args()
 
