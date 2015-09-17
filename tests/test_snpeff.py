@@ -7,7 +7,8 @@
 import logging
 import unittest
 from bioformats.snpeff import parse_snpeff_annotation, Record
-from bioformats.snpeff import parse_hgvs_dna, HgvsRecord
+from bioformats.snpeff import parse_hgvs_dna, parse_hgvs_prot
+from bioformats.snpeff import HgvsRecord
 from bioformats.exception import SnpEffError
 
 
@@ -31,7 +32,11 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
 
     def test_parse_hgvs_dna(self):
         line = 'c.718G>C'
-        self.assertIsInstance(parse_hgvs_dna(line), HgvsRecord)
+        result = parse_hgvs_dna(line)
+        self.assertIsInstance(result, HgvsRecord)
+        self.assertEqual(result.pos, 718)
+        self.assertEqual(result.ref, 'G')
+        self.assertEqual(result.alt, 'C')
 
         with self.assertRaises(SnpEffError):
             line = '718G>C'
@@ -40,7 +45,27 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
         with self.assertRaises(SnpEffError):
             line = 'c.718GC'
             parse_hgvs_dna(line)
-            
+
         with self.assertRaises(SnpEffError):
             line = 'c.7G8G>C'
             parse_hgvs_dna(line)
+
+    def test_parse_hgvs_prot(self):
+        line = 'p.Val240Leu'
+        result = parse_hgvs_prot(line)
+        self.assertIsInstance(result, HgvsRecord)
+        self.assertEqual(result.pos, 240)
+        self.assertEqual(result.ref, 'Val')
+        self.assertEqual(result.alt, 'Leu')
+
+        with self.assertRaises(SnpEffError):
+            line = 'Val240Leu'
+            parse_hgvs_prot(line)
+
+        with self.assertRaises(SnpEffError):
+            line = 'p.ValLeu'
+            parse_hgvs_prot(line)
+
+        with self.assertRaises(SnpEffError):
+            line = 'p.Val2E0Leu'
+            parse_hgvs_prot(line)

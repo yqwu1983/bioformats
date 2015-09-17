@@ -25,11 +25,11 @@ HgvsRecord = namedtuple('HgvsRecord', ('pos', 'ref', 'alt'))
 
 def parse_hgvs_dna(x):
     """
-    Parse a HGVS notation record.
+    Parse a HGVS DNA notation record.
 
     :param x: a DNA variant in the HGVS notation
     :type x: str
-    :return: a parsed HGVS record
+    :return: a parsed HGVS DNA record
     :rtype: HgvsRecord
     """
     if not x.startswith('c.'):
@@ -44,10 +44,37 @@ def parse_hgvs_dna(x):
     try:
         pos = int(pos)
     except ValueError:
-        logger.error('incorrect numeric value %s in HGVS notation',
-                     pos)
+        logger.error('incorrect position %s in HGVS notation', pos)
         raise SnpEffError
     ref, alt = x_parts[0][-1], x_parts[1]
+
+    return HgvsRecord(pos=pos, ref=ref, alt=alt)
+
+
+def parse_hgvs_prot(x):
+    """
+    Parse a HGVS protein notation record.
+
+    :param x: a protein variant in the HGVS notation
+    :type x: str
+    :return: a parsed HGVS protein record
+    :return: HgvsRecord
+    """
+    if not x.startswith('p.'):
+        logger.error('incorrect HGVS protein notation %s', x)
+        raise SnpEffError
+    x = x[2:]
+    if len(x) <= 6:
+        logger.error('incorrect HGVS protein notation %s', x)
+        raise SnpEffError
+    ref = x[:3]
+    alt = x[-3:]
+    pos = x[3:-3]
+    try:
+        pos = int(pos)
+    except ValueError:
+        logger.error('incorrect position %s in HGVS notation', pos)
+        raise SnpEffError
 
     return HgvsRecord(pos=pos, ref=ref, alt=alt)
 
