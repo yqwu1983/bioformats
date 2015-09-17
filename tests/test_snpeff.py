@@ -22,7 +22,10 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
                'ENSG00000186092|transcript|ENST00000335137|' \
                'protein_coding|1/1|c.718G>C|p.Val240Leu|718/918|' \
                '718/918|240/305||'
-        self.assertIsInstance(parse_snpeff_annotation(line), Record)
+        result = parse_snpeff_annotation(line)
+        self.assertIsInstance(result, Record)
+        self.assertIsInstance(result.hgvs_c, HgvsRecord)
+        self.assertIsInstance(result.hgvs_p, HgvsRecord)
 
         with self.assertRaises(SnpEffError):
             parse_snpeff_annotation(line[4:])

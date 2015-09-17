@@ -101,7 +101,8 @@ def parse_snpeff_annotation(annotation):
     # rank/total field
     record_fields += map(int, ann_parts[8].split('/'))
     # HGVS.c and HGVS.p fields
-    record_fields += ann_parts[9:11]
+    record_fields += [parse_hgvs_dna(ann_parts[9])]
+    record_fields += [parse_hgvs_prot(ann_parts[10])]
     # cDNA position/length field
     record_fields += map(int, ann_parts[11].split('/'))
     # CDS position/length field
