@@ -7,7 +7,7 @@
 from setuptools import setup, find_packages
 
 setup(name='bioformats',
-      version='0.1.6',
+      version='0.1.7',
       description='Classes to handle bioinformatics data',
 
       author='Gaik Tamazian',
@@ -30,7 +30,8 @@ setup(name='bioformats',
       packages=find_packages(exclude=['doc', 'tests*']),
 
       install_requires=['pyfaidx',
-                        'future'],
+                        'future',
+                        'pyvcf'],
 
       entry_points={
           'console_scripts': [

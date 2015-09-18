@@ -22,6 +22,29 @@ Record = namedtuple('Record', snpeff_columns)
 
 HgvsRecord = namedtuple('HgvsRecord', ('pos', 'ref', 'alt'))
 
+aa_code = {
+    'Gly': 'G',
+    'Pro': 'P',
+    'Ala': 'A',
+    'Val': 'V',
+    'Leu': 'L',
+    'Ile': 'I',
+    'Met': 'M',
+    'Cys': 'C',
+    'Phe': 'F',
+    'Tyr': 'Y',
+    'Trp': 'W',
+    'His': 'H',
+    'Lys': 'K',
+    'Arg': 'R',
+    'Gln': 'Q',
+    'Asn': 'N',
+    'Glu': 'E',
+    'Asp': 'D',
+    'Ser': 'S',
+    'Thr': 'T'
+}
+
 
 def parse_hgvs_dna(x):
     """
@@ -88,11 +111,6 @@ def parse_snpeff_ann(annotation):
     :return: a parsed snpEff annotation record
     :rtype: Record
     """
-    # check the annotation header
-    if len(annotation) < 4 or annotation[:4] != 'ANN=':
-        logger.error('incorrect snpEff annotation line header')
-        raise SnpEffError
-    annotation = annotation[4:]
     ann_parts = annotation.split('|', 15)
     if len(ann_parts) < 16:
         logger.error('incorrect number of snpEff annotation fields')

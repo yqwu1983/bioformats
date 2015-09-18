@@ -1,6 +1,15 @@
 Changes
 =======
 
++ 0.1.7
+-----
+- Tool `snpeff2pph` to produce PolyPhen2 input files from 
+snpEff-annotated VCF files.
+- Tool `gff2to3` to convert a GFF2 file to the GFF3 format.
+- Tool `gfftagstat` to investigate attribute tags of a GFF3 file.
+- Additional routines to process GFF files.
+- Subroutines sorted by name.
+
 0.1.6
 -----
 - Tool `rmout2bed` to convert RepeatMasker out files to the BED format.

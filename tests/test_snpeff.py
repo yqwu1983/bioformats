@@ -18,7 +18,7 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
         logging.disable(logging.ERROR)
 
     def test_parse_snpeff_annotation(self):
-        line = 'ANN=C|missense_variant|MODERATE|OR4F5|' \
+        line = 'C|missense_variant|MODERATE|OR4F5|' \
                'ENSG00000186092|transcript|ENST00000335137|' \
                'protein_coding|1/1|c.718G>C|p.Val240Leu|718/918|' \
                '718/918|240/305||'
@@ -27,13 +27,10 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
         self.assertIsInstance(result.hgvs_c, HgvsRecord)
         self.assertIsInstance(result.hgvs_p, HgvsRecord)
 
-        line = 'ANN=C|missense_variant|MODERATE|OR4F5|' \
+        line = 'C|missense_variant|MODERATE|OR4F5|' \
                'ENSG00000186092|transcript|ENST00000335137|' \
                'protein_coding||||||||'
         parse_snpeff_ann(line)
-
-        with self.assertRaises(SnpEffError):
-            parse_snpeff_ann(line[4:])
 
         with self.assertRaises(SnpEffError):
             parse_snpeff_ann(line[:-50])

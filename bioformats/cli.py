@@ -8,6 +8,7 @@ import argparse
 import pyfaidx
 import re
 import sys
+import vcf
 from . import autosql
 from . import fasta
 from . import seqname
@@ -15,6 +16,7 @@ from . import bed
 from . import gff3
 from . import exception
 from . import repeatmasker
+from . import snpeff
 
 
 def bioformats():
@@ -28,7 +30,7 @@ def bioformats():
     )
 
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s 0.1.5')
+                        version='%(prog)s 0.1.7')
 
     subparsers = parser.add_subparsers(dest='command')
 
@@ -42,7 +44,8 @@ def bioformats():
         'bedautosql': bedautosql_parser,
         'rmout2bed': rmout2bed_parser,
         'gfftagstat': gfftagstat_parser,
-        'gff2to3': gff2to3_parser
+        'gff2to3': gff2to3_parser,
+        'snpeff2pph': snpeff2pph_parser
     }
 
     for i in sorted(subparser_routines):
@@ -60,7 +63,8 @@ def bioformats():
         ('bedautosql', bedautosql_launcher),
         ('rmout2bed', rmout2bed_launcher),
         ('gfftagstat', gfftagstat_launcher),
-        ('gff2to3', gff2to3_launcher)
+        ('gff2to3', gff2to3_launcher),
+        ('snpeff2pph', snpeff2pph_launcher)
     ])
 
     launchers[args.command](args)
@@ -614,3 +618,41 @@ def gff2to3_launcher(args):
             gff3.gff2to3(input_file, output_file,
                          not args.ignore_incorrect_records)
 
+
+def snpeff2pph_parser(subparsers):
+    """
+    Parser for the snpeff2pph tool.
+    """
+    parser = subparsers.add_parser(
+        'snpeff2pph',
+        help='create a PolyPhen2 input file from an snpEff-annotated '
+             'VCF file',
+        description='Create an input file of aminoacid substitutions '
+                    'for PolyPhen2 from a VCF file of variants '
+                    'annotated with snpEff'
+    )
+
+    parser.add_argument('vcf_file', help='an snpEff-annotated VCF '
+                                         'file')
+    parser.add_argument('output_file', help='the output file in the '
+                                            'PolyPhen2 format')
+
+
+def snpeff2pph_launcher(args):
+    """
+    Launcher for the snpeff2pph tool.
+    """
+    with open(args.vcf_file) as vcf_file:
+        with open(args.output_file, 'w') as output_file:
+            template = '\t'.join(['{}'] * 4) + '\n'
+            reader = vcf.Reader(vcf_file)
+            for variant in reader:
+                if 'ANN' in variant.INFO:
+                    for effect in variant.INFO['ANN']:
+                        snpeff_ann = snpeff.parse_snpeff_ann(effect)
+                        if snpeff_ann.annotation == 'missense_variant':
+                            output_file.write(template.format(
+                                snpeff_ann.feature_id,
+                                snpeff_ann.hgvs_p.pos,
+                                snpeff.aa_code[snpeff_ann.hgvs_p.ref],
+                                snpeff.aa_code[snpeff_ann.hgvs_p.alt]))
