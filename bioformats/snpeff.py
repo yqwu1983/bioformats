@@ -79,7 +79,7 @@ def parse_hgvs_prot(x):
     return HgvsRecord(pos=pos, ref=ref, alt=alt)
 
 
-def parse_snpeff_annotation(annotation):
+def parse_snpeff_ann(annotation):
     """
     Given a string representing an snpEff annotation, parse it.
 
@@ -99,16 +99,34 @@ def parse_snpeff_annotation(annotation):
         raise SnpEffError
     record_fields = ann_parts[:8]
     # rank/total field
-    record_fields += map(int, ann_parts[8].split('/'))
+    if ann_parts[8]:
+        record_fields += map(int, ann_parts[8].split('/'))
+    else:
+        record_fields += [None, None]
     # HGVS.c and HGVS.p fields
-    record_fields += [parse_hgvs_dna(ann_parts[9])]
-    record_fields += [parse_hgvs_prot(ann_parts[10])]
+    if ann_parts[9]:
+        record_fields += [parse_hgvs_dna(ann_parts[9])]
+    else:
+        record_fields += [None]
+    if ann_parts[10]:
+        record_fields += [parse_hgvs_prot(ann_parts[10])]
+    else:
+        record_fields += [None]
     # cDNA position/length field
-    record_fields += map(int, ann_parts[11].split('/'))
+    if ann_parts[11]:
+        record_fields += map(int, ann_parts[11].split('/'))
+    else:
+        record_fields += [None, None]
     # CDS position/length field
-    record_fields += map(int, ann_parts[12].split('/'))
+    if ann_parts[12]:
+        record_fields += map(int, ann_parts[12].split('/'))
+    else:
+        record_fields += [None, None]
     # Protein position/length field
-    record_fields += map(int, ann_parts[13].split('/'))
+    if ann_parts[13]:
+        record_fields += map(int, ann_parts[13].split('/'))
+    else:
+        record_fields += [None, None]
     # feature distance field
     record_fields += [ann_parts[14]]
     # errors, warnings of information messages field
