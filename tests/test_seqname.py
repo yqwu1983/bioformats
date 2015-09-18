@@ -198,7 +198,7 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
             output_fasta = Fasta(self.__output)
             example_fasta = Fasta(example_file)
             # compare the obtained file to the example
-            self.assertEqual(output_fasta.keys, example_fasta.keys)
+            self.assertEqual(output_fasta.keys(), example_fasta.keys())
 
         # test for an incorrect format
         with self.assertRaises(SeqRenameError):
@@ -235,7 +235,7 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
 
         output_fasta = Fasta(self.__output)
         example_fasta = Fasta(example_file)
-        self.assertEqual(output_fasta.keys, example_fasta.keys)
+        self.assertEqual(output_fasta.keys(), example_fasta.keys())
         os.unlink(example_file + '.fai')
 
         # remove temporary files and FASTA indices

@@ -1,7 +1,7 @@
 Changes
 =======
 
-+ 0.1.7
+0.1.7
 -----
 - Tool `snpeff2pph` to produce PolyPhen2 input files from 
 snpEff-annotated VCF files.

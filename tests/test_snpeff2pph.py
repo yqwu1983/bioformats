@@ -13,7 +13,7 @@ import bioformats.cli
 
 class TestSnpeff2Pph(unittest.TestCase):
     def setUp(self):
-        self.__input = os.path.join('data', 'snpeff', 'snpeff.vcf.gz')
+        self.__input = os.path.join('data', 'snpeff', 'snpeff.vcf')
         self.__output = tempfile.NamedTemporaryFile().name
 
     def test_snpeff2pph(self):
