@@ -19,9 +19,6 @@ try:
 except ImportError:
     pass
 
-path = os.path.dirname(__file__)
-os.chdir(path)
-
 
 class TestReader(unittest.TestCase):
     def setUp(self):
@@ -83,7 +80,9 @@ class TestWriter(unittest.TestCase):
                     Reader(output_file).variants()):
                 self.assertEqual(x, y)
 
-        os.unlink(self.__output_file)
+    def tearDown(self):
+        if os.path.isfile(self.__output_file):
+            os.unlink(self.__output_file)
 
 
 class TestSortedReader(unittest.TestCase):
@@ -116,4 +115,6 @@ class TestSortedReader(unittest.TestCase):
                     Reader(produced_sorted).variants()):
                 self.assertEqual(x, y)
 
-        os.unlink(self.__output)
+    def tearDown(self):
+        if os.path.isfile(self.__output):
+            os.unlink(self.__output)

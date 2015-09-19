@@ -67,11 +67,6 @@ class TestRenameSeq(unittest.TestCase):
                 for x, y in zip(renamed_fasta, nodesc_renamed_fasta):
                     self.assertEqual(x, y)
 
-        os.unlink(self.__fasta + '.fai')
-        os.unlink(self.__output)
-        os.unlink(self.__rev_output)
-        os.unlink(self.__rev_output + '.fai')
-
     def test_renameseq_table(self):
         """
         Check if sequence names in a tabular file are properly changed.
@@ -93,5 +88,8 @@ class TestRenameSeq(unittest.TestCase):
                 for x, y in zip(original_table, rev_renamed_table):
                     self.assertEqual(x, y)
 
-        os.unlink(self.__output)
-        os.unlink(self.__rev_output)
+    def tearDown(self):
+        for i in (self.__output, self.__rev_output,
+                  self.__output + '.fai', self.__rev_output + '.fai'):
+            if os.path.isfile(i):
+                os.unlink(i)

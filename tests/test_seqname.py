@@ -57,7 +57,9 @@ class TestBaseSeqRenamer(unittest.TestCase):
         self.assertEqual(renamer.renaming_dict,
                          produced_renamer.renaming_dict)
 
-        os.unlink(self.__output)
+    def tearDown(self):
+        if os.path.isfile(self.__output):
+            os.unlink(self.__output)
 
 
 class TestFastaSeqRenamer(unittest.TestCase):
@@ -74,7 +76,10 @@ class TestFastaSeqRenamer(unittest.TestCase):
     def tearDown(self):
         # remove the FASTA index file created while we iterated
         # through its sequences
-        os.unlink(self.__fasta + '.fai')
+        for i in (self.__output, self.__rev_output,
+                  self.__fasta + '.fai'):
+            if os.path.isfile(i):
+                os.unlink(i)
 
     def test_renamed(self):
         """
@@ -106,9 +111,6 @@ class TestFastaSeqRenamer(unittest.TestCase):
         with self.assertRaises(MissingSeqNameError):
             for _ in renamer.renamed(self.__fasta):
                 pass
-
-        os.unlink(self.__output)
-        os.unlink(self.__rev_output)
 
 
 class TestTableSeqRenamer(unittest.TestCase):
@@ -148,8 +150,10 @@ class TestTableSeqRenamer(unittest.TestCase):
             for _ in renamer.renamed(self.__table, 0):
                 pass
 
-        os.unlink(self.__output)
-        os.unlink(self.__rev_output)
+    def tearDown(self):
+        for i in (self.__output, self.__rev_output):
+            if os.path.isfile(i):
+                os.unlink(i)
 
 
 class TestNcbiFastaSeqRenamer(unittest.TestCase):
@@ -173,10 +177,12 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
         self.__acc_num_files = (self.__chr, self.__unlocalized,
                                 self.__unplaced)
 
+        self.__formats = ('refseq_full', 'genbank_full', 'refseq_gi',
+                          'genbank_gi', 'refseq', 'genbank',
+                          'chr_refseq', 'chr_genbank', 'chr')
+
     def test_renamed(self):
-        formats = ('refseq_full', 'genbank_full', 'refseq_gi',
-                   'genbank_gi', 'refseq', 'genbank',
-                   'chr_refseq', 'chr_genbank', 'chr')
+        formats = self.__formats
         for i, j in itertools.product(formats[:-1], formats):
             renamer = bioformats.seqname.NcbiFastaSeqRenamer()
             for k in self.__acc_num_files:
@@ -238,9 +244,12 @@ class TestNcbiFastaSeqRenamer(unittest.TestCase):
         self.assertEqual(output_fasta.keys(), example_fasta.keys())
         os.unlink(example_file + '.fai')
 
-        # remove temporary files and FASTA indices
-        os.unlink(self.__output)
-        os.unlink(self.__output + '.fai')
-        for i in formats:
-            os.unlink(os.path.join(self.__test_dir,
-                                   'ncbi_' + i + '.fa.fai'))
+    def tearDown(self):
+        for i in (self.__output, self.__output + '.fai'):
+            if os.path.isfile(i):
+                os.unlink(i)
+        for i in self.__formats:
+            fai_file = os.path.join(self.__test_dir,
+                                    'ncbi_' + i + '.fa.fai')
+            if os.path.isfile(fai_file):
+                os.unlink(fai_file)

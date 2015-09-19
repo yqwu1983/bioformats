@@ -17,9 +17,6 @@ try:
 except ImportError:
     pass
 
-path = os.path.dirname(__file__)
-os.chdir(path)
-
 
 class TestGff3Reader(unittest.TestCase):
     def setUp(self):
@@ -131,3 +128,7 @@ class TestGff2to3(unittest.TestCase):
         with open(self.__incorrect_gff2) as input_file:
             with open(self.__output, 'w') as output_file:
                 gff2to3(input_file, output_file, strict=False)
+
+    def tearDown(self):
+        if os.path.isfile(self.__output):
+            os.unlink(self.__output)

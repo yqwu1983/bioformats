@@ -59,10 +59,6 @@ class TestNcbiRenameSeq(unittest.TestCase):
         for x, y in zip(original_fasta.keys(), renamed_fasta.keys()):
             self.assertEqual(x, y)
 
-        os.unlink(self.__ucsc_fasta + '.fai')
-        os.unlink(self.__output)
-        os.unlink(self.__output + '.fai')
-
     def test_ncbiseqrename_table(self):
         """
         Check if NCBI sequence names in a table are properly changed.
@@ -93,6 +89,9 @@ class TestNcbiRenameSeq(unittest.TestCase):
                 for x, y in zip(original_table, rev_renamed_table):
                     self.assertEqual(x, y)
 
-        os.unlink(self.__output_table)
-        os.unlink(self.__output)
-        os.unlink(self.__rev_output)
+    def tearDown(self):
+        for i in (self.__ucsc_fasta + '.fai', self.__output,
+                  self.__output + '.fai', self.__output_table,
+                  self.__output, self.__rev_output):
+            if os.path.isfile(i):
+                os.unlink(i)

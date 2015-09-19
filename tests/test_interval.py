@@ -17,9 +17,6 @@ try:
 except ImportError:
     pass
 
-path = os.path.dirname(__file__)
-os.chdir(path)
-
 
 class TestReader(unittest.TestCase):
     def setUp(self):
@@ -69,3 +66,7 @@ class TestWriter(unittest.TestCase):
         for x, y in zip(
                 test_input.intervals(), test_output.intervals()):
             self.assertEqual(x, y)
+
+    def tearDown(self):
+        if os.path.isfile(self.__output_file):
+            os.unlink(self.__output_file)

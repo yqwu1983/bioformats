@@ -18,9 +18,6 @@ try:
 except ImportError:
     pass
 
-path = os.path.dirname(__file__)
-os.chdir(path)
-
 
 class TestBedReader(unittest.TestCase):
     def setUp(self):

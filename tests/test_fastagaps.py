@@ -43,5 +43,7 @@ class TestFastaGaps(unittest.TestCase):
                         output_reader.records()):
                     self.assertEqual(x, y)
 
-        os.unlink(self.__output_file)
-        os.unlink(self.__fasta + '.fai')
+    def tearDown(self):
+        for i in (self.__output_file, self.__fasta + '.fai'):
+            if os.path.isfile(i):
+                os.unlink(i)

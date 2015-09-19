@@ -21,4 +21,7 @@ class TestRandomFasta(unittest.TestCase):
         """
         sys.argv = ['', 'randomfasta', '10', '10', self.__output_file]
         bioformats.cli.bioformats()
-        os.unlink(self.__output_file)
+
+    def tearDown(self):
+        if os.path.isfile(self.__output_file):
+            os.unlink(self.__output_file)
