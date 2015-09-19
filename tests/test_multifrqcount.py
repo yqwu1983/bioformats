@@ -10,6 +10,9 @@ import unittest
 from bioformats.vcftools.multifrqcount import Reader
 from bioformats.vcftools.multifrqcount import Record
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestReader(unittest.TestCase):
     def setUp(self):

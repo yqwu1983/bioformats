@@ -10,6 +10,9 @@ import unittest
 from bioformats.blast import BlastTab
 from bioformats.exception import BlastTabError
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestBlastTab(unittest.TestCase):
     def setUp(self):

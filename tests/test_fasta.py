@@ -14,6 +14,9 @@ from bioformats.fasta import Reorder
 from bioformats.fasta import Writer
 from future.utils import iteritems
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestWriter(unittest.TestCase):
     def setUp(self):

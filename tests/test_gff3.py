@@ -17,6 +17,9 @@ try:
 except ImportError:
     pass
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestGff3Reader(unittest.TestCase):
     def setUp(self):

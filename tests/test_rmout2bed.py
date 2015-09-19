@@ -12,6 +12,9 @@ import unittest
 import tempfile
 import bioformats.cli
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestRmOut2Bed(unittest.TestCase):
     def setUp(self):

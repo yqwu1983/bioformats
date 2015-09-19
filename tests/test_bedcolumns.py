@@ -9,6 +9,9 @@ import sys
 import unittest
 import bioformats.cli
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestBedColumns(unittest.TestCase):
     def setUp(self):

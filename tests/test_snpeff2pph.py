@@ -10,6 +10,9 @@ import tempfile
 import unittest
 import bioformats.cli
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestSnpeff2Pph(unittest.TestCase):
     def setUp(self):

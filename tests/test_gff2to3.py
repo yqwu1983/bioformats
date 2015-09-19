@@ -10,6 +10,9 @@ import tempfile
 import unittest
 import bioformats.cli
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestGff2to3(unittest.TestCase):
     def setUp(self):

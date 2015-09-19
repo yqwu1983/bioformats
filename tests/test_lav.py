@@ -11,6 +11,9 @@ import unittest
 from bioformats.lav import Lav
 from bioformats.exception import LavError
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestLavAlignment(unittest.TestCase):
     def setUp(self):

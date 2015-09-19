@@ -12,6 +12,9 @@ from bioformats.repeatmasker import Reader, Record, whiten_color, \
     rmout2bed_record
 from bioformats.exception import RepeatMaskerError
 
+path = os.path.dirname(__file__)
+os.chdir(path)
+
 
 class TestRepeatMaskerReader(unittest.TestCase):
     def setUp(self):
