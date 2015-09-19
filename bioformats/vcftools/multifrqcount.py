@@ -5,7 +5,6 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 import csv
-import gzip
 import logging
 from collections import namedtuple
 

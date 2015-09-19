@@ -11,7 +11,6 @@ from collections import namedtuple
 from collections import OrderedDict
 from operator import attrgetter
 from bioformats.exception import FrqCountReaderError
-import gzip
 import logging
 
 logging.basicConfig()

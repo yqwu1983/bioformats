@@ -479,7 +479,7 @@ def bedautosql_launcher(args):
                 for i in table.entries:
                     writer.write(i)
         except exception.BedError:
-                sys.stderr.write('Incorrect BED file.\n')
+            sys.stderr.write('Incorrect BED file.\n')
 
 
 def rmout2bed_parser(subparsers):

@@ -88,17 +88,17 @@ def is_coord(x):
     return autosql.is_int(x) and (int(x) >= 0)
 
 
-def is_itemrgb(x):
+def is_itemrgb(value):
     """
     Given a value, determine if it can represent a BED RGB color
     value.
 
-    :param x: a value to check
-    :type x: str
+    :param value: a value to check
+    :type value: str
     :return: if the specified value can represent a BED RGB color value
     :rtype: bool
     """
-    color_values = x.split(',', 2)
+    color_values = value.split(',', 2)
     if len(color_values) < 3:
         return False
     if not all([autosql.is_int(x) for x in color_values]):
@@ -110,48 +110,48 @@ def is_itemrgb(x):
     return True
 
 
-def is_block_count(x):
+def is_block_count(value):
     """
     Given a value, determine if it can represent a BED block count.
 
-    :param x: a value to check
-    :type x: str
+    :param value: a value to check
+    :type value: str
     :return: if the specified value can represent a BED block count
     :rtype: bool
     """
-    return autosql.is_int(x) and (int(x) > 0)
+    return autosql.is_int(value) and (int(value) > 0)
 
 
-def is_block_sizes(x):
+def is_block_sizes(value):
     """
     Given a value, determine if it can represent BED block sizes.
 
-    :param x: a value to check
-    :type x: str
+    :param value: a value to check
+    :type value: str
     :return: if the specified value can represent BED block sizes
     :rtype: bool
     """
-    size_values = x.split(',')
+    size_values = value.split(',')
     if not all([autosql.is_int(x) for x in size_values]):
         return False
     size_numbers = [int(x) for x in size_values]
-    for x in size_numbers:
+    for value in size_numbers:
         # block sizes must be positive numbers
-        if not x > 0:
+        if not value > 0:
             return False
     return True
 
 
-def is_block_starts(x):
+def is_block_starts(value):
     """
     Given a value, determine if it can represent BED block sizes.
 
-    :param x: a value to check
-    :type x: str
+    :param value: a value to check
+    :type value: str
     :return: if the specified value can represent BED block sizes
     :rtype: bool
     """
-    size_values = x.split(',')
+    size_values = value.split(',')
     if not all([autosql.is_int(x) for x in size_values]):
         return False
     size_numbers = [int(x) for x in size_values]
@@ -160,8 +160,8 @@ def is_block_starts(x):
         return False
     if len(size_numbers) > 1:
         # block starts must be ascending numbers
-        for x, y in zip(size_numbers[:-1], size_numbers[1:]):
-            if not (x < y):
+        for value, y in zip(size_numbers[:-1], size_numbers[1:]):
+            if not (value < y):
                 return False
     return True
 

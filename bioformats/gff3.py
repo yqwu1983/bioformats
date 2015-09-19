@@ -180,7 +180,7 @@ def analyze_tags(handle, feature_source=None, feature_type=None):
         dictionary of attribute tag counts
     :rtype: dict
     """
-    total_features = filtered_features = attr_features =  0
+    total_features = filtered_features = 0
     tag_counts = defaultdict(int)
     for record in Reader(handle).records():
         total_features += 1
