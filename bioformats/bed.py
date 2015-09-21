@@ -48,7 +48,7 @@ bed_autosql_fields = (
                        name='blockSizes',
                        desc='Block sizes'),
     autosql.TableEntry(type='int[blockCount]', num=None,
-                       name='blockStarts',
+                       name='chromStarts',
                        desc='Block start positions')
 )
 
