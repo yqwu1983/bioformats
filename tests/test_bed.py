@@ -221,3 +221,24 @@ class TestGetBlocks(unittest.TestCase):
         result = bioformats.bed.get_blocks(start, end)
         self.assertEqual(result[0], [0, 4, 17])
         self.assertEqual(result[1], [3, 6, 12])
+
+
+class TestConvertGff2BedGene(unittest.TestCase):
+    def setUp(self):
+        self.__input_file = os.path.join(
+            'data', 'gff3', 'exons.gff'
+        )
+        self.__output_file = tempfile.NamedTemporaryFile().name
+
+    def test_convert_gff2bed_gene(self):
+        bioformats.bed.convert_gff2bed_gene(self.__input_file,
+                                            self.__output_file)
+        # try to read the obtained BED file
+        with open(self.__output_file) as bed_file:
+            reader = Reader(bed_file)
+            for _ in reader.records():
+                pass
+
+    def tearDown(self):
+        if os.path.isfile(self.__output_file):
+            os.unlink(self.__output_file)

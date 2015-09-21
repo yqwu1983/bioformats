@@ -1,0 +1,23 @@
+##gff-version 3
+scaffold_10867	maker	gene	26774	56123	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2622;Name=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	26774	26884	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2622;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	28304	28509	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2623;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	29902	30006	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2624;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	32220	32294	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2625;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	32652	32754	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2626;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	40707	40906	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2627;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	43581	43922	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2628;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	44109	44301	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2629;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	45662	45882	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2630;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	49238	49415	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2631;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	50044	50087	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2632;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	51620	51784	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2633;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	52674	52817	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2634;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	53107	53247	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2635;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	53330	53446	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2636;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_10867	maker	exon	54974	56123	.	-	.	ID=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1:exon:2637;Parent=snap_masked-scaffold_10867-processed-gene-0.8-mRNA-1
+scaffold_16993	maker	exon	2	265	.	-	.	ID=augustus_masked-scaffold_16993-processed-gene-0.0-mRNA-1:exon:2766;Parent=augustus_masked-scaffold_16993-processed-gene-0.0-mRNA-1
+scaffold_9918	maker	exon	10352	10478	.	-	.	ID=maker-scaffold_9918-augustus-gene-0.3-mRNA-1:exon:2272;Parent=maker-scaffold_9918-augustus-gene-0.3-mRNA-1
+scaffold_9918	maker	gene	10352	43682	.	-	.	ID=maker-scaffold_9918-augustus-gene-0.3;Name=maker-scaffold_9918-augustus-gene-0.3
+scaffold_9918	maker	exon	29023	29153	.	-	.	ID=maker-scaffold_9918-augustus-gene-0.3-mRNA-1:exon:2273;Parent=maker-scaffold_9918-augustus-gene-0.3-mRNA-1
+scaffold_9918	maker	exon	43368	43682	.	-	.	ID=maker-scaffold_9918-augustus-gene-0.3-mRNA-1:exon:2274;Parent=maker-scaffold_9918-augustus-gene-0.3-mRNA-1

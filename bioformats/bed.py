@@ -8,6 +8,7 @@ import csv
 import logging
 from collections import namedtuple
 from . import autosql
+from . import gff3
 from .exception import BedError
 
 logging.basicConfig()
@@ -406,3 +407,99 @@ def get_blocks(start, end):
         result[1].append(j - i + 1)
 
     return result
+
+
+def convert_gff2bed_gene(gff3_file, bed_file, exon_type='exon',
+                         parent_tag='Parent'):
+    """
+    Convert a specified GFF3 file of gene exons to the BED12 format
+    considering gene structure.
+
+    :param gff3_file: a name of an input GFF3 file of gene exons
+    :param bed_file: a name of the output BED12 file
+    :param exon_type: a type of GFF3 exon records
+    :param parent_tag: a tag of GFF3 exon records encoding the gene
+        they belong to
+    :type bed_file: str
+    :type gff3_file: str
+    :type exon_type: str
+    :type parent_tag: str
+    """
+    total_exons = 0
+    total_genes = 0
+    with open(gff3_file) as input_file:
+        gff_reader = gff3.Reader(input_file)
+        with Writer(bed_file) as bed_writer:
+            # process the first exon
+            gff_record_iterator = gff_reader.records()
+            exon = next(gff_record_iterator)
+            while exon.type != exon_type:
+                exon = next(gff_record_iterator)
+            cur_gene_seq = exon.seqid
+            cur_gene = exon.attributes[parent_tag]
+            cur_gene_start = exon.start
+            cur_gene_end = exon.end
+            exon_starts = [exon.start]
+            exon_ends = [exon.end]
+            total_exons += 1
+            # start iterating through exon records of a GFF3 file
+            for exon in gff_record_iterator:
+                if exon.type != exon_type:
+                    continue
+                total_exons += 1
+                if exon.attributes[parent_tag] != cur_gene:
+                    total_genes += 1
+                    # we have read a gene, write it to output
+                    block_starts, block_sizes = get_blocks(
+                        exon_starts, exon_ends)
+                    bed_record = Record(
+                        seq=cur_gene_seq,
+                        start=cur_gene_start - 1,
+                        end=cur_gene_end,
+                        name=cur_gene,
+                        score=1000,
+                        strand=exon.strand,
+                        thick_start=cur_gene_start,
+                        thick_end=cur_gene_end,
+                        color='255,255,255',
+                        block_num=len(exon_starts),
+                        block_sizes=','.join(map(str, block_sizes)),
+                        block_starts=','.join(map(str, block_starts)),
+                        extra=[]
+                    )
+                    bed_writer.write(bed_record)
+                    # update the exon data
+                    cur_gene_seq = exon.seqid
+                    cur_gene = exon.attributes[parent_tag]
+                    cur_gene_start = exon.start
+                    cur_gene_end = exon.end
+                    exon_starts = [exon.start]
+                    exon_ends = [exon.end]
+                else:
+                    # we have read another exon of the gene being
+                    # processed
+                    exon_starts.append(exon.start)
+                    exon_ends.append(exon.end)
+                    cur_gene_end = exon.end
+            # process the last gene
+            total_genes += 1
+            block_starts, block_sizes = get_blocks(
+                exon_starts, exon_ends)
+            bed_record = Record(
+                seq=cur_gene_seq,
+                start=cur_gene_start - 1,
+                end=cur_gene_end,
+                name=cur_gene,
+                score=1000,
+                strand=exon.strand,
+                thick_start=cur_gene_start,
+                thick_end=cur_gene_end,
+                color='255,255,255',
+                block_num=len(exon_starts),
+                block_sizes=','.join(map(str, block_sizes)),
+                block_starts=','.join(map(str, block_starts)),
+                extra=[]
+            )
+            bed_writer.write(bed_record)
+    logger.info('%d exon records of %d genes processed', total_exons,
+                total_genes)
