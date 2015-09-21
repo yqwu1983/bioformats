@@ -45,7 +45,8 @@ def bioformats():
         'rmout2bed': rmout2bed_parser,
         'gfftagstat': gfftagstat_parser,
         'gff2to3': gff2to3_parser,
-        'snpeff2pph': snpeff2pph_parser
+        'snpeff2pph': snpeff2pph_parser,
+        'gff2bed': gff2bed_parser
     }
 
     for i in sorted(subparser_routines):
@@ -64,7 +65,8 @@ def bioformats():
         ('rmout2bed', rmout2bed_launcher),
         ('gfftagstat', gfftagstat_launcher),
         ('gff2to3', gff2to3_launcher),
-        ('snpeff2pph', snpeff2pph_launcher)
+        ('snpeff2pph', snpeff2pph_launcher),
+        ('gff2bed', gff2bed_launcher)
     ])
 
     launchers[args.command](args)
@@ -656,3 +658,43 @@ def snpeff2pph_launcher(args):
                                 snpeff_ann.hgvs_p.pos,
                                 snpeff.aa_code[snpeff_ann.hgvs_p.ref],
                                 snpeff.aa_code[snpeff_ann.hgvs_p.alt]))
+
+
+def gff2bed_parser(subparsers):
+    """
+    Parser for the gff2bed tool.
+    """
+    parser = subparsers.add_parser(
+        'gff2bed',
+        help='convert a GFF3 file to the BED format',
+        description='Convert a GFF3 file to the BED format.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    parser.add_argument('gff_file', help='a GFF3 file')
+    parser.add_argument('output_file',
+                        help='the output file in the BED format')
+
+    # optional arguments
+    parser.add_argument('-t', '--tags', nargs='?',
+                        help='tags to include to the output BED file')
+    parser.add_argument('-v', '--exclude_tags', nargs='?',
+                        help='tags to exclude from the output BED '
+                             'file')
+    parser.add_argument('-m', '--missing_value', default='NA',
+                        help='the missing tag value')
+    parser.add_argument('-g', '--genes', action='store_true',
+                        help='output a BED12 file of genes')
+    parser.add_argument('-e', '--exon_type', default='exon',
+                        help='a feature type that denotes exons')
+    parser.add_argument('-p', '--parent_tag', default='Parent',
+                        help='an attribute tag of exon genes')
+
+
+def gff2bed_launcher(args):
+    if args.genes:
+        bed.convert_gff2bed_gene(args.gff_file, args.output_file,
+                                 args.exon_type, args.parent_tag)
+    else:
+        # TODO: convert a GFF3 file to the BED format
+        raise NotImplementedError
