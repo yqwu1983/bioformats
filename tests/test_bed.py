@@ -210,3 +210,14 @@ class TestGetAutoSqlTable(unittest.TestCase):
                 self.assertEqual(len(autosql_table.entries),
                                  reader.bed_columns +
                                  reader.aux_columns)
+
+
+class TestGetBlocks(unittest.TestCase):
+    def test_get_blocks(self):
+        with self.assertRaises(BedError):
+            bioformats.bed.get_blocks([1, 5], [3])
+        start = [1, 5, 18]
+        end = [3, 10, 29]
+        result = bioformats.bed.get_blocks(start, end)
+        self.assertEqual(result[0], [0, 4, 17])
+        self.assertEqual(result[1], [3, 6, 12])

@@ -382,3 +382,27 @@ def get_autosql_table(bed_reader, name='Table', desc='Description'):
 
     table_scheme = autosql.Table(name=name, desc=desc, entries=entries)
     return table_scheme
+
+
+def get_blocks(start, end):
+    """
+    Given start and end coordinates of regions, return their starts
+    and sizes in the BED block format.
+
+    :param start: start positions of regions
+    :param end: end positions of regions
+    :return: a dictionary of two lists: block starts and sizes
+    :rtype: dict
+    """
+    result = ([], [])
+
+    if len(start) != len(end):
+        logger.error('unequal number of start and end coordinates %d '
+                     'and %d', len(start), len(end))
+        raise BedError
+    feature_start = start[0]
+    for i, j in zip(start, end):
+        result[0].append(i - feature_start)
+        result[1].append(j - i + 1)
+
+    return result
