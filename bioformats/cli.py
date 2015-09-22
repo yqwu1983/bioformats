@@ -672,6 +672,8 @@ def gff2bed_parser(subparsers):
     )
 
     parser.add_argument('gff_file', help='a GFF3 file')
+    parser.add_argument('type', help='type of features to be '
+                                     'processed')
     parser.add_argument('output_file',
                         help='the output file in the BED format')
 
@@ -686,8 +688,6 @@ def gff2bed_parser(subparsers):
                         help='the missing tag value')
     parser.add_argument('-g', '--genes', action='store_true',
                         help='output a BED12 file of genes')
-    parser.add_argument('-t', '--type', default=argparse.SUPPRESS,
-                        help='process features of the specified type')
     parser.add_argument('-p', '--parent_tag', default='Parent',
                         help='an attribute tag of exon genes')
 
