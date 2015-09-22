@@ -445,7 +445,7 @@ def convert_gff2bed_gene(gff3_file, bed_file, exon_type='exon',
         gff_reader = gff3.Reader(input_file)
         with Writer(bed_file) as bed_writer:
             # process the first exon
-            gff_record_iterator = gff_reader.records()
+            gff_record_iterator = gff_reader.records(check_order=True)
             exon = next(gff_record_iterator)
             while exon.type != exon_type:
                 exon = next(gff_record_iterator)
