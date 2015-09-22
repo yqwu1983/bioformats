@@ -20,8 +20,8 @@ class TestGff2Bed(unittest.TestCase):
         self.__output_file = tempfile.NamedTemporaryFile().name
 
     def test_gff2bed(self):
-        sys.argv = ['', 'gff2bed', '-g', self.__input_file,
-                    self.__output_file]
+        sys.argv = ['', 'gff2bed', '-g', '-t', 'exon',
+                    self.__input_file, self.__output_file]
         bioformats.cli.bioformats()
         with self.assertRaises(NotImplementedError):
             sys.argv = ['', 'gff2bed', self.__input_file,

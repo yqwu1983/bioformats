@@ -676,17 +676,18 @@ def gff2bed_parser(subparsers):
                         help='the output file in the BED format')
 
     # optional arguments
-    parser.add_argument('-t', '--tags', nargs='?',
-                        help='tags to include to the output BED file')
-    parser.add_argument('-v', '--exclude_tags', nargs='?',
-                        help='tags to exclude from the output BED '
+    parser.add_argument('-a', '--attributes', nargs='?',
+                        help='attributes to include to the output BED '
                              'file')
+    parser.add_argument('-v', '--exclude_attributes', nargs='?',
+                        help='attributes to exclude from the output '
+                             'BED file')
     parser.add_argument('-m', '--missing_value', default='NA',
                         help='the missing tag value')
     parser.add_argument('-g', '--genes', action='store_true',
                         help='output a BED12 file of genes')
-    parser.add_argument('-e', '--exon_type', default='exon',
-                        help='a feature type that denotes exons')
+    parser.add_argument('-t', '--type', default=argparse.SUPPRESS,
+                        help='process features of the specified type')
     parser.add_argument('-p', '--parent_tag', default='Parent',
                         help='an attribute tag of exon genes')
 
@@ -694,7 +695,7 @@ def gff2bed_parser(subparsers):
 def gff2bed_launcher(args):
     if args.genes:
         bed.convert_gff2bed_gene(args.gff_file, args.output_file,
-                                 args.exon_type, args.parent_tag)
+                                 args.type, args.parent_tag)
     else:
         # TODO: convert a GFF3 file to the BED format
         raise NotImplementedError
