@@ -45,6 +45,12 @@ class TestGff3Reader(unittest.TestCase):
             parser = Reader(gff_file)
             for record in parser.records():
                 self.assertIsInstance(record, Record)
+        # check against an unsorted input file
+        with open(self.__correct_file) as gff_file:
+            parser = Reader(gff_file)
+            with self.assertRaises(Gff3Error):
+                for record in parser.records(check_order=True):
+                    self.assertIsInstance(record, Record)
         # test against incorrect input files
         for i in self.__incorrect_files:
             with open(i) as gff_file:

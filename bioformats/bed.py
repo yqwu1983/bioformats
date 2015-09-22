@@ -200,16 +200,30 @@ class Reader(object):
         self.__bed_col = 12     # the number of BED columns
         self.__aux_col = 0      # the number of auxiliary columns
 
-    def records(self):
+    def records(self, check_order=False):
         """
         Iterate through records in the BED file the object was
         created from.
 
+        :param check_order: check if BED records are sorted; if they
+            are not, then raise the exception
+        :type check_order: bool
         :return: a record from the BED file the object was created from
         :rtype: Record
         """
+        prev_seq = ''
+        prev_start = -1
         for self.__line_parts in self.__reader:
-            yield self.__parse_bed_line()
+            new_record = self.__parse_bed_line()
+            if check_order and ((prev_seq > new_record.seq) or (
+                    prev_start > new_record.start)):
+                logger.error('line %d: BED record order violated',
+                             self.__reader.line_num)
+                raise BedError
+            prev_seq = new_record.seq
+            prev_start = new_record.start
+            yield new_record
+
 
     def __get_bed_format(self):
         """

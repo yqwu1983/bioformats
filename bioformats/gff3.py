@@ -34,11 +34,14 @@ class Reader(object):
         self.__reader = csv.reader(handle, delimiter='\t')
         self.__line_parts = []
 
-    def records(self):
+    def records(self, check_order=False):
         """
         Iterate through records in the GFF3 file the object was
         created from.
 
+        :param check_order: check if GFF3 records are sorted; if they
+            are not, then raise the exception
+        :type check_order: bool
         :return: a record from the GFF3 file the object was created
         from
         :rtype: Record
@@ -48,8 +51,18 @@ class Reader(object):
         if first_line.rstrip() != '##gff-version 3':
             logger.error('an incorrect GFF3 header')
             raise Gff3Error
+        prev_seq = ''
+        prev_start = -1
         for self.__line_parts in self.__reader:
-            yield self.__parse_gff3_line()
+            new_record = self.__parse_gff3_line()
+            if check_order and ((prev_seq > new_record.seqid) or (
+                    prev_start > new_record.start)):
+                logger.error('line %d: GFF3 record order violated',
+                             self.__reader.line_num)
+                raise Gff3Error
+            prev_seq = new_record.seqid
+            prev_start = new_record.start
+            yield new_record
 
     def __parse_gff3_line(self):
         """

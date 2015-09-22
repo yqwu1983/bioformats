@@ -61,6 +61,13 @@ class TestBedReader(unittest.TestCase):
                 parser = Reader(bed_file)
                 for record in parser.records():
                     self.assertIsInstance(record, Record)
+        # test against an unsorted input file
+        for i in self.__correct_files:
+            with open(i) as unsorted_bed_file:
+                parser = Reader(unsorted_bed_file)
+                with self.assertRaises(BedError):
+                    for record in parser.records(check_order=True):
+                        self.assertIsInstance(record, Record)
         # test against the incorrect input file
         with open(self.__incorrect_file) as bed_file:
             parser = Reader(bed_file)
