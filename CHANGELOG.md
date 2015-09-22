@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.1.8
+-----
+- Tool `gff2bed` to convert a GFF3 file to the BED format.
+- Option for BED and GFF3 readers to check for sorted records. 
+
 0.1.7
 -----
 - Tool `snpeff2pph` to produce PolyPhen2 input files from 

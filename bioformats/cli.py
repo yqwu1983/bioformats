@@ -30,7 +30,7 @@ def bioformats():
     )
 
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s 0.1.7')
+                        version='%(prog)s 0.1.8')
 
     subparsers = parser.add_subparsers(dest='command')
 
@@ -681,9 +681,8 @@ def gff2bed_parser(subparsers):
     parser.add_argument('-a', '--attributes', nargs='?',
                         help='attributes to include to the output BED '
                              'file')
-    parser.add_argument('-v', '--exclude_attributes', nargs='?',
-                        help='attributes to exclude from the output '
-                             'BED file')
+    parser.add_argument('-n', '--name_tag', default=None,
+                        help='an attribute tag of a feature name')
     parser.add_argument('-m', '--missing_value', default='NA',
                         help='the missing tag value')
     parser.add_argument('-g', '--genes', action='store_true',
@@ -697,5 +696,6 @@ def gff2bed_launcher(args):
         bed.convert_gff2bed_gene(args.gff_file, args.output_file,
                                  args.type, args.parent_tag)
     else:
-        # TODO: convert a GFF3 file to the BED format
-        raise NotImplementedError
+        bed.convert_gff2bed(args.gff_file, args.output_file,
+                            args.type, args.name_tag,
+                            args.missing_value, args.attributes)

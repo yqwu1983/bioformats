@@ -517,3 +517,69 @@ def convert_gff2bed_gene(gff3_file, bed_file, exon_type='exon',
             bed_writer.write(bed_record)
     logger.info('%d exon records of %d genes processed', total_exons,
                 total_genes)
+
+
+def convert_gff2bed(gff3_file, bed_file, feature_type, name_tag=None,
+                    missing_value='NA', attributes=None):
+    """
+    Convert a specified GFF3 file to the BED format considering its
+    attributes.
+
+    :param gff3_file: a name of an input GFF3 file
+    :param bed_file: a name of the output BED file
+    :param feature_type: a type of features to be processed
+    :param name_tag: a tag which value to use as a feature name
+    :param missing_value: the value to denote a missing attribute
+    :param attributes: a list of attributes to be added to output
+    :type gff3_file: str
+    :type bed_file: str
+    :type feature_type: str
+    :type name_tag: str
+    :type missing_value: str
+    :type attributes: list
+    """
+    total_processed = 0
+    total_bed = 0
+    if attributes is None:
+        attributes = []
+    with open(gff3_file) as input_file:
+        gff_reader = gff3.Reader(input_file)
+        with Writer(bed_file) as bed_writer:
+            for feature in gff_reader.records():
+                total_processed += 1
+                if feature.type != feature_type:
+                    continue
+                if name_tag is not None:
+                    if name_tag in feature.attributes:
+                        feature_name = feature.attributes[name_tag]
+                    else:
+                        feature_name = missing_value
+                else:
+                    feature_name = 'feature_{}'.format(total_bed)
+                # prepare extra BED columns
+                feature_extra = []
+                for i in attributes:
+                    if i in feature.attributes:
+                        feature_extra.append(feature.attributes[i])
+                    else:
+                        feature_extra.append('NA')
+                # prepare a BED record
+                bed_record = Record(
+                    seq=feature.seqid,
+                    start=feature.start - 1,
+                    end=feature.end,
+                    name=feature_name,
+                    score=1000,
+                    strand=feature.strand,
+                    thick_start=feature.start - 1,
+                    thick_end=feature.end,
+                    color=None,
+                    block_num=None,
+                    block_sizes=None,
+                    block_starts=None,
+                    extra=feature_extra
+                )
+                bed_writer.write(bed_record)
+                total_bed += 1
+    logger.info('%d BED records of %d GFF3 records processed',
+                total_bed, total_processed)

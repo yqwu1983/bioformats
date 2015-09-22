@@ -246,6 +246,36 @@ class TestConvertGff2BedGene(unittest.TestCase):
             for _ in reader.records():
                 pass
 
+    def test_convert_gff2bed(self):
+        bioformats.bed.convert_gff2bed(self.__input_file,
+                                       self.__output_file,
+                                       'exon')
+        # try to read the obtained BED file
+        with open(self.__output_file) as bed_file:
+            reader = Reader(bed_file)
+            for _ in reader.records():
+                pass
+        bioformats.bed.convert_gff2bed(self.__input_file,
+                                       self.__output_file,
+                                       'exon',
+                                       attributes=['Parent'],
+                                       name_tag='ID')
+        # try to read the obtained BED file
+        with open(self.__output_file) as bed_file:
+            reader = Reader(bed_file)
+            for _ in reader.records():
+                pass
+        bioformats.bed.convert_gff2bed(self.__input_file,
+                                       self.__output_file,
+                                       'exon',
+                                       attributes=['Parent'],
+                                       name_tag='NoTag')
+        # try to read the obtained BED file
+        with open(self.__output_file) as bed_file:
+            reader = Reader(bed_file)
+            for _ in reader.records():
+                pass
+
     def tearDown(self):
         if os.path.isfile(self.__output_file):
             os.unlink(self.__output_file)

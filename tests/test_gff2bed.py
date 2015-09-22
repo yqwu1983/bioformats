@@ -23,10 +23,9 @@ class TestGff2Bed(unittest.TestCase):
         sys.argv = ['', 'gff2bed', '-g', self.__input_file, 'exon',
                     self.__output_file]
         bioformats.cli.bioformats()
-        with self.assertRaises(NotImplementedError):
-            sys.argv = ['', 'gff2bed', self.__input_file, 'exon',
-                        self.__output_file]
-            bioformats.cli.bioformats()
+        sys.argv = ['', 'gff2bed', self.__input_file, 'exon',
+                    self.__output_file, '-a', 'Parent']
+        bioformats.cli.bioformats()
 
     def tearDown(self):
         if os.path.isfile(self.__output_file):
