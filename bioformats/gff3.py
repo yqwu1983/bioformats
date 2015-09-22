@@ -56,7 +56,8 @@ class Reader(object):
         for self.__line_parts in self.__reader:
             new_record = self.__parse_gff3_line()
             if check_order and ((prev_seq > new_record.seqid) or (
-                    prev_start > new_record.start)):
+                        (prev_seq == new_record.seqid) and
+                        (prev_start > new_record.start))):
                 logger.error('line %d: GFF3 record order violated',
                              self.__reader.line_num)
                 raise Gff3Error
