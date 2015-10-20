@@ -1,6 +1,11 @@
 Changes
 =======
 
+* 0.1.9
+-----
+- Tool `snpeff2bed` to obtain the BED file of variant effects from an
+ snpEff-annotated VCF file.
+ 
 0.1.8
 -----
 - Tool `gff2bed` to convert a GFF3 file to the BED format.

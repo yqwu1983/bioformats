@@ -46,7 +46,8 @@ def bioformats():
         'gfftagstat': gfftagstat_parser,
         'gff2to3': gff2to3_parser,
         'snpeff2pph': snpeff2pph_parser,
-        'gff2bed': gff2bed_parser
+        'gff2bed': gff2bed_parser,
+        'snpeff2bed': snpeff2bed_parser
     }
 
     for i in sorted(subparser_routines):
@@ -66,7 +67,8 @@ def bioformats():
         ('gfftagstat', gfftagstat_launcher),
         ('gff2to3', gff2to3_launcher),
         ('snpeff2pph', snpeff2pph_launcher),
-        ('gff2bed', gff2bed_launcher)
+        ('gff2bed', gff2bed_launcher),
+        ('snpeff2bed', snpeff2bed_launcher)
     ])
 
     launchers[args.command](args)
@@ -699,3 +701,27 @@ def gff2bed_launcher(args):
         bed.convert_gff2bed(args.gff_file, args.output_file,
                             args.type, args.name_tag,
                             args.missing_value, args.attributes)
+
+
+def snpeff2bed_parser(subparsers):
+    """
+    Parser for the snpeff2bed tool.
+    """
+    parser = subparsers.add_parser(
+        'snpeff2bed',
+        help='convert an snpEff-annotated VCF file to the BED format',
+        description='Convert an snpEff-annotated VCF file to the BED '
+                    'format with extra columns that describe variant '
+                    'effects'
+    )
+    parser.add_argument('vcf_file', help='an snpEff-annotated VCF '
+                                         'file')
+    parser.add_argument('bed_file', help='the output BED file of '
+                                         'annotated variants')
+
+
+def snpeff2bed_launcher(args):
+    """
+    Launcher for the snpeff2bed tool.
+    """
+    snpeff.convert_snpeff2bed(args.vcf_file, args.bed_file)

@@ -6,14 +6,24 @@
 
 import logging
 import unittest
+import os
+import tempfile
 from bioformats.snpeff import parse_snpeff_ann, Record
 from bioformats.snpeff import parse_hgvs_dna, parse_hgvs_prot
+from bioformats.snpeff import convert_snpeff2bed
 from bioformats.snpeff import HgvsRecord
 from bioformats.exception import SnpEffError
+
+path = os.path.dirname(__file__)
+os.chdir(path)
 
 
 class TestParseSnpEffAnnotation(unittest.TestCase):
     def setUp(self):
+        self.__vcf_file = os.path.join(
+            'data', 'snpeff', 'snpeff.vcf'
+        )
+        self.__output = tempfile.NamedTemporaryFile().name
         # disable logging messages
         logging.disable(logging.ERROR)
 
@@ -74,3 +84,10 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
         with self.assertRaises(SnpEffError):
             line = 'p.Val2E0Leu'
             parse_hgvs_prot(line)
+
+    def test_convert_snpeff2bed(self):
+        convert_snpeff2bed(self.__vcf_file, self.__output)
+
+    def tearDown(self):
+        if os.path.isfile(self.__output):
+            os.unlink(self.__output)

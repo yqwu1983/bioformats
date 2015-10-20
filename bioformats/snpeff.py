@@ -5,7 +5,9 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 import logging
+import vcf
 from collections import namedtuple
+from . import bed
 from .exception import SnpEffError
 
 logging.basicConfig()
@@ -43,6 +45,67 @@ aa_code = {
     'Asp': 'D',
     'Ser': 'S',
     'Thr': 'T'
+}
+
+
+annotation_impacts = {
+    'chromosome_number_variation': 'high',
+    'exon_loss_variant': 'high',
+    'frameshift_variant': 'high',
+    'rare_amino_acid_variant': 'high',
+    'splice_acceptor_variant': 'high',
+    'splice_donor_variant': 'high',
+    'start_lost': 'high',
+    'stop_gained': 'high',
+    'stop_lost': 'high',
+    'transcript_ablation': 'high',
+    '3_prime_UTR_truncation': 'moderate',
+    '5_prime_UTR_truncation': 'moderate',
+    'coding_sequence_variant': 'moderate',
+    'disruptive_inframe_deletion': 'moderate',
+    'disruptive_inframe_insertion': 'moderate',
+    'inframe_deletion': 'moderate',
+    'inframe_insertion': 'moderate',
+    'missense_variant': 'moderate',
+    'regulatory_region_ablation': 'moderate',
+    'splice_region_variant': 'moderate',
+    'TFBS_ablation': 'moderate',
+    '5_prime_UTR_premature_start_codon_gain_variant': 'low',
+    'initiator codon variant': 'low',
+    'start_retained': 'low',
+    'stop_retained variant': 'low',
+    'synonymous variant': 'low',
+    '3_prime_UTR_variant': 'modifier',
+    '5_crime_UTR_variant': 'modifier',
+    'conserved_intergenic_variant': 'modifier',
+    'conserved_intron_variant': 'modifier',
+    'downstream_gene_variant': 'modifier',
+    'exon_variant': 'modifier',
+    'feature_elongation': 'modifier',
+    'feature_truncation': 'modifier',
+    'gene_variant': 'modifier',
+    'intergenic_region': 'modifier',
+    'intragenic_variant': 'modifier',
+    'intron_variant': 'modifier',
+    'mature_miRNA_variant': 'modifier',
+    'miRNA': 'modifier',
+    'NMD_transcript_variant': 'modifier',
+    'non_coding_transcript_exon_variant': 'modifier',
+    'non_coding_transcript_variant': 'modifier',
+    'regulatory_region_amplification': 'modifier',
+    'regulatory_region_variant': 'modifier',
+    'TF_binding_site_variant': 'modifier',
+    'FFBS_amplification': 'modifier',
+    'transcript_amplification': 'modifier',
+    'transcript_variant': 'modifier',
+    'upstream_gene_variant': 'modifier'
+}
+
+impact_colors = {
+    'high': (255, 0, 0),
+    'moderate': (0, 255, 255),
+    'low': (0, 0, 255),
+    'modifier': (255, 255, 255)
 }
 
 
@@ -151,3 +214,61 @@ def parse_snpeff_ann(annotation):
     record_fields.append(ann_parts[15])
 
     return Record(*record_fields)
+
+
+def convert_snpeff2bed(vcf_file, bed_file):
+    """
+    Convert a specified snpEff-annotated VCF file to the BED format
+    considering its attributes.
+
+    :param vcf_file: a name of an snpEff-annotated VCF file
+    :param bed_file: a name of the output BED file
+    :type vcf_file: str
+    :type bed_file: str
+    """
+    total_processed = 0
+    with open(vcf_file) as input_file:
+        vcf_reader = vcf.Reader(input_file)
+        with bed.Writer(bed_file) as bed_writer:
+            for variant in vcf_reader:
+                if 'ANN' in variant.INFO:
+                    for var_ann in variant.INFO['ANN']:
+                        var_ann = parse_snpeff_ann(var_ann)
+                        bed_size = len(var_ann.allele) - \
+                            len(variant.REF) + 1
+                        bed_start = variant.POS - 1
+                        bed_end = bed_start + bed_size
+                        bed_color = impact_colors[annotation_impacts[
+                            var_ann.annotation]]
+                        bed_extra = list(var_ann)
+                        if var_ann.hgvs_c is not None:
+                            bed_extra[10] = 'c.{}{}>{}'.format(
+                                var_ann.hgvs_c.pos, var_ann.hgvs_c.ref,
+                                var_ann.hgvs_c.alt)
+                        else:
+                            bed_extra[10] = 'NA'
+                        if var_ann.hgvs_p is not None:
+                            bed_extra[11] = 'p.{}{}>{}'.format(
+                                var_ann.hgvs_p.pos, var_ann.hgvs_p.ref,
+                                var_ann.hgvs_p.alt
+                            )
+                        else:
+                            bed_extra[11] = 'NA'
+                        bed_record = bed.Record(
+                            seq=variant.CHROM,
+                            start=bed_start,
+                            end=bed_end,
+                            name=var_ann.annotation,
+                            score=1000,
+                            strand='+',
+                            thick_start=bed_start,
+                            thick_end=bed_end,
+                            color=','.join(map(str, bed_color)),
+                            block_num=None,
+                            block_sizes=None,
+                            block_starts=None,
+                            extra=bed_extra
+                        )
+                        bed_writer.write(bed_record)
+                        total_processed += 1
+    logger.info('%d variant effects processed', total_processed)
