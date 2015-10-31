@@ -20,17 +20,16 @@ class Reader(object):
     This class implements a parser to read data from a file in the
     interval data format.
     """
-    def __init__(self, filename):
+    def __init__(self, handle):
         """
-        Given a name of a file, create an interval format reader
+        Given a handle of a file, create an interval format reader
         object to read data from it.
 
-        :param filename: a name of an interval format file
-        :type filename: str
+        :param handle: a handle of an interval format file
         """
-        self.__filename = filename
-        self.__lineno = 0
+        self.__handle = handle
         self.__line = ''
+        self.__lineno = 0
         self.__seq = ''
 
     def intervals(self):
@@ -42,25 +41,24 @@ class Reader(object):
             was created from
         :rtype: Record
         """
-        with open(self.__filename) as interval_file:
-            for self.__line in interval_file:
-                self.__line = self.__line.rstrip()
-                self.__lineno += 1
-                if self.__line.startswith('>'):
-                    # remove the comment if present
-                    self.__line = self.__line.split()[0]
-                    self.__seq = self.__line[1:]
-                elif self.__line:
-                    # parse the interval line
-                    try:
-                        start, end = (int(x) for x in
-                                      self.__line.split('-', 2))
-                    except (TypeError, ValueError):
-                        logger.error('line %d: an incorrect interval '
-                                     'line %s', self.__lineno,
-                                     self.__line)
-                        raise IntervalError
-                    yield Record(self.__seq, start, end)
+        for self.__line in self.__handle:
+            self.__line = self.__line.rstrip()
+            self.__lineno += 1
+            if self.__line.startswith('>'):
+                # remove the comment if present
+                self.__line = self.__line.split()[0]
+                self.__seq = self.__line[1:]
+            elif self.__line:
+                # parse the interval line
+                try:
+                    start, end = (int(x) for x in
+                                  self.__line.split('-', 2))
+                except (TypeError, ValueError):
+                    logger.error('line %d: an incorrect interval '
+                                 'line %s', self.__lineno,
+                                 self.__line)
+                    raise IntervalError
+                yield Record(self.__seq, start, end)
 
 
 class Writer(object):

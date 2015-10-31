@@ -39,14 +39,16 @@ class TestReader(unittest.TestCase):
         the correct way.
         """
         # test against the correct input file
-        parser = Reader(self.__correct_file)
-        for record in parser.intervals():
-            self.assertIsInstance(record, Record)
+        with open(self.__correct_file) as input_file:
+            parser = Reader(input_file)
+            for record in parser.intervals():
+                self.assertIsInstance(record, Record)
         # test against the incorrect input file
-        parser = Reader(self.__incorrect_file)
-        with self.assertRaises(IntervalError):
-            for _ in parser.intervals():
-                pass
+        with open(self.__incorrect_file) as input_file:
+            parser = Reader(input_file)
+            with self.assertRaises(IntervalError):
+                for _ in parser.intervals():
+                    pass
 
 
 class TestWriter(unittest.TestCase):
@@ -59,16 +61,21 @@ class TestWriter(unittest.TestCase):
         """
         Check if intervals are correctly written to the output file.
         """
-        test_input = Reader(self.__input_file)
-        with Writer(self.__output_file) as test_output:
-            for record in test_input.intervals():
-                test_output.write(record)
+        with open(self.__input_file) as test_input:
+            input_reader = Reader(test_input)
+            with Writer(self.__output_file) as test_output:
+                for record in input_reader.intervals():
+                    test_output.write(record)
 
-        # compare the test output file to the original one
-        test_output = Reader(self.__output_file)
-        for x, y in zip(
-                test_input.intervals(), test_output.intervals()):
-            self.assertEqual(x, y)
+            # compare the test output file to the original one
+        with open(self.__input_file) as test_input:
+            with open(self.__output_file) as produced_output:
+                input_reader = Reader(test_input)
+                output_reader = Reader(produced_output)
+                for x, y in zip(
+                        input_reader.intervals(),
+                        output_reader.intervals()):
+                    self.assertEqual(x, y)
 
     def tearDown(self):
         if os.path.isfile(self.__output_file):
