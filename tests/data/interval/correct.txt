@@ -1,7 +1,7 @@
 >chrA1
 240 - 246
 342 - 348
->chrA2
+>chrA2 comment
 0 - 271
 >chrA3
 548 - 601

@@ -47,6 +47,8 @@ class Reader(object):
                 self.__line = self.__line.rstrip()
                 self.__lineno += 1
                 if self.__line.startswith('>'):
+                    # remove the comment if present
+                    self.__line = self.__line.split()[0]
                     self.__seq = self.__line[1:]
                 elif self.__line:
                     # parse the interval line
