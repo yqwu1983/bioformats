@@ -4,6 +4,7 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import bioformats.bed
 import logging
 import unittest
 import os
@@ -86,7 +87,19 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
             parse_hgvs_prot(line)
 
     def test_convert_snpeff2bed(self):
+        # convert to a BED file and try to read it
         convert_snpeff2bed(self.__vcf_file, self.__output)
+        with open(self.__output) as bed_file:
+            reader = bioformats.bed.Reader(bed_file)
+            for record in reader.records():
+                self.assertIsInstance(record, bioformats.bed.Record)
+            self.assertEqual(reader.bed_columns, 9)
+        # now check if a BED3 file is correctly generated
+        convert_snpeff2bed(self.__vcf_file, self.__output, is_bed3=True)
+        with open(self.__output) as bed_file:
+            reader = bioformats.bed.Reader(bed_file)
+            for record in reader.records():
+                self.assertIsInstance(record, bioformats.bed.Record)
 
     def tearDown(self):
         if os.path.isfile(self.__output):

@@ -22,6 +22,9 @@ class TestSnpeff2Pph(unittest.TestCase):
     def test_snpeff2pph(self):
         sys.argv = ['', 'snpeff2bed', self.__input, self.__output]
         bioformats.cli.bioformats()
+        sys.argv = ['', 'snpeff2bed', self.__input, self.__output,
+                    '--bed3']
+        bioformats.cli.bioformats()
 
     def tearDown(self):
         if os.path.isfile(self.__output):

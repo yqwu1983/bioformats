@@ -718,10 +718,12 @@ def snpeff2bed_parser(subparsers):
                                          'file')
     parser.add_argument('bed_file', help='the output BED file of '
                                          'annotated variants')
+    parser.add_argument('--bed3', action='store_true',
+                        help='convert to the BED3 format')
 
 
 def snpeff2bed_launcher(args):
     """
     Launcher for the snpeff2bed tool.
     """
-    snpeff.convert_snpeff2bed(args.vcf_file, args.bed_file)
+    snpeff.convert_snpeff2bed(args.vcf_file, args.bed_file, args.bed3)

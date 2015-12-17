@@ -216,15 +216,17 @@ def parse_snpeff_ann(annotation):
     return Record(*record_fields)
 
 
-def convert_snpeff2bed(vcf_file, bed_file):
+def convert_snpeff2bed(vcf_file, bed_file, is_bed3=False):
     """
     Convert a specified snpEff-annotated VCF file to the BED format
     considering its attributes.
 
     :param vcf_file: a name of an snpEff-annotated VCF file
     :param bed_file: a name of the output BED file
+    :param is_bed3: convert to the BED3 format
     :type vcf_file: str
     :type bed_file: str
+    :type is_bed3: bool
     """
     total_processed = 0
     with open(vcf_file) as input_file:
@@ -254,21 +256,38 @@ def convert_snpeff2bed(vcf_file, bed_file):
                             )
                         else:
                             bed_extra[11] = 'NA'
-                        bed_record = bed.Record(
-                            seq=variant.CHROM,
-                            start=bed_start,
-                            end=bed_end,
-                            name=var_ann.annotation,
-                            score=1000,
-                            strand='+',
-                            thick_start=bed_start,
-                            thick_end=bed_end,
-                            color=','.join(map(str, bed_color)),
-                            block_num=None,
-                            block_sizes=None,
-                            block_starts=None,
-                            extra=bed_extra
-                        )
+                        if is_bed3:
+                            bed_record = bed.Record(
+                                seq=variant.CHROM,
+                                start=bed_start,
+                                end=bed_end,
+                                name=None,
+                                score=None,
+                                strand=None,
+                                thick_start=None,
+                                thick_end=None,
+                                color=None,
+                                block_num=None,
+                                block_sizes=None,
+                                block_starts=None,
+                                extra=bed_extra
+                            )
+                        else:
+                            bed_record = bed.Record(
+                                seq=variant.CHROM,
+                                start=bed_start,
+                                end=bed_end,
+                                name=var_ann.annotation,
+                                score=1000,
+                                strand='+',
+                                thick_start=bed_start,
+                                thick_end=bed_end,
+                                color=','.join(map(str, bed_color)),
+                                block_num=None,
+                                block_sizes=None,
+                                block_starts=None,
+                                extra=bed_extra
+                            )
                         bed_writer.write(bed_record)
                         total_processed += 1
     logger.info('%d variant effects processed', total_processed)
