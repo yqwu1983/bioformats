@@ -16,11 +16,17 @@ os.chdir(path)
 
 class TestVcfGeno2Bed(unittest.TestCase):
     def setUp(self):
-        self.__input = os.path.join('data', 'snpeff', 'snpeff.vcf')
+        self.__input = os.path.join('data', 'variants', 'test.vcf')
+        self.__individuals = os.path.join('data', 'variants',
+                                          'test.vcf')
         self.__output = tempfile.NamedTemporaryFile().name
 
     def test_vcfgeno2bed(self):
         sys.argv = ['', 'vcfgeno2bed', self.__input, self.__output]
+        bioformats.cli.bioformats()
+        # check with the specified list of individuals
+        sys.argv = ['', 'vcfgeno2bed', self.__input, self.__output,
+                    '-i', self.__individuals]
         bioformats.cli.bioformats()
 
     def tearDown(self):

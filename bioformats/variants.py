@@ -4,7 +4,6 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
-import itertools
 import operator
 import vcf
 

@@ -15,13 +15,24 @@ os.chdir(path)
 
 class TestVcf2Genotypes(unittest.TestCase):
     def setUp(self):
-        self.__input = os.path.join('data', 'snpeff', 'snpeff.vcf')
+        self.__input = os.path.join('data', 'variants', 'test.vcf')
+        self.__individuals = os.path.join('data', 'variants',
+                                          'individuals.txt')
         self.__output = tempfile.NamedTemporaryFile().name
 
     def test_vcf2genotypes(self):
         with open(self.__input) as vcf_file:
             bioformats.variants.convert_vcf2genotypes(vcf_file,
                                                       self.__output)
+        # now check with the list of individuals
+        individuals = []
+        with open(self.__individuals) as individuals_file:
+            for line in individuals_file:
+                individuals.append(line.rstrip())
+        with open(self.__input) as vcf_file:
+            bioformats.variants.convert_vcf2genotypes(vcf_file,
+                                                      self.__output,
+                                                      individuals)
 
     def tearDown(self):
         if os.path.isfile(self.__output):
