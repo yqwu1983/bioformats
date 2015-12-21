@@ -15,10 +15,10 @@ def get_unique_genotypes(record, individuals=None):
     genotypes specific to it.
 
     :param record: a record from a VCF file
-    :param individuals: a tuple of names of individuals which
+    :param individuals: a list of names of individuals which
         genotypes are to be considered
     :type record: vcf.Record
-    :type individuals: tuple
+    :type individuals: list
     :return: a set of its unique genotypes
     :rtype: set
     """
@@ -38,10 +38,10 @@ def get_all_genotypes(record, individuals=None):
     Given a record from a VCF file, return a list of all its genotypes.
 
     :param record: a record from a VCF file
-    :param individuals: a tuple of names of individuals which
+    :param individuals: a list of names of individuals which
         genotypes are to be considered
     :type record: vcf.Record
-    :type individuals: tuple
+    :type individuals: list
     :return: a list of all genotypes
     :rtype: list
     """
@@ -61,9 +61,11 @@ def convert_vcf2genotypes(vcf_file, output_filename, individuals=None):
     Given a VCF file, prepare the genotype statistics file from it.
 
     :param vcf_file: a VCF file handle
-    :param individuals:
+    :param individuals: a list of individuals which genotypes are to
+        be counted
     :param output_filename: an output file name
     :type output_filename: str
+    :type individuals: list
     """
     template = '\t'.join(['{}'] * 9) + '\n'
     with open(output_filename, 'w') as output:
