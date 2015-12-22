@@ -31,7 +31,7 @@ def bioformats():
     )
 
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s 0.1.9.post2')
+                        version='%(prog)s 0.1.9.post3')
 
     subparsers = parser.add_subparsers(dest='command')
 

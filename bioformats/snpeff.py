@@ -47,66 +47,11 @@ aa_code = {
     'Thr': 'T'
 }
 
-
-annotation_impacts = {
-    'chromosome_number_variation': 'high',
-    'exon_loss_variant': 'high',
-    'frameshift_variant': 'high',
-    'rare_amino_acid_variant': 'high',
-    'splice_acceptor_variant': 'high',
-    'splice_donor_variant': 'high',
-    'start_lost': 'high',
-    'stop_gained': 'high',
-    'stop_lost': 'high',
-    'transcript_ablation': 'high',
-    '3_prime_UTR_truncation': 'moderate',
-    '5_prime_UTR_truncation': 'moderate',
-    'coding_sequence_variant': 'moderate',
-    'disruptive_inframe_deletion': 'moderate',
-    'disruptive_inframe_insertion': 'moderate',
-    'inframe_deletion': 'moderate',
-    'inframe_insertion': 'moderate',
-    'missense_variant': 'moderate',
-    'regulatory_region_ablation': 'moderate',
-    'splice_region_variant': 'moderate',
-    'TFBS_ablation': 'moderate',
-    'sequence_feature': 'low',
-    '5_prime_UTR_premature_start_codon_gain_variant': 'low',
-    'initiator codon variant': 'low',
-    'start_retained': 'low',
-    'stop_retained variant': 'low',
-    'synonymous variant': 'low',
-    '3_prime_UTR_variant': 'modifier',
-    '5_crime_UTR_variant': 'modifier',
-    'conserved_intergenic_variant': 'modifier',
-    'conserved_intron_variant': 'modifier',
-    'downstream_gene_variant': 'modifier',
-    'exon_variant': 'modifier',
-    'feature_elongation': 'modifier',
-    'feature_truncation': 'modifier',
-    'gene_variant': 'modifier',
-    'intergenic_region': 'modifier',
-    'intragenic_variant': 'modifier',
-    'intron_variant': 'modifier',
-    'mature_miRNA_variant': 'modifier',
-    'miRNA': 'modifier',
-    'NMD_transcript_variant': 'modifier',
-    'non_coding_transcript_exon_variant': 'modifier',
-    'non_coding_transcript_variant': 'modifier',
-    'regulatory_region_amplification': 'modifier',
-    'regulatory_region_variant': 'modifier',
-    'TF_binding_site_variant': 'modifier',
-    'FFBS_amplification': 'modifier',
-    'transcript_amplification': 'modifier',
-    'transcript_variant': 'modifier',
-    'upstream_gene_variant': 'modifier'
-}
-
 impact_colors = {
-    'high': (255, 0, 0),
-    'moderate': (0, 255, 255),
-    'low': (0, 0, 255),
-    'modifier': (255, 255, 255)
+    'HIGH': (255, 0, 0),
+    'MODERATE': (0, 255, 255),
+    'LOW': (0, 0, 255),
+    'MODIFIER': (255, 255, 255)
 }
 
 
@@ -213,8 +158,8 @@ def convert_snpeff2bed(vcf_file, bed_file, is_bed3=False):
                             len(variant.REF) + 1
                         bed_start = variant.POS - 1
                         bed_end = bed_start + bed_size
-                        bed_color = impact_colors[annotation_impacts[
-                            var_ann.annotation]]
+                        bed_color = impact_colors[
+                            var_ann.putative_impact]
                         bed_extra = list(var_ann)
                         if var_ann.hgvs_c is not None:
                             bed_extra[10] = var_ann.hgvs_c
