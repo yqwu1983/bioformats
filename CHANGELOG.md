@@ -1,7 +1,7 @@
 Changes
 =======
 
-* 0.1.9
+0.1.9
 -----
 - Tool `snpeff2bed` to obtain the BED3+ file of variant effects from an
  snpEff-annotated VCF file.

@@ -70,6 +70,7 @@ annotation_impacts = {
     'regulatory_region_ablation': 'moderate',
     'splice_region_variant': 'moderate',
     'TFBS_ablation': 'moderate',
+    'sequence_feature': 'low',
     '5_prime_UTR_premature_start_codon_gain_variant': 'low',
     'initiator codon variant': 'low',
     'start_retained': 'low',
