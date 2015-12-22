@@ -4,8 +4,12 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import logging
 import operator
 import vcf
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
 
 
 def get_unique_genotypes(record, individuals=None):
@@ -27,8 +31,17 @@ def get_unique_genotypes(record, individuals=None):
     genotypes = set()
     for i in record.samples:
         if i.sample in individuals:
-            genotypes.add(tuple(sorted(i.gt_bases.split(
-                i.gt_phase_char()))))
+            new_genotype = sorted(i.gt_bases.split(i.gt_phase_char()))
+            if len(new_genotype) < 2:
+                logger.warning('the genotype %s at %s:%d contains '
+                               'of the sample %s only a single '
+                               'allele',
+                               i.gt_bases,
+                               record.CHROM,
+                               record.POS,
+                               i.sample)
+                new_genotype.append('-')
+            genotypes.add(tuple(new_genotype))
     return genotypes
 
 
@@ -50,8 +63,17 @@ def get_all_genotypes(record, individuals=None):
     genotypes = []
     for i in record.samples:
         if i.sample in individuals:
-            genotypes.append(tuple(sorted(i.gt_bases.split(
-                i.gt_phase_char()))))
+            new_genotype = sorted(i.gt_bases.split(i.gt_phase_char()))
+            if len(new_genotype) < 2:
+                logger.warning('the genotype %s at %s:%d contains '
+                               'of the sample %s only a single '
+                               'allele',
+                               i.gt_bases,
+                               record.CHROM,
+                               record.POS,
+                               i.sample)
+                new_genotype.append('-')
+            genotypes.append(tuple(new_genotype))
     return genotypes
 
 
@@ -71,12 +93,17 @@ def convert_vcf2genotypes(vcf_file, output_filename, individuals=None):
         for record in vcf.Reader(vcf_file):
             genotypes = get_all_genotypes(record, individuals)
             for i in get_unique_genotypes(record, individuals):
-                if i[0] == i[1]:
-                    # skip homozygous genotypes
-                    continue
                 hom_1 = hom_2 = het = 0
+                cur_alleles = set(i)
                 for j in genotypes:
-                    if i[0] in j or i[1] in j:
+                    if not cur_alleles.issuperset(set(j)):
+                        continue
+                    if j[1] == '-':
+                        # we have only one allele for the variant
+                        # it cannot be a heterozygote
+                        if j[0] == i[0]:
+                            hom_1 += 1
+                    else:
                         # consider this genotype because it contains
                         # at least allele of the current genotype
                         if j[0] == j[1]:

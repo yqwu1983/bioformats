@@ -15,7 +15,7 @@ os.chdir(path)
 
 class TestVcf2Genotypes(unittest.TestCase):
     def setUp(self):
-        self.__input = os.path.join('data', 'variants', 'test.vcf')
+        self.__input = os.path.join('data', 'variants', 'test.vcf.gz')
         self.__individuals = os.path.join('data', 'variants',
                                           'individuals.txt')
         self.__output = tempfile.NamedTemporaryFile().name
