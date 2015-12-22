@@ -110,34 +110,6 @@ impact_colors = {
 }
 
 
-def parse_hgvs_dna(x):
-    """
-    Parse a HGVS DNA notation record.
-
-    :param x: a DNA variant in the HGVS notation
-    :type x: str
-    :return: a parsed HGVS DNA record
-    :rtype: HgvsRecord
-    """
-    if not x.startswith('c.'):
-        logger.error('incorrect HGVS DNA notation %s', x)
-        raise SnpEffError
-    x = x[2:]
-    x_parts = x.split('>', 1)
-    if len(x_parts) < 2:
-        logger.error('incorrect HGVS DNA notation %s', x)
-        raise SnpEffError
-    pos = x_parts[0][:-1]
-    try:
-        pos = int(pos)
-    except ValueError:
-        logger.error('incorrect position %s in HGVS notation', pos)
-        raise SnpEffError
-    ref, alt = x_parts[0][-1], x_parts[1]
-
-    return HgvsRecord(pos=pos, ref=ref, alt=alt)
-
-
 def parse_hgvs_prot(x):
     """
     Parse a HGVS protein notation record.
@@ -187,7 +159,7 @@ def parse_snpeff_ann(annotation):
         record_fields += [None, None]
     # HGVS.c and HGVS.p fields
     if ann_parts[9]:
-        record_fields += [parse_hgvs_dna(ann_parts[9])]
+        record_fields += [ann_parts[9]]
     else:
         record_fields += [None]
     if ann_parts[10]:
@@ -245,9 +217,7 @@ def convert_snpeff2bed(vcf_file, bed_file, is_bed3=False):
                             var_ann.annotation]]
                         bed_extra = list(var_ann)
                         if var_ann.hgvs_c is not None:
-                            bed_extra[10] = 'c.{}{}>{}'.format(
-                                var_ann.hgvs_c.pos, var_ann.hgvs_c.ref,
-                                var_ann.hgvs_c.alt)
+                            bed_extra[10] = var_ann.hgvs_c
                         else:
                             bed_extra[10] = 'NA'
                         if var_ann.hgvs_p is not None:
