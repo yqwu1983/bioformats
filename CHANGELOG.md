@@ -3,8 +3,10 @@ Changes
 
 * 0.1.9
 -----
-- Tool `snpeff2bed` to obtain the BED file of variant effects from an
+- Tool `snpeff2bed` to obtain the BED3+ file of variant effects from an
  snpEff-annotated VCF file.
+- Tool `vcfgeno2bed` to obtain the BED3+ file of variant genotypes 
+from a VCF file.
  
 0.1.8
 -----

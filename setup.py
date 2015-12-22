@@ -7,7 +7,7 @@
 from setuptools import setup, find_packages
 
 setup(name='bioformats',
-      version='0.1.8',
+      version='0.1.9',
       description='Classes to handle bioinformatics data',
 
       author='Gaik Tamazian',
@@ -16,12 +16,13 @@ setup(name='bioformats',
       license='MIT',
 
       classifiers=[
-          "Development Status :: 2 - Pre-Alpha",
+          "Development Status :: 3 - Alpha",
           "License :: OSI Approved :: MIT License",
           "Environment :: Console",
           "Intended Audience :: Science/Research",
           "Natural Language :: English",
-          "Operating System :: Unix",
+          "Operating System :: MacOS :: MacOS X",
+          "Operating System :: POSIX :: Linux",
           "Programming Language :: Python :: 2.7",
           "Programming Language :: Python :: 3.5",
           "Topic :: Scientific/Engineering :: Bio-Informatics"
