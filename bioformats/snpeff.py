@@ -108,7 +108,10 @@ def parse_snpeff_ann(annotation):
     else:
         record_fields += [None]
     if ann_parts[10]:
-        record_fields += [parse_hgvs_prot(ann_parts[10])]
+        if ann_parts[1] == 'missense_variant':
+            record_fields += [parse_hgvs_prot(ann_parts[10])]
+        else:
+            record_fields += [ann_parts[10]]
     else:
         record_fields += [None]
     # cDNA position/length field
@@ -166,10 +169,15 @@ def convert_snpeff2bed(vcf_file, bed_file, is_bed3=False):
                         else:
                             bed_extra[10] = 'NA'
                         if var_ann.hgvs_p is not None:
-                            bed_extra[11] = 'p.{}{}>{}'.format(
-                                var_ann.hgvs_p.pos, var_ann.hgvs_p.ref,
-                                var_ann.hgvs_p.alt
-                            )
+                            if var_ann.annotation == \
+                                    'missense_variant':
+                                bed_extra[11] = 'p.{}{}>{}'.format(
+                                    var_ann.hgvs_p.pos,
+                                    var_ann.hgvs_p.ref,
+                                    var_ann.hgvs_p.alt
+                                )
+                            else:
+                                bed_extra[11] = var_ann.hgvs_p
                         else:
                             bed_extra[11] = 'NA'
                         if is_bed3:
