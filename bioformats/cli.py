@@ -27,11 +27,13 @@ def bioformats():
     """
     parser = argparse.ArgumentParser(
         description='A collection of tools to process bioinformatic '
-                    'data.'
+                    'data.',
+        usage='%(prog)s [command] [-h] [-v]\nPlease specify the '
+              'command or use -h to view the help message.'
     )
 
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s 0.1.9.post4')
+                        version='%(prog)s 0.1.9.post5')
 
     subparsers = parser.add_subparsers(dest='command')
 
