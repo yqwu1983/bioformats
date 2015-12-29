@@ -92,7 +92,7 @@ def convert_vcf2genotypes(vcf_file, output_filename, individuals=None):
     with open(output_filename, 'w') as output:
         for record in vcf.Reader(vcf_file):
             genotypes = get_all_genotypes(record, individuals)
-            for i in get_unique_genotypes(record, individuals):
+            for i in sorted(get_unique_genotypes(record, individuals)):
                 hom_1 = hom_2 = het = 0
                 cur_alleles = set(i)
                 for j in genotypes:
