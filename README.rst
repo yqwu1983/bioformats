@@ -20,9 +20,9 @@ required packages.
 Usage
 -----
 
-The package tool are called via the main wrapper script **bioformats**.
+The package tools are called via the main wrapper script **bioformats**.
 For example, one may get the genotype count table from a VCF file by
-calling the **vcfgeno2bed** tool in the following way.
+calling the **vcfgeno2bed** tool in the following way::
 
     bioformats vcfgeno2bed variants.vcf genotype_counts.txt
 
