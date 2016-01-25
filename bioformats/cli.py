@@ -33,7 +33,7 @@ def bioformats():
     )
 
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s 0.1.9.post5')
+                        version='%(prog)s 0.1.9.post6')
 
     subparsers = parser.add_subparsers(dest='command')
 
@@ -685,7 +685,7 @@ def gff2bed_parser(subparsers):
                         help='the output file in the BED format')
 
     # optional arguments
-    parser.add_argument('-a', '--attributes', nargs='?',
+    parser.add_argument('-a', '--attributes', nargs='*',
                         help='attributes to include to the output BED '
                              'file')
     parser.add_argument('-n', '--name_tag', default=None,
