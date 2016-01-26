@@ -33,7 +33,7 @@ def bioformats():
     )
 
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s 0.1.9.post6')
+                        version='%(prog)s 0.1.9.post7')
 
     subparsers = parser.add_subparsers(dest='command')
 
@@ -696,12 +696,16 @@ def gff2bed_parser(subparsers):
                         help='output a BED12 file of genes')
     parser.add_argument('-p', '--parent_tag', default='Parent',
                         help='an attribute tag of exon genes')
+    parser.add_argument('--no_order_check', action='store_true',
+                        help='do not check the order of GFF3 file '
+                             'records')
 
 
 def gff2bed_launcher(args):
     if args.genes:
         bed.convert_gff2bed_gene(args.gff_file, args.output_file,
-                                 args.type, args.parent_tag)
+                                 args.type, args.parent_tag,
+                                 args.no_order_check)
     else:
         bed.convert_gff2bed(args.gff_file, args.output_file,
                             args.type, args.name_tag,

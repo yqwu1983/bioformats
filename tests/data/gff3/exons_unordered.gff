@@ -1,0 +1,16 @@
+##gff-version 3
+JPTV01026923.1	Unigene_M_javanica	exon	179430	179970	95	+	.	Parent=comp166861_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	179988	180222	92	+	.	Parent=comp166861_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	181176	182829	94	+	.	Parent=comp168532_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	181063	181197	98	+	.	Parent=comp174515_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	184235	184348	97	+	.	Parent=comp174515_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	185165	185350	98	+	.	Parent=comp174515_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	186842	186909	100	+	.	Parent=comp174515_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	188848	188947	99	+	.	Parent=comp174515_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	189387	189696	97	+	.	Parent=comp174515_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	18229	18262	94	-	.	Parent=comp177608_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	17599	17964	86	+	.	Parent=comp180338_c1_seq1.mrna3
+JPTV01026923.1	Unigene_M_javanica	exon	51177	53194	96	-	.	Parent=comp187267_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	53291	54026	95	-	.	Parent=comp187267_c0_seq1.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	54036	59777	95	-	.	Parent=comp187267_c1_seq2.mrna1
+JPTV01026923.1	Unigene_M_javanica	exon	61227	62322	97	-	.	Parent=comp187267_c1_seq2.mrna1

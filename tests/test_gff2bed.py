@@ -17,11 +17,16 @@ os.chdir(path)
 class TestGff2Bed(unittest.TestCase):
     def setUp(self):
         self.__input_file = os.path.join('data', 'gff3', 'exons.gff')
+        self.__input_file_unordered = os.path.join(
+                'data', 'gff3', 'exons_unordered.gff')
         self.__output_file = tempfile.NamedTemporaryFile().name
 
     def test_gff2bed(self):
         sys.argv = ['', 'gff2bed', '-g', self.__input_file, 'exon',
                     self.__output_file]
+        bioformats.cli.bioformats()
+        sys.argv = ['', 'gff2bed', '-g', self.__input_file_unordered,
+                    'exon', self.__output_file, '--no_order_check']
         bioformats.cli.bioformats()
         sys.argv = ['', 'gff2bed', self.__input_file, 'exon',
                     self.__output_file, '-a', 'Parent']

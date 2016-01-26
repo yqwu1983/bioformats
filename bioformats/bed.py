@@ -424,7 +424,7 @@ def get_blocks(start, end):
 
 
 def convert_gff2bed_gene(gff3_file, bed_file, exon_type='exon',
-                         parent_tag='Parent'):
+                         parent_tag='Parent', ignore_order=False):
     """
     Convert a specified GFF3 file of gene exons to the BED12 format
     considering gene structure.
@@ -434,10 +434,12 @@ def convert_gff2bed_gene(gff3_file, bed_file, exon_type='exon',
     :param exon_type: a type of GFF3 exon records
     :param parent_tag: a tag of GFF3 exon records encoding the gene
         they belong to
+    :param ignore_order: do not check the order of GFF3 records
     :type bed_file: str
     :type gff3_file: str
     :type exon_type: str
     :type parent_tag: str
+    :type ignore_order: bool
     """
     total_exons = 0
     total_genes = 0
@@ -445,7 +447,8 @@ def convert_gff2bed_gene(gff3_file, bed_file, exon_type='exon',
         gff_reader = gff3.Reader(input_file)
         with Writer(bed_file) as bed_writer:
             # process the first exon
-            gff_record_iterator = gff_reader.records(check_order=True)
+            gff_record_iterator = gff_reader.records(
+                    check_order=not ignore_order)
             exon = next(gff_record_iterator)
             while exon.type != exon_type:
                 exon = next(gff_record_iterator)
