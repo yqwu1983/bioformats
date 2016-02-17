@@ -130,3 +130,23 @@ def convert_vcf2genotypes(vcf_file, output_filename, individuals=None):
                     hom_2,
                     ref_allele
                 ))
+
+
+def allele_pair_iterator(record):
+    """
+    Given a record from a VCF file, return an iterator to iterate
+    over the variant allele pairs in the lexicographic order.
+
+    :param record: a record from a VCF file
+    :type record: vcf.model._Record
+    :return: an iterator to iterate over variant allele pairts
+    """
+    allele_pairs = set()
+    for g in record.samples:
+        cur_alleles = g.gt_bases.split(g.gt_phase_char())
+        cur_alleles.sort()
+        if len(cur_alleles) < 2:
+            cur_alleles.append('-')
+        allele_pairs.add(tuple(cur_alleles))
+    for i in sorted(list(allele_pairs)):
+        yield i
