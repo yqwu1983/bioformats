@@ -9,10 +9,12 @@ import logging
 import unittest
 import os
 import tempfile
+import vcf
 from bioformats.snpeff import parse_snpeff_ann, Record
 from bioformats.snpeff import parse_hgvs_prot
 from bioformats.snpeff import convert_snpeff2bed
 from bioformats.snpeff import HgvsRecord
+from bioformats.snpeff import gene_feature_id_iterator
 from bioformats.exception import SnpEffError
 
 path = os.path.dirname(__file__)
@@ -23,6 +25,9 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
     def setUp(self):
         self.__vcf_file = os.path.join(
             'data', 'snpeff', 'snpeff.vcf'
+        )
+        self.__vcf_file_no_snpeff = os.path.join(
+            'data', 'variants', 'multiallele_indels.vcf'
         )
         self.__output = tempfile.NamedTemporaryFile().name
         # disable logging messages
@@ -79,6 +84,14 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
             reader = bioformats.bed.Reader(bed_file)
             for record in reader.records():
                 self.assertIsInstance(record, bioformats.bed.Record)
+
+    def test_gene_feature_id_iterator(self):
+        for i in (self.__vcf_file, self.__vcf_file_no_snpeff):
+            with open(i) as vcf_file:
+                reader = vcf.Reader(vcf_file)
+                for variant in reader:
+                    for _ in gene_feature_id_iterator(variant):
+                        pass
 
     def tearDown(self):
         if os.path.isfile(self.__output):

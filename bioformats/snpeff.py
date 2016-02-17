@@ -215,3 +215,24 @@ def convert_snpeff2bed(vcf_file, bed_file, is_bed3=False):
                         bed_writer.write(bed_record)
                         total_processed += 1
     logger.info('%d variant effects processed', total_processed)
+
+
+def gene_feature_id_iterator(record):
+    """
+    Given a record from an snpEff-annotated VCF file, iterate over
+    pairs of gene and feature IDs of its effects.
+
+    :param record: a record from an snpEff-annotated VCF file
+    :type record: vcf.model._Record
+    :return: an iterator to iterate over pairs of gene and feature
+        IDs of variant effects
+    """
+    if 'ANN' in record.INFO:
+        gene_feature_pairs = set()
+        for effect in record.INFO['ANN']:
+            ann = parse_snpeff_ann(effect)
+            gene_feature_pairs.add((ann.gene_id, ann.feature_id))
+        for i in sorted(list(gene_feature_pairs)):
+            yield i
+    else:
+        yield
