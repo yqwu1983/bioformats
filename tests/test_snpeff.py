@@ -15,6 +15,7 @@ from bioformats.snpeff import parse_hgvs_prot
 from bioformats.snpeff import convert_snpeff2bed
 from bioformats.snpeff import HgvsRecord
 from bioformats.snpeff import gene_feature_id_iterator
+from bioformats.snpeff import sample_effect_iterator
 from bioformats.exception import SnpEffError
 
 path = os.path.dirname(__file__)
@@ -91,6 +92,14 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
                 reader = vcf.Reader(vcf_file)
                 for variant in reader:
                     for _ in gene_feature_id_iterator(variant):
+                        pass
+
+    def test_sample_effect_iterator(self):
+        for i in (self.__vcf_file, self.__vcf_file_no_snpeff):
+            with open(i) as vcf_file:
+                reader = vcf.Reader(vcf_file)
+                for variant in reader:
+                    for _ in sample_effect_iterator(variant):
                         pass
 
     def tearDown(self):

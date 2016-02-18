@@ -7,8 +7,11 @@
 import logging
 import vcf
 from collections import namedtuple
+from collections import OrderedDict
 from . import bed
+from .variants import allele_pair_iterator
 from .exception import SnpEffError
+from future.utils import iteritems
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -234,5 +237,68 @@ def gene_feature_id_iterator(record):
             gene_feature_pairs.add((ann.gene_id, ann.feature_id))
         for i in sorted(list(gene_feature_pairs)):
             yield i
+    else:
+        yield
+
+
+def sample_effect_iterator(record):
+    """
+    Given a record from an snpEff-annotated VCF file, iterate over
+    effects of the related genotypes.
+
+    :param record: a record from an snpEff-annotated VCF file
+    :type record: vcf.model._Record
+    :return: an iterator to iterate over pairs of gene and feature
+        IDs of variant effects
+    """
+    if 'ANN' in record.INFO:
+        # first, form the dictionary of variant effects which keys
+        # are tuples of three elements: an alternative allele,
+        # a gene ID and a transcript ID
+        effects = {}
+        for ann in record.INFO['ANN']:
+            ann = parse_snpeff_ann(ann)
+            key = (ann.allele, ann.gene_id, ann.feature_id)
+            if key not in effects:
+                effects[key] = ann.annotation
+            elif effects[key] == ann.annotation:
+                logger.warning('duplicate effect record: (%s,%s,'
+                               '%s) - %s',
+                               ann.allele,
+                               ann.gene_id,
+                               ann.feature_id,
+                               effects[key])
+            else:
+                logger.error('conflicting effect records: (%s,%s,'
+                             '%s) - %s vs %s !',
+                             ann.allele,
+                             ann.gene_id,
+                             ann.feature_id,
+                             effects[key],
+                             ann.effect)
+                raise SnpEffError
+        # next, iterate over genotypes and return tuples of two
+        # elements: an original genotype and its effects
+        gene_feature_ids = list(gene_feature_id_iterator(record))
+        genotypes_dict = OrderedDict()
+        for i in allele_pair_iterator(record):
+            genotypes_dict[i] = OrderedDict()
+            for g in gene_feature_ids:
+                genotypes_dict[i][g] = dict()
+        for g in record.samples:
+            alleles = tuple(sorted(g.gt_bases.split(g.gt_phase_char())))
+            for e in effects:
+                genotypes_dict[alleles][(e[1], e[2])] = (
+                    g.sample,
+                    effects[(alleles[0], e[1], e[2])]
+                    if alleles[0] != record.REF else '-',
+                    effects[(alleles[1], e[1], e[2])]
+                    if alleles[1] != record.REF else '-'
+                )
+        # we have formed the dictionary of effects in the required
+        # order; now release its values in that order
+        for i, j in iteritems(genotypes_dict):
+            for k, l in iteritems(j):
+                yield i + k + l
     else:
         yield
