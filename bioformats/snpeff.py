@@ -301,4 +301,51 @@ def sample_effect_iterator(record):
             for k, l in iteritems(j):
                 yield i + k + l
     else:
-        yield
+        raise StopIteration
+
+
+def convert_vcfeffect2bed(vcf_filename, bed_filename):
+    """
+    Given an snpEff-annotated VCF file, convert its effect records to
+    the BED file of the variant effect format.
+
+    :param vcf_filename: a name of an snpEff-annotated VCF file
+    :param bed_filename: a name of an output BED file
+    :type vcf_filename: str
+    :type bed_filename: str
+    """
+    with open(vcf_filename) as vcf_file:
+        reader = vcf.Reader(vcf_file)
+        with bed.Writer(bed_filename) as bed_file:
+            for variant in reader:
+                for effect in sample_effect_iterator(variant):
+                    # skip reference homozygotes since they have no
+                    # associated effects
+                    if effect[5] == '-' and effect[6] == '-':
+                        continue
+                    effect = list(effect)
+                    # check for an empty feature ID
+                    if not effect[3]:
+                        effect[3] = 'NA'
+                    if effect[0] == variant.REF:
+                        effect.append(1)
+                    elif effect[1] == variant.REF:
+                        effect.append(2)
+                    else:
+                        effect.append(0)
+                    bed_line = bed.Record(
+                        seq=variant.CHROM,
+                        start=variant.POS - 1,
+                        end=variant.POS,
+                        name=None,
+                        score=None,
+                        strand=None,
+                        thick_start=None,
+                        thick_end=None,
+                        color=None,
+                        block_num=None,
+                        block_sizes=None,
+                        block_starts=None,
+                        extra=effect
+                    )
+                    bed_file.write(bed_line)
