@@ -51,7 +51,8 @@ def bioformats():
         'snpeff2pph': snpeff2pph_parser,
         'gff2bed': gff2bed_parser,
         'snpeff2bed': snpeff2bed_parser,
-        'vcfgeno2bed': vcfgeno2bed_parser
+        'vcfgeno2bed': vcfgeno2bed_parser,
+        'vcfeffect2bed': vcfeffect2bed_parser
     }
 
     for i in sorted(subparser_routines):
@@ -73,7 +74,8 @@ def bioformats():
         ('snpeff2pph', snpeff2pph_launcher),
         ('gff2bed', gff2bed_launcher),
         ('snpeff2bed', snpeff2bed_launcher),
-        ('vcfgeno2bed', vcfgeno2bed_launcher)
+        ('vcfgeno2bed', vcfgeno2bed_launcher),
+        ('vcfeffect2bed', vcfeffect2bed_launcher)
     ])
 
     launchers[args.command](args)
@@ -772,3 +774,23 @@ def vcfgeno2bed_launcher(args):
     with open(args.vcf_file) as input_file:
         variants.convert_vcf2genotypes(input_file, args.output_file,
                                        individuals)
+
+
+def vcfeffect2bed_parser(subparsers):
+    """
+    Parser for the vcfeffect2bed tool.
+    """
+    parser = subparsers.add_parser(
+        'vcfeffect2bed', help='Given an snpEff-annotated VCF file, '
+                              'extract its sample genotype effects.')
+    parser.add_argument('vcf_file', help='an snpEff-annotated VCF '
+                                         'file')
+    parser.add_argument('output_file', help='the output BED3+ file of '
+                        'sample effects')
+
+
+def vcfeffect2bed_launcher(args):
+    """
+    Launcher for the vcfeffect2bed tool.
+    """
+    snpeff.convert_vcfeffect2bed(args.vcf_file, args.output_file)
