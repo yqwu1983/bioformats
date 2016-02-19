@@ -457,27 +457,31 @@ def convert_vcfeffect2bed(vcf_filename, bed_filename,
                     if not (sei.get(effect[5], 'NONE') in impacts or
                             sei.get(effect[6], 'NONE') in impacts):
                         continue
+                    # determine the reference allele
+                    if effect[0] == variant.REF:
+                        ref_allele_num = 1
+                    elif effect[1] == variant.REF:
+                        ref_allele_num = 2
+                    else:
+                        ref_allele_num = 0
+                    effect = effect + (ref_allele_num,)
                     # check the current genotype
                     if effect[-1] != 0 and 'REFHET' not in genotypes:
                         # the current variant is heterozygous and one
                         #  of its alleles is of the reference
                         continue
-                    elif 'COMHET' not in genotypes and effect[5] != \
-                            effect[6]:
-                        continue
-                    elif 'ALTHOM' not in genotypes and effect[5] == \
-                            effect[6]:
-                        continue
+                    else:
+                        if effect[5] != effect[6]:
+                            if 'COMHET' not in genotypes:
+                                continue
+                        else:
+                            if 'ALTHOM' not in genotypes:
+                                continue
+                    # check for an empty feature ID and add the
+                    # reference allele number
                     effect = list(effect)
-                    # check for an empty feature ID
                     if not effect[3]:
                         effect[3] = 'NA'
-                    if effect[0] == variant.REF:
-                        effect.append(1)
-                    elif effect[1] == variant.REF:
-                        effect.append(2)
-                    else:
-                        effect.append(0)
                     bed_line = bed.Record(
                         seq=variant.CHROM,
                         start=variant.POS - 1,
