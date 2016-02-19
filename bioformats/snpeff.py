@@ -332,7 +332,7 @@ def convert_snpeff2bed(vcf_file, bed_file, is_bed3=False):
                                 block_num=None,
                                 block_sizes=None,
                                 block_starts=None,
-                                extra=bed_extra
+                                extra=[variant.REF] + bed_extra
                             )
                         else:
                             bed_record = bed.Record(
@@ -348,7 +348,7 @@ def convert_snpeff2bed(vcf_file, bed_file, is_bed3=False):
                                 block_num=None,
                                 block_sizes=None,
                                 block_starts=None,
-                                extra=bed_extra
+                                extra=[variant.REF] + bed_extra
                             )
                         bed_writer.write(bed_record)
                         total_processed += 1

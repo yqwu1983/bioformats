@@ -1,6 +1,13 @@
 Changes
 =======
 
+0.1.10
+------
+- Tool `vcfeffect2bed` to get a BED file of genotype effects from an 
+snpEff-annotated VCF file.
+- Reference alleles added to output of the `snpeff2bed` tool.
+
+
 0.1.9
 -----
 - Tool `snpeff2bed` to obtain the BED3+ file of variant effects from an
