@@ -781,8 +781,18 @@ def vcfeffect2bed_parser(subparsers):
     Parser for the vcfeffect2bed tool.
     """
     parser = subparsers.add_parser(
-        'vcfeffect2bed', help='Given an snpEff-annotated VCF file, '
-                              'extract its sample genotype effects.')
+        'vcfeffect2bed',
+        help='create a BED file of genotype effects from an '
+             'snpEff-annotated VCF file',
+        description='Given an snpEff-annotated VCF file, extract its '
+                    'sample genotype effects.',
+        epilog='Genotype values:\n'
+               '\tREFHET - a heterozygote with one reference allele\n'
+               '\tCOMHET - a heterozygote with both alternative '
+               'alleles\n'
+               '\tALTHOM - an alternative homozygote\n',
+        formatter_class=argparse.RawTextHelpFormatter
+    )
     parser.add_argument('vcf_file', help='an snpEff-annotated VCF '
                                          'file')
     parser.add_argument('output_file', help='the output BED3+ file of '
