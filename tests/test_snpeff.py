@@ -106,6 +106,8 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
     def test_convert_vcfeffect2bed(self):
         for i in (self.__vcf_file, self.__vcf_file_no_snpeff):
             convert_vcfeffect2bed(i, self.__output)
+            convert_vcfeffect2bed(i, self.__output, impacts={
+                'MODERATE'})
 
     def tearDown(self):
         if os.path.isfile(self.__output):

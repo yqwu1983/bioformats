@@ -57,6 +57,65 @@ impact_colors = {
     'MODIFIER': (255, 255, 255)
 }
 
+snpeff_impact_effects = {
+    'HIGH': ('chromosome_number_variation',
+             'exon_loss_variant',
+             'frameshift_variant',
+             'rare_amino_acid_variant',
+             'splice_acceptor_variant',
+             'splice_donor_variant',
+             'start_lost',
+             'stop_gained',
+             'stop_lost',
+             'transcript_ablation'),
+    'MODERATE': ('coding_sequence_variant',
+                 'disruptive_inframe_deletion',
+                 'disruptive_inframe_insertion',
+                 'inframe_deletion',
+                 'inframe_insertion',
+                 'missense_variant',
+                 'regulatory_region_ablation',
+                 'splice_region_variant',
+                 'TFBS_ablation'),
+    'LOW': ('initiator_codon_variant',
+            'splice_region_variant',
+            'start_retained',
+            'stop_retained_variant',
+            'synonymous_variant'),
+    'MODIFIER': ('3_prime_UTR_variant',
+                 '5_prime_UTR_variant',
+                 'coding_sequence_variant',
+                 'conserved_intergenic_variant',
+                 'conserved_intron_variant',
+                 'downstream_gene_variant',
+                 'exon_variant',
+                 'feature_elongation',
+                 'feature_truncation',
+                 'gene_variant',
+                 'intergenic_region',
+                 'intragenic_variant',
+                 'intron_variant',
+                 'mature_miRNA_variant',
+                 'miRNA',
+                 'NMD_transcript_variant',
+                 'non_coding_transcript_exon_variant',
+                 'non_coding_transcript_variant',
+                 'regulatory_region_amplification',
+                 'regulatory_region_variant',
+                 'TF_binding_site_variant',
+                 'TFBS_amplification',
+                 'transcript_amplification',
+                 'transcript_variant',
+                 'upstream_gene_variant'
+                 )}
+
+
+snpeff_effect_impacts = {}
+for impact, effects in iteritems(snpeff_impact_effects):
+    for i in effects:
+        snpeff_effect_impacts[i] = impact
+
+
 snpeff_annotations = ('chromosome_number_variation',
                       'exon_loss_variant',
                       'frameshift_variant',
@@ -367,16 +426,22 @@ def sample_effect_iterator(record):
         raise StopIteration
 
 
-def convert_vcfeffect2bed(vcf_filename, bed_filename):
+def convert_vcfeffect2bed(vcf_filename, bed_filename,
+                          impacts={'HIGH', 'MODERATE', 'LOW',
+                                   'MODIFIER'},
+                          ):
     """
     Given an snpEff-annotated VCF file, convert its effect records to
     the BED file of the variant effect format.
 
     :param vcf_filename: a name of an snpEff-annotated VCF file
     :param bed_filename: a name of an output BED file
+    :param impacts: a set of impacts which variants are to be reported
     :type vcf_filename: str
     :type bed_filename: str
+    :type impacts: set
     """
+    sei = snpeff_effect_impacts
     with open(vcf_filename) as vcf_file:
         reader = vcf.Reader(vcf_file)
         with bed.Writer(bed_filename) as bed_file:
@@ -385,6 +450,10 @@ def convert_vcfeffect2bed(vcf_filename, bed_filename):
                     # skip reference homozygotes since they have no
                     # associated effects
                     if effect[5] == '-' and effect[6] == '-':
+                        continue
+                    # check the effect impact
+                    if not (sei.get(effect[5], 'NONE') in impacts or
+                            sei.get(effect[6], 'NONE') in impacts):
                         continue
                     effect = list(effect)
                     # check for an empty feature ID

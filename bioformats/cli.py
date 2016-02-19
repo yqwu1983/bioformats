@@ -787,10 +787,17 @@ def vcfeffect2bed_parser(subparsers):
                                          'file')
     parser.add_argument('output_file', help='the output BED3+ file of '
                         'sample effects')
+    parser.add_argument('-i', '--impacts', nargs='+', choices=[
+        'HIGH', 'MODERATE', 'LOW', 'MODIFIER'], default={'HIGH',
+                                                         'MODERATE',
+                                                         'LOW',
+                                                         'MODIFIER'},
+                        help='impacts of effects to be reported')
 
 
 def vcfeffect2bed_launcher(args):
     """
     Launcher for the vcfeffect2bed tool.
     """
-    snpeff.convert_vcfeffect2bed(args.vcf_file, args.output_file)
+    snpeff.convert_vcfeffect2bed(args.vcf_file, args.output_file,
+                                 args.impacts)
