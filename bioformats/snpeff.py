@@ -429,7 +429,7 @@ def sample_effect_iterator(record):
 def convert_vcfeffect2bed(vcf_filename, bed_filename,
                           impacts={'HIGH', 'MODERATE', 'LOW',
                                    'MODIFIER'},
-                          ):
+                          genotypes={'REFHET', 'COMHET', 'ALTHOM'}):
     """
     Given an snpEff-annotated VCF file, convert its effect records to
     the BED file of the variant effect format.
@@ -437,9 +437,11 @@ def convert_vcfeffect2bed(vcf_filename, bed_filename,
     :param vcf_filename: a name of an snpEff-annotated VCF file
     :param bed_filename: a name of an output BED file
     :param impacts: a set of impacts which variants are to be reported
+    :param genotypes: a set of genotypes to be reported
     :type vcf_filename: str
     :type bed_filename: str
     :type impacts: set
+    :type genotypes: set
     """
     sei = snpeff_effect_impacts
     with open(vcf_filename) as vcf_file:
@@ -454,6 +456,17 @@ def convert_vcfeffect2bed(vcf_filename, bed_filename,
                     # check the effect impact
                     if not (sei.get(effect[5], 'NONE') in impacts or
                             sei.get(effect[6], 'NONE') in impacts):
+                        continue
+                    # check the current genotype
+                    if effect[-1] != 0 and 'REFHET' not in genotypes:
+                        # the current variant is heterozygous and one
+                        #  of its alleles is of the reference
+                        continue
+                    elif 'COMHET' not in genotypes and effect[5] != \
+                            effect[6]:
+                        continue
+                    elif 'ALTHOM' not in genotypes and effect[5] == \
+                            effect[6]:
                         continue
                     effect = list(effect)
                     # check for an empty feature ID

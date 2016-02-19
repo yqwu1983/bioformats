@@ -793,6 +793,9 @@ def vcfeffect2bed_parser(subparsers):
                                                          'LOW',
                                                          'MODIFIER'},
                         help='impacts of effects to be reported')
+    parser.add_argument('-g', '--genotypes', nargs='+', choices=[
+        'REFHET', 'COMHET', 'ALTHOM'], default={'REFHET', 'COMHET',
+                                                'ALTHOM'})
 
 
 def vcfeffect2bed_launcher(args):
@@ -800,4 +803,5 @@ def vcfeffect2bed_launcher(args):
     Launcher for the vcfeffect2bed tool.
     """
     snpeff.convert_vcfeffect2bed(args.vcf_file, args.output_file,
-                                 args.impacts)
+                                 impacts=args.impacts,
+                                 genotypes=args.genotypes)

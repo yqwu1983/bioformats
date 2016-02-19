@@ -108,6 +108,8 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
             convert_vcfeffect2bed(i, self.__output)
             convert_vcfeffect2bed(i, self.__output, impacts={
                 'MODERATE'})
+            for j in ('REFHET', 'COMHET', 'ALTHOM'):
+                convert_vcfeffect2bed(i, self.__output, genotypes={j})
 
     def tearDown(self):
         if os.path.isfile(self.__output):

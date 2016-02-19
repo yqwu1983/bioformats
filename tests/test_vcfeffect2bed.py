@@ -28,6 +28,9 @@ class TestVcfGeno2Bed(unittest.TestCase):
             sys.argv = ['', 'vcfeffect2bed', input_file, self.__output,
                         '-i', 'HIGH', 'MODERATE']
             bioformats.cli.bioformats()
+            sys.argv = ['', 'vcfeffect2bed', input_file,
+                        self.__output, '-g', 'COMHET', 'ALTHOM']
+            bioformats.cli.bioformats()
 
     def tearDown(self):
         if os.path.isfile(self.__output):
