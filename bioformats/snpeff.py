@@ -57,6 +57,82 @@ impact_colors = {
     'MODIFIER': (255, 255, 255)
 }
 
+snpeff_annotations = ('chromosome_number_variation',
+                      'exon_loss_variant',
+                      'frameshift_variant',
+                      'stop_gained',
+                      'stop_lost',
+                      'start_lost',
+                      'splice_acceptor_variant',
+                      'splice_donor_variant',
+                      'rare_amino_acid_variant',
+                      'missense_variant',
+                      'inframe_insertion',
+                      'disruptive_inframe_insertion',
+                      'inframe_deletion',
+                      'disruptive_inframe_deletion',
+                      '5_prime_UTR_truncation+exon_loss_variant',
+                      '3_prime_UTR_truncation+exon_loss',
+                      '5_prime_UTR_truncation',
+                      '3_prime_UTR_truncation',
+                      'splice_branch_variant',
+                      'splice_region_variant',
+                      'splice_branch_variant',
+                      'stop_retained_variant',
+                      'initiator_codon_variant',
+                      'synonymous_variant',
+                      'stop_retained_variant',
+                      'coding_sequence_variant',
+                      '5_prime_UTR_variant',
+                      '3_prime_UTR_variant',
+                      '5_prime_UTR_premature_start_codon_gain_variant',
+                      'upstream_gene_variant',
+                      'downstream_gene_variant',
+                      'TF_binding_site_variant',
+                      'regulatory_region_variant',
+                      'miRNA',
+                      'transcript',
+                      'custom',
+                      'sequence_feature',
+                      'conserved_intron_variant',
+                      'intron_variant',
+                      'intragenic_variant',
+                      'conserved_intergenic_variant',
+                      'intergenic_region',
+                      'coding_sequence_variant',
+                      'non_coding_exon_variant',
+                      'nc_transcript_variant',
+                      'gene_variant',
+                      'chromosome')
+
+snpeff_order = dict(zip(snpeff_annotations,
+                        range(len(snpeff_annotations))))
+
+
+def compare_annotations(x, y):
+    """
+    Given two annotations by snpEff, compare them by their
+    significance and return the most significant one.
+
+    :param x: a first snpEff annotation
+    :param y: a second snpEff annotation
+    :type x: str
+    :type y: str
+    :return: the most significant snpEff annotation from the provided
+        pair
+    :rtype: str
+    """
+    if x in snpeff_order and y in snpeff_order:
+        if snpeff_order[x] < snpeff_order[y]:
+            return x
+        else:
+            return y
+    elif x in snpeff_order or y in snpeff_order:
+        if x in snpeff_order:
+            return x
+        else:
+            return y
+    return None
 
 def parse_hgvs_prot(x):
     """
@@ -261,22 +337,9 @@ def sample_effect_iterator(record):
             key = (ann.allele, ann.gene_id, ann.feature_id)
             if key not in effects:
                 effects[key] = ann.annotation
-            elif effects[key] == ann.annotation:
-                logger.warning('duplicate effect record: (%s,%s,'
-                               '%s) - %s',
-                               ann.allele,
-                               ann.gene_id,
-                               ann.feature_id,
-                               effects[key])
             else:
-                logger.error('conflicting effect records: (%s,%s,'
-                             '%s) - %s vs %s !',
-                             ann.allele,
-                             ann.gene_id,
-                             ann.feature_id,
-                             effects[key],
-                             ann.effect)
-                raise SnpEffError
+                effects[key] = compare_annotations(effects[key],
+                                                   ann.annotation)
         # next, iterate over genotypes and return tuples of two
         # elements: an original genotype and its effects
         gene_feature_ids = list(gene_feature_id_iterator(record))
