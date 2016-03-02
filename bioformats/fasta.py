@@ -5,12 +5,11 @@
 # gaik (dot) tamazian (at) gmail (dot) com
 
 import random
-
+import vcf
 import pyfaidx
 from builtins import range  # pylint:disable=redefined-builtin
-
-from .bed import Reader, Writer
 from .exception import BioformatsError
+from . import bed
 
 
 class Writer(object):
@@ -175,8 +174,8 @@ class FlankNFilter(object):
         :type output_filename: str
         """
         with open(input_filename) as input_file:
-            bed_reader = Reader(input_file)
-            with Writer(output_filename) as output_file:
+            bed_reader = bed.Reader(input_file)
+            with bed.Writer(output_filename) as output_file:
                 for record in bed_reader.records():
                     seq = record.seq
                     down_start = max(0, record.start - self.__len)
@@ -187,3 +186,30 @@ class FlankNFilter(object):
                     if self.check_seq(seq, down_start, down_end) and \
                             self.check_seq(seq, up_start, up_end):
                         output_file.write(record)
+
+    def filter_vcf(self, input_filename, output_filename):
+        """
+        Filter routines from the specified BED file and output the
+        filtered ones to the specified output file.
+
+        :param input_filename: a name of a BED file containing
+            features to be filtered
+        :param output_filename: the output BED file name
+        :type input_filename: str
+        :type output_filename: str
+        """
+        with open(input_filename) as input_file:
+            vcf_reader = vcf.Reader(input_file)
+            with open(output_filename, 'w') as output_file:
+                vcf_writer = vcf.Writer(output_file, vcf_reader)
+                for record in vcf_reader:
+                    seq = record.CHROM
+                    seq_len = len(self.__fasta[seq])
+                    pos = record.POS - 1
+                    down_start = max(0, pos - self.__len)
+                    down_end = pos
+                    up_start = pos + 1
+                    up_end = min(seq_len, up_start + self.__len)
+                    if self.check_seq(seq, down_start, down_end) and \
+                            self.check_seq(seq, up_start, up_end):
+                        vcf_writer.write_record(record)

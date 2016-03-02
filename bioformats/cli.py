@@ -850,4 +850,7 @@ def flanknfilter_launcher(args):
     """
     feature_filter = fasta.FlankNFilter(args.fasta_file,
                                         args.length)
-    feature_filter.filter_bed(args.input_file, args.output_file)
+    if args.type == 'bed':
+        feature_filter.filter_bed(args.input_file, args.output_file)
+    else:
+        feature_filter.filter_vcf(args.input_file, args.output_file)
