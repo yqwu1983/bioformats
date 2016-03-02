@@ -52,7 +52,8 @@ def bioformats():
         'gff2bed': gff2bed_parser,
         'snpeff2bed': snpeff2bed_parser,
         'vcfgeno2bed': vcfgeno2bed_parser,
-        'vcfeffect2bed': vcfeffect2bed_parser
+        'vcfeffect2bed': vcfeffect2bed_parser,
+        'flanknfilter': flanknfilter_parser
     }
 
     for i in sorted(subparser_routines):
@@ -75,7 +76,8 @@ def bioformats():
         ('gff2bed', gff2bed_launcher),
         ('snpeff2bed', snpeff2bed_launcher),
         ('vcfgeno2bed', vcfgeno2bed_launcher),
-        ('vcfeffect2bed', vcfeffect2bed_launcher)
+        ('vcfeffect2bed', vcfeffect2bed_launcher),
+        ('flanknfilter', flanknfilter_launcher)
     ])
 
     launchers[args.command](args)
@@ -815,3 +817,37 @@ def vcfeffect2bed_launcher(args):
     snpeff.convert_vcfeffect2bed(args.vcf_file, args.output_file,
                                  impacts=args.impacts,
                                  genotypes=args.genotypes)
+
+def flanknfilter_parser(subparsers):
+    """
+    Parser for the flanknfilter tool.
+    """
+    parser = subparsers.add_parser(
+        "flanknfilter",
+        help="filter features from a BED or VCF file by having N's "
+             "in their flanking regions",
+        description="Given features from a BED or VCF file, check if "
+                    "they contain N's in their flanking regions of "
+                    "the specified length.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument("input_file", help="an input file of features "
+                                           "to be filtered")
+    parser.add_argument("fasta_file", help="a FASTA file of sequences "
+                                           "the features are related "
+                                           "to")
+    parser.add_argument("output_file", help="an output file of "
+                                            "filtered features")
+    parser.add_argument("-t", "--type", choices=["bed", "vcf"],
+                        default="bed", help="the input file type")
+    parser.add_argument("-l", "--length", type=int, default=100,
+                        help="the flanking region length")
+
+
+def flanknfilter_launcher(args):
+    """
+    Launcher for the flanknfilter tool.
+    """
+    feature_filter = fasta.FlankNFilter(args.fasta_file,
+                                        args.length)
+    feature_filter.filter_bed(args.input_file, args.output_file)

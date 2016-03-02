@@ -3,8 +3,8 @@ Changes
 
 * 0.1.11
 --------
-- Class `NeighborhoodFilter` for filtering features from a BED or VCF
- file by having **N**'s in their flanking regions. 
+- Tool `flanknfilter` to filter features from a BED or VCF file by 
+having *N*'s in their flanking regions.
 
 0.1.10
 ------

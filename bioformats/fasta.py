@@ -128,7 +128,7 @@ class Reorder(object):
                     seq_writer.write(i, str(seq_reader[i]))
 
 
-class NeighborhoodFilter(object):
+class FlankNFilter(object):
     """
     The class implements routines for filtering features from a FASTA
     or VCF file by the presence of N's in their neighborhood.
