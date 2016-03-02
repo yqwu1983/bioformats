@@ -1,6 +1,11 @@
 Changes
 =======
 
+* 0.1.11
+--------
+- Class `NeighborhoodFilter` for filtering features from a BED or VCF
+ file by having **N**'s in their flanking regions. 
+
 0.1.10
 ------
 - Tool `vcfeffect2bed` to get a BED file of genotype effects from an 
