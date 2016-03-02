@@ -842,6 +842,11 @@ def flanknfilter_parser(subparsers):
                         default="bed", help="the input file type")
     parser.add_argument("-l", "--length", type=int, default=100,
                         help="the flanking region length")
+    parser.add_argument("-s", "--strict", action="store_true",
+                        help="require flanks to have exactly the "
+                             "specified length (it may be shorter if "
+                             "a feature is located near a sequence "
+                             "start or end)")
 
 
 def flanknfilter_launcher(args):
@@ -851,6 +856,8 @@ def flanknfilter_launcher(args):
     feature_filter = fasta.FlankNFilter(args.fasta_file,
                                         args.length)
     if args.type == 'bed':
-        feature_filter.filter_bed(args.input_file, args.output_file)
+        feature_filter.filter_bed(args.input_file, args.output_file,
+                                  args.strict)
     else:
-        feature_filter.filter_vcf(args.input_file, args.output_file)
+        feature_filter.filter_vcf(args.input_file, args.output_file,
+                                  args.strict)

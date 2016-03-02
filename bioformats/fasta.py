@@ -162,7 +162,7 @@ class FlankNFilter(object):
         seq = str(self.__fasta[seq_id][start_pos:end_pos])
         return 'N' not in seq
 
-    def filter_bed(self, input_filename, output_filename):
+    def filter_bed(self, input_filename, output_filename, strict):
         """
         Filter routines from the specified BED file and output the
         filtered ones to the specified output file.
@@ -170,24 +170,31 @@ class FlankNFilter(object):
         :param input_filename: a name of a BED file containing
             features to be filtered
         :param output_filename: the output BED file name
+        :param strict: if specified, require the flank regions to
+            have exactly the specified length
         :type input_filename: str
         :type output_filename: str
+        :type strict: bool
         """
         with open(input_filename) as input_file:
             bed_reader = bed.Reader(input_file)
             with bed.Writer(output_filename) as output_file:
                 for record in bed_reader.records():
                     seq = record.seq
+                    seq_len = len(self.__fasta[seq])
+                    if strict and record.start < self.__len:
+                        continue
                     down_start = max(0, record.start - self.__len)
                     down_end = record.start
                     up_start = record.end
-                    up_end = min(len(self.__fasta[record.seq]),
-                                 record.end + self.__len, )
+                    if strict and record.end + self.__len > seq_len:
+                        continue
+                    up_end = min(seq_len, up_start + self.__len)
                     if self.check_seq(seq, down_start, down_end) and \
                             self.check_seq(seq, up_start, up_end):
                         output_file.write(record)
 
-    def filter_vcf(self, input_filename, output_filename):
+    def filter_vcf(self, input_filename, output_filename, strict):
         """
         Filter routines from the specified BED file and output the
         filtered ones to the specified output file.
@@ -195,8 +202,11 @@ class FlankNFilter(object):
         :param input_filename: a name of a BED file containing
             features to be filtered
         :param output_filename: the output BED file name
+        :param strict: if specified, require the flank regions to
+            have extactly the specified length
         :type input_filename: str
         :type output_filename: str
+        :type strict: bool
         """
         with open(input_filename) as input_file:
             vcf_reader = vcf.Reader(input_file)
@@ -206,9 +216,13 @@ class FlankNFilter(object):
                     seq = record.CHROM
                     seq_len = len(self.__fasta[seq])
                     pos = record.POS - 1
+                    if strict and pos < self.__len:
+                        continue
                     down_start = max(0, pos - self.__len)
                     down_end = pos
                     up_start = pos + 1
+                    if strict and pos + 1 + self.__len > seq_len:
+                        continue
                     up_end = min(seq_len, up_start + self.__len)
                     if self.check_seq(seq, down_start, down_end) and \
                             self.check_seq(seq, up_start, up_end):
