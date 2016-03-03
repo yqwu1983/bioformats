@@ -8,11 +8,18 @@ import os
 import pyfaidx
 import tempfile
 import unittest
+from bioformats.bed import Reader
 from bioformats.exception import BioformatsError
 from bioformats.fasta import RandomSequence
 from bioformats.fasta import Reorder
 from bioformats.fasta import Writer
+from bioformats.fasta import FlankNFilter
 from future.utils import iteritems
+
+try:
+    import itertools.izip as zip
+except ImportError:
+    pass
 
 path = os.path.dirname(__file__)
 os.chdir(path)
@@ -90,3 +97,37 @@ class TestReorder(unittest.TestCase):
                   self.__output + '.fai'):
             if os.path.isfile(i):
                 os.unlink(i)
+
+
+class TestFlankNFilter(unittest.TestCase):
+    def setUp(self):
+        self.test_fa = os.path.join(
+            'data', 'fasta', 'flanknfilter_test.fa'
+        )
+        self.test_bed = os.path.join(
+            'data', 'fasta', 'flanknfilter_test.bed'
+        )
+        self.output_results = dict([
+            ((2, False), 'fnf_test_2f.bed'),
+            ((3, False), 'fnf_test_3f.bed'),
+            ((4, False), 'fnf_test_4f.bed'),
+            ((4, True), 'fnf_test_4t.bed')
+        ])
+        self.output = tempfile.NamedTemporaryFile().name
+
+    def test_bed(self):
+        for i, j in iteritems(self.output_results):
+            feature_filter = FlankNFilter(self.test_fa, flank_len=i[0])
+            test_output = os.path.join('data', 'fasta', j)
+            feature_filter.filter_bed(self.test_bed, self.output,
+                                      i[1])
+            with open(test_output) as correct_file:
+                with open(self.output) as produced_file:
+                    for k, l in zip(
+                            Reader(correct_file).records(),
+                            Reader(produced_file).records()):
+                        self.assertEqual(k, l)
+
+    def tearDown(self):
+        if os.path.isfile(self.output):
+            os.unlink(self.output)

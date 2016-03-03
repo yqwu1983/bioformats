@@ -62,3 +62,6 @@ target/
 # PyPI
 .pypirc
 
+# FASTA index file
+*.fai
+
