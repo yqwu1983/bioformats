@@ -8,6 +8,7 @@ import os
 import pyfaidx
 import tempfile
 import unittest
+import vcf
 from bioformats.bed import Reader
 from bioformats.exception import BioformatsError
 from bioformats.fasta import RandomSequence
@@ -107,18 +108,21 @@ class TestFlankNFilter(unittest.TestCase):
         self.test_bed = os.path.join(
             'data', 'fasta', 'flanknfilter_test.bed'
         )
+        self.test_vcf = os.path.join(
+            'data', 'fasta', 'flanknfilter_test.vcf'
+        )
         self.output_results = dict([
-            ((2, False), 'fnf_test_2f.bed'),
-            ((3, False), 'fnf_test_3f.bed'),
-            ((4, False), 'fnf_test_4f.bed'),
-            ((4, True), 'fnf_test_4t.bed')
+            ((2, False), 'fnf_test_2f'),
+            ((3, False), 'fnf_test_3f'),
+            ((4, False), 'fnf_test_4f'),
+            ((4, True), 'fnf_test_4t')
         ])
         self.output = tempfile.NamedTemporaryFile().name
 
     def test_bed(self):
         for i, j in iteritems(self.output_results):
             feature_filter = FlankNFilter(self.test_fa, flank_len=i[0])
-            test_output = os.path.join('data', 'fasta', j)
+            test_output = os.path.join('data', 'fasta', j) + '.bed'
             feature_filter.filter_bed(self.test_bed, self.output,
                                       i[1])
             with open(test_output) as correct_file:
@@ -126,6 +130,18 @@ class TestFlankNFilter(unittest.TestCase):
                     for k, l in zip(
                             Reader(correct_file).records(),
                             Reader(produced_file).records()):
+                        self.assertEqual(k, l)
+
+    def test_vcf(self):
+        for i, j in iteritems(self.output_results):
+            feature_filter = FlankNFilter(self.test_fa, flank_len=i[0])
+            test_output = os.path.join('data', 'fasta', j) + '.vcf'
+            feature_filter.filter_vcf(self.test_vcf, self.output,
+                                      i[1])
+            with open(test_output) as correct_file:
+                with open(self.output) as produced_file:
+                    for k, l in zip(vcf.Reader(correct_file),
+                                    vcf.Reader(produced_file)):
                         self.assertEqual(k, l)
 
     def tearDown(self):
