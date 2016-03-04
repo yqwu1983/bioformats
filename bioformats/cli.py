@@ -465,7 +465,8 @@ def bedautosql_parser(subparsers):
         'bedautosql',
         help='get an autoSql table for a BED file',
         description='Get an autoSql table structure for the specified '
-                    'BED file'
+                    'BED file',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument('bed_file', help='a BED file')
@@ -476,6 +477,9 @@ def bedautosql_parser(subparsers):
                         help='a table name')
     parser.add_argument('-d', '--description', default='Description',
                         help='a table description')
+    parser.add_argument('-l', '--lines', type=int, default=100,
+                        help='the number of lines to analyze'
+                             'from the input file')
 
 
 def bedautosql_launcher(args):
@@ -486,7 +490,8 @@ def bedautosql_launcher(args):
         reader = bed.Reader(bed_file)
         try:
             table = bed.get_autosql_table(reader, args.name,
-                                          args.description)
+                                          args.description,
+                                          args.lines)
             with autosql.Writer(args.output_file, table.name,
                                 table.desc) as writer:
                 for i in table.entries:

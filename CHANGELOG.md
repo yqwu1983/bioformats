@@ -1,7 +1,12 @@
 Changes
 =======
 
-* 0.1.11
+* 0.1.12
+--------
+- **bedautosql**: option `--lines` specifying the number of lines to be 
+analyzed from an input file.
+
+0.1.11
 --------
 - Tool `flanknfilter` to filter features from a BED or VCF file by 
 having *N*'s in their flanking regions.

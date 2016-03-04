@@ -349,7 +349,8 @@ class Writer(object):
         self.__output.close()
 
 
-def get_autosql_table(bed_reader, name='Table', desc='Description'):
+def get_autosql_table(bed_reader, name='Table', desc='Description',
+                      lines=None):
     """
     Given a BED reader, process entries from the associated BED file
     and choose appropriate autoSql types.
@@ -357,9 +358,11 @@ def get_autosql_table(bed_reader, name='Table', desc='Description'):
     :param bed_reader: a BED reader
     :param name: a table name
     :param desc: a table description
+    :param lines: the number of lines to analyze
     :type bed_reader: Reader
     :type name: str
     :type desc: str
+    :type lines: int
     :return: an autoSql table
     :rtype: autosql.Table
     """
@@ -376,8 +379,13 @@ def get_autosql_table(bed_reader, name='Table', desc='Description'):
         new_classifier.add_value(str(first_record.extra[i]))
         column_types.append(new_classifier)
 
+    # we have already checked the first line
+    if lines is not None:
+        lines -= 1
     # process entries from the specified BED reader
-    for record in bed_reader.records():
+    for line_num, record in enumerate(bed_reader.records()):
+        if lines is not None and not (line_num < lines):
+            break
         for i in range(num_aux_columns):
             column_types[i].add_value(str(record.extra[i]))
 

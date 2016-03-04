@@ -32,6 +32,8 @@ class TestBedAutoSql(unittest.TestCase):
         for i in self.__bed_files:
             sys.argv = ['', 'bedautosql', i, self.__output_file]
             bioformats.cli.bioformats()
+            sys.argv = ['', 'bedautosql', '-l', '2', i,
+                        self.__output_file]
 
     def tearDown(self):
         if os.path.isfile(self.__output_file):
