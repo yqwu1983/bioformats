@@ -5,6 +5,7 @@ Changes
 --------
 - **bedautosql**: option `--lines` specifying the number of lines to be 
 analyzed from an input file.
+- Test suite added for the `flanknfilter` tool.
 
 0.1.11
 --------
