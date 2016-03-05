@@ -33,7 +33,7 @@ def bioformats():
     )
 
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s 0.1.11')
+                        version='%(prog)s 0.1.12')
 
     subparsers = parser.add_subparsers(dest='command')
 
@@ -819,9 +819,15 @@ def vcfeffect2bed_launcher(args):
     """
     Launcher for the vcfeffect2bed tool.
     """
-    snpeff.convert_vcfeffect2bed(args.vcf_file, args.output_file,
-                                 impacts=args.impacts,
-                                 genotypes=args.genotypes)
+    try:
+        snpeff.convert_vcfeffect2bed(args.vcf_file, args.output_file,
+                                     impacts=args.impacts,
+                                     genotypes=args.genotypes)
+    except (KeyError, exception.BioformatsError):
+        # let a user know if something goes wrong
+        with open(args.output_file, "a") as output_file:
+            output_file.write("ERROR!\n")
+
 
 def flanknfilter_parser(subparsers):
     """

@@ -1,10 +1,12 @@
 Changes
 =======
 
-* 0.1.12
+0.1.12
 --------
 - **bedautosql**: option `--lines` specifying the number of lines to be 
 analyzed from an input file.
+- **vcfeffect2bed**: report errors to an output file (useful for 
+checking whether all variant effects were successfully processed).
 - Test suite added for the `flanknfilter` tool.
 
 0.1.11
