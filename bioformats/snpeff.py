@@ -426,10 +426,8 @@ def sample_effect_iterator(record):
         raise StopIteration
 
 
-def convert_vcfeffect2bed(vcf_filename, bed_filename,
-                          impacts={'HIGH', 'MODERATE', 'LOW',
-                                   'MODIFIER'},
-                          genotypes={'REFHET', 'COMHET', 'ALTHOM'}):
+def convert_vcfeffect2bed(vcf_filename, bed_filename, impacts=None,
+                          genotypes=None):
     """
     Given an snpEff-annotated VCF file, convert its effect records to
     the BED file of the variant effect format.
@@ -443,6 +441,10 @@ def convert_vcfeffect2bed(vcf_filename, bed_filename,
     :type impacts: set
     :type genotypes: set
     """
+    if impacts is None:
+        impacts = {'HIGH', 'MODERATE', 'LOW', 'MODIFIER'}
+    if genotypes is None:
+        genotypes = {'REFHET', 'COMHET', 'ALTHOM'}
     sei = snpeff_effect_impacts
     with open(vcf_filename) as vcf_file:
         reader = vcf.Reader(vcf_file)
