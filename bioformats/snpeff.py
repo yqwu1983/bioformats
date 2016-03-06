@@ -514,3 +514,8 @@ def convert_vcfeffect2bed(vcf_filename, bed_filename, impacts=None,
                                      vcf_filename, variant.CHROM,
                                      variant.POS)
                         raise SnpEffError
+                    else:
+                        logger.warning("%s, chr %s, pos %d - an "
+                                       "incorrect record",
+                                       vcf_filename, variant.CHROM,
+                                       variant.POS)
