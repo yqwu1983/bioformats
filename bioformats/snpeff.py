@@ -10,7 +10,7 @@ from collections import namedtuple
 from collections import OrderedDict
 from . import bed
 from .variants import allele_pair_iterator
-from .exception import SnpEffError
+from .exception import SnpEffError, BioformatsError
 from future.utils import iteritems
 
 logging.basicConfig()
@@ -427,7 +427,7 @@ def sample_effect_iterator(record):
 
 
 def convert_vcfeffect2bed(vcf_filename, bed_filename, impacts=None,
-                          genotypes=None):
+                          genotypes=None, ignore_errors=False):
     """
     Given an snpEff-annotated VCF file, convert its effect records to
     the BED file of the variant effect format.
@@ -436,10 +436,13 @@ def convert_vcfeffect2bed(vcf_filename, bed_filename, impacts=None,
     :param bed_filename: a name of an output BED file
     :param impacts: a set of impacts which variants are to be reported
     :param genotypes: a set of genotypes to be reported
+    :param ignore_errors: if a record contains an error, ignore it
+        and continue processing of the specified file
     :type vcf_filename: str
     :type bed_filename: str
     :type impacts: set
     :type genotypes: set
+    :type ignore_errors: bool
     """
     if impacts is None:
         impacts = {'HIGH', 'MODERATE', 'LOW', 'MODIFIER'}
@@ -450,53 +453,64 @@ def convert_vcfeffect2bed(vcf_filename, bed_filename, impacts=None,
         reader = vcf.Reader(vcf_file)
         with bed.Writer(bed_filename) as bed_file:
             for variant in reader:
-                for effect in sample_effect_iterator(variant):
-                    # skip reference homozygotes since they have no
-                    # associated effects
-                    if effect[5] == '-' and effect[6] == '-':
-                        continue
-                    # check the effect impact
-                    if not (sei.get(effect[5], 'NONE') in impacts or
-                            sei.get(effect[6], 'NONE') in impacts):
-                        continue
-                    # determine the reference allele
-                    if effect[0] == variant.REF:
-                        ref_allele_num = 1
-                    elif effect[1] == variant.REF:
-                        ref_allele_num = 2
-                    else:
-                        ref_allele_num = 0
-                    effect = effect + (ref_allele_num,)
-                    # check the current genotype
-                    if effect[-1] != 0 and 'REFHET' not in genotypes:
-                        # the current variant is heterozygous and one
-                        #  of its alleles is of the reference
-                        continue
-                    else:
-                        if effect[5] != effect[6]:
-                            if 'COMHET' not in genotypes:
-                                continue
+                try:
+                    for effect in sample_effect_iterator(variant):
+                        # skip reference homozygotes since they have no
+                        # associated effects
+                        if effect[5] == '-' and effect[6] == '-':
+                            continue
+                        # check the effect impact
+                        if not (sei.get(effect[5], 'NONE') in impacts
+                                or sei.get(effect[6], 'NONE') in
+                                impacts):
+                            continue
+                        # determine the reference allele
+                        if effect[0] == variant.REF:
+                            ref_allele_num = 1
+                        elif effect[1] == variant.REF:
+                            ref_allele_num = 2
                         else:
-                            if 'ALTHOM' not in genotypes:
-                                continue
-                    # check for an empty feature ID and add the
-                    # reference allele number
-                    effect = list(effect)
-                    if not effect[3]:
-                        effect[3] = 'NA'
-                    bed_line = bed.Record(
-                        seq=variant.CHROM,
-                        start=variant.POS - 1,
-                        end=variant.POS,
-                        name=None,
-                        score=None,
-                        strand=None,
-                        thick_start=None,
-                        thick_end=None,
-                        color=None,
-                        block_num=None,
-                        block_sizes=None,
-                        block_starts=None,
-                        extra=effect
-                    )
-                    bed_file.write(bed_line)
+                            ref_allele_num = 0
+                        effect = effect + (ref_allele_num,)
+                        # check the current genotype
+                        if effect[
+                            -1] != 0 and 'REFHET' not in genotypes:
+                            # the current variant is heterozygous and
+                            #  onemof its alleles is of the reference
+                            continue
+                        else:
+                            if effect[5] != effect[6]:
+                                if 'COMHET' not in genotypes:
+                                    continue
+                            else:
+                                if 'ALTHOM' not in genotypes:
+                                    continue
+                        # check for an empty feature ID and add the
+                        # reference allele number
+                        effect = list(effect)
+                        if not effect[3]:
+                            effect[3] = 'NA'
+                        bed_line = bed.Record(
+                            seq=variant.CHROM,
+                            start=variant.POS - 1,
+                            end=variant.POS,
+                            name=None,
+                            score=None,
+                            strand=None,
+                            thick_start=None,
+                            thick_end=None,
+                            color=None,
+                            block_num=None,
+                            block_sizes=None,
+                            block_starts=None,
+                            extra=effect
+                        )
+                        bed_file.write(bed_line)
+                except (IndexError, KeyError, ValueError,
+                        BioformatsError):
+                    if not ignore_errors:
+                        logger.error("%s, chr %s, pos %d - an "
+                                     "incorrect record",
+                                     vcf_filename, variant.CHROM,
+                                     variant.POS)
+                        raise SnpEffError

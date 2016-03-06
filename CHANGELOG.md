@@ -7,6 +7,8 @@ Changes
 analyzed from an input file.
 - **vcfeffect2bed**: report errors to an output file (useful for 
 checking whether all variant effects were successfully processed).
+- **vcfeffect2bed**: option `--ignore_errors` to continue input file 
+processing after encountered errors.
 - Test suite added for the `flanknfilter` tool.
 
 0.1.11

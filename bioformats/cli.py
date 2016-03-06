@@ -33,7 +33,7 @@ def bioformats():
     )
 
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s 0.1.12')
+                        version='%(prog)s 0.1.12.post1')
 
     subparsers = parser.add_subparsers(dest='command')
 
@@ -813,6 +813,8 @@ def vcfeffect2bed_parser(subparsers):
     parser.add_argument('-g', '--genotypes', nargs='+', choices=[
         'REFHET', 'COMHET', 'ALTHOM'], default={'REFHET', 'COMHET',
                                                 'ALTHOM'})
+    parser.add_argument('--ignore_errors', action='store_true',
+                        help="ignore errors in an input file")
 
 
 def vcfeffect2bed_launcher(args):
@@ -822,7 +824,8 @@ def vcfeffect2bed_launcher(args):
     try:
         snpeff.convert_vcfeffect2bed(args.vcf_file, args.output_file,
                                      impacts=args.impacts,
-                                     genotypes=args.genotypes)
+                                     genotypes=args.genotypes,
+                                     ignore_errors=args.ignore_errors)
     except (KeyError, exception.BioformatsError):
         # let a user know if something goes wrong
         with open(args.output_file, "a") as output_file:

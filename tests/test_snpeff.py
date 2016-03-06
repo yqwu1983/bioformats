@@ -31,6 +31,9 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
         self.__vcf_file_no_snpeff = os.path.join(
             'data', 'variants', 'multiallele_indels.vcf'
         )
+        self.__vcf_snpeff_incorrect = os.path.join(
+            'data', 'snpeff', 'snpeff_incorrect_annotation.vcf'
+        )
         self.__output = tempfile.NamedTemporaryFile().name
         # disable logging messages
         logging.disable(logging.ERROR)
@@ -110,6 +113,12 @@ class TestParseSnpEffAnnotation(unittest.TestCase):
                 'MODERATE'})
             for j in ('REFHET', 'COMHET', 'ALTHOM'):
                 convert_vcfeffect2bed(i, self.__output, genotypes={j})
+        # check if errors in an input file are ignored if required
+        with self.assertRaises(SnpEffError):
+            convert_vcfeffect2bed(self.__vcf_snpeff_incorrect,
+                                  self.__output)
+        convert_vcfeffect2bed(self.__vcf_snpeff_incorrect,
+                              self.__output, ignore_errors=True)
 
     def tearDown(self):
         if os.path.isfile(self.__output):
