@@ -18,6 +18,7 @@ from . import exception
 from . import repeatmasker
 from . import snpeff
 from . import variants
+from . import interval
 
 
 def bioformats():
@@ -53,7 +54,8 @@ def bioformats():
         'snpeff2bed': snpeff2bed_parser,
         'vcfgeno2bed': vcfgeno2bed_parser,
         'vcfeffect2bed': vcfeffect2bed_parser,
-        'flanknfilter': flanknfilter_parser
+        'flanknfilter': flanknfilter_parser,
+        'interval2bed': interval2bed_parser
     }
 
     for i in sorted(subparser_routines):
@@ -77,7 +79,8 @@ def bioformats():
         ('snpeff2bed', snpeff2bed_launcher),
         ('vcfgeno2bed', vcfgeno2bed_launcher),
         ('vcfeffect2bed', vcfeffect2bed_launcher),
-        ('flanknfilter', flanknfilter_launcher)
+        ('flanknfilter', flanknfilter_launcher),
+        ('interval2bed', interval2bed_launcher)
     ])
 
     launchers[args.command](args)
@@ -875,3 +878,24 @@ def flanknfilter_launcher(args):
     else:
         feature_filter.filter_vcf(args.input_file, args.output_file,
                                   args.strict)
+
+
+def interval2bed_parser(subparsers):
+    """
+    Parser for the interval2bed tool.
+    """
+    parser = subparsers.add_parser(
+        'interval2bed',
+        help='convert an interval file to the BED format',
+        description='Convert a file in the interval format to the '
+                    'BED format'
+    )
+    parser.add_argument('interval_file', help='an interval file')
+    parser.add_argument('bed_file', help='the output BED file')
+
+
+def interval2bed_launcher(args):
+    """
+    Launcher for the interval2bed tool.
+    """
+    interval.convert_interval2bed(args.interval_file, args.bed_file)

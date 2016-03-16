@@ -6,6 +6,7 @@
 
 from collections import namedtuple
 from .exception import IntervalError
+from . import bed
 import logging
 
 logging.basicConfig()
@@ -97,3 +98,34 @@ class Writer(object):
             self.__output.write('>{}\n'.format(self.__seq))
         self.__output.write('{} - {}\n'.format(interval_record.start,
                                                interval_record.end))
+
+
+def convert_interval2bed(interval_filename, bed_filename):
+    """
+    Convert a specified interval file to the BED format.
+
+    :param interval_filename: a name of an interval file
+    :param bed_filename: a name of the output BED file
+    :type interval_filename: str
+    :type bed_filename: str
+    """
+    with open(interval_filename) as input_file:
+        reader = Reader(input_file)
+        with bed.Writer(bed_filename) as writer:
+            for record in reader.intervals():
+                bed_record = bed.Record(
+                    seq=record.seq,
+                    start=record.start - 1,
+                    end=record.end,
+                    name=None,
+                    score=None,
+                    strand=None,
+                    thick_start=None,
+                    thick_end=None,
+                    color=None,
+                    block_num=None,
+                    block_sizes=None,
+                    block_starts=None,
+                    extra=[]
+                )
+                writer.write(bed_record)

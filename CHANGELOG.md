@@ -1,6 +1,11 @@
 Changes
 =======
 
+* 0.1.13
+--------
+- Tool `interval2bed` to convert interval files (e.g., WindowMasker 
+output) to the BED format.
+
 0.1.12
 --------
 - **bedautosql**: option `--lines` specifying the number of lines to be 
