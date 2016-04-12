@@ -1,0 +1,20 @@
+# AGP dumped from Genomic-Collection: Assembly Pan_troglodytes-2.1.4 Primary_Assembly
+# (Assembly accession = GCA_000000075.4, asm_id = 85193)
+# Chromosomes-from-Components
+##agp-version 2.0
+# Format: object object_beg object_end part_number component_type component_id component_beg component_end  orientation
+#   Gaps: object object_beg object_end part_number     N          gap_length   gap_type      linkage        evidence
+CM000314.2	1	77636	1	N	77636	telomere	no	na
+CM000314.2	77637	78679	2	W	AACZ03011355.1	1	1043	+
+CM000314.2	78680	83751	3	N	5072	contig	no	na
+CM000314.2	83752	84805	4	W	AACZ03011432.1	1	1054	+
+CM000314.2	84806	130090	5	N	45285	contig	no	na
+CM000314.2	130091	131636	6	W	AACZ03011187.1	1	1546	+
+CM000314.2	131637	132440	7	N	804	scaffold	yes	paired-ends
+CM000314.2	132441	135161	8	W	AACZ03011188.1	1	2721	+
+CM000314.2	135162	135171	9	N	10	scaffold	yes	paired-ends
+CM000314.2	135172	137383	10	W	AACZ03011189.1	1	2212	+
+CM000314.2	137384	138730	11	N	1347	scaffold	yes	paired-ends
+CM000314.2	138731	148135	12	W	AACZ03011190.1	1	9405	+
+CM000314.2	148136	149072	13	N	937	scaffold	yes	paired-ends
+CM000314.2	149073	151748	14	W	AACZ03011191.1	1	2676	+

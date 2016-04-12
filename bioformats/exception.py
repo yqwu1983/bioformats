@@ -106,3 +106,11 @@ class SnpEffError(BioformatsError):
     parsing.
     """
     pass
+
+
+class AgpError(BioformatsError):
+    """
+    This class describes an error related to the AGP processing
+    routines.
+    """
+    pass
