@@ -4,10 +4,11 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
+import bioformats
 from setuptools import setup, find_packages
 
 setup(name='bioformats',
-      version='0.1.12.post1',
+      version=bioformats.__version__,
       description='Classes to handle bioinformatics data',
 
       author='Gaik Tamazian',
