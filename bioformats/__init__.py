@@ -4,4 +4,4 @@
 # Copyright (C) 2015 by Gaik Tamazian
 # gaik (dot) tamazian (at) gmail (dot) com
 
-__version__ = "0.1.2.post1"
+__version__ = "0.1.4"
