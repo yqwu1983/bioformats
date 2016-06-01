@@ -8,6 +8,7 @@ import os
 import tempfile
 import unittest
 import bioformats.variants as variants
+import bioformats.bed
 import vcf
 
 path = os.path.dirname(__file__)
@@ -44,6 +45,14 @@ class TestVariantRoutines(unittest.TestCase):
                 for v in reader:
                     for _ in variants.allele_pair_iterator(v):
                         pass
+
+    def test_vcf2bed(self):
+        variants.vcf2bed(self.__input, self.__output)
+        # verify the obtained BED file
+        with open(self.__output) as bed_file:
+            bed_reader = bioformats.bed.Reader(bed_file)
+            for record in bed_reader.records():
+                self.assertIsInstance(record, bioformats.bed.Record)
 
     def tearDown(self):
         if os.path.isfile(self.__output):

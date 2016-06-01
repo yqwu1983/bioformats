@@ -7,6 +7,7 @@
 import logging
 import operator
 import vcf
+from .bed import Record, Writer
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -150,3 +151,34 @@ def allele_pair_iterator(record):
         allele_pairs.add(tuple(cur_alleles))
     for i in sorted(list(allele_pairs)):
         yield i
+
+
+def vcf2bed(vcf_filename, bed_filename):
+    """
+    Convert the specified VCF file to the BED format.
+
+    :param vcf_filename: a name of an input VCF file
+    :param bed_filename: a name of an output VCF file
+    :type vcf_filename: str
+    :type bed_filename: str
+    """
+    with open(vcf_filename) as vcf_file:
+        vcf_reader = vcf.Reader(vcf_file)
+        with Writer(bed_filename) as bed_writer:
+            for variant in vcf_reader:
+                bed_record = Record(
+                    seq=variant.CHROM,
+                    start=int(variant.POS) - 1,
+                    end=int(variant.POS) + len(variant.REF) - 1,
+                    name=None,
+                    score=None,
+                    strand=None,
+                    thick_start=None,
+                    thick_end=None,
+                    color=None,
+                    block_num=None,
+                    block_sizes=None,
+                    block_starts=None,
+                    extra=[]
+                )
+                bed_writer.write(bed_record)
