@@ -113,7 +113,7 @@ class Reader(object):
         if len(self.__line_parts) == 9:
             # parse the attributes
             attributes = OrderedDict()
-            for x in self.__line_parts[8].split(';'):
+            for x in self.__line_parts[8].strip(';').split(';'):
                 try:
                     tag, value = x.split('=', 2)
                 except ValueError:
